@@ -12,5 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineArgumentsParser" Version="3.0.18" />
+    <PackageReference Include="Cinegy.TsDecoder" Version="2.0.90" />
   </ItemGroup>
 </Project>

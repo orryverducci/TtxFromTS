@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Cinegy.TsDecoder.TransportStream;
 using CommandLineParser.Exceptions;
 
 namespace TtxFromTS
@@ -27,6 +28,40 @@ namespace TtxFromTS
             // Parse command line arguments, and run application if successful
             if (ParseArguments(args))
             {
+                // Open the input file
+                using (FileStream fileStream = _options.InputFile.OpenRead())
+                {
+                    // Setup transport stream decoder
+                    TsDecoder tsDecoder = new TsDecoder();
+                    TsPacketFactory packetFactory = new TsPacketFactory();
+                    // Setup count of packets processed and buffer for packet data
+                    int packetsProcessed = 0;
+                    byte[] data = new byte[1316];
+                    // Read the file in a loop until the end of the file
+                    while (fileStream.Read(data, 0, 1316) > 0)
+                    {
+                        // Retrieve transport stream packets from the data
+                        TsPacket[] packets = packetFactory.GetTsPacketsFromData(data);
+                        // If packets are returned add each packet to the TS decoder and increase the count of packets processed
+                        if (packets != null)
+                        {
+                            foreach (TsPacket packet in packets)
+                            {
+                                tsDecoder.AddPacket(packet);
+                                packetsProcessed++;
+                            }
+                        }
+                    }
+                    // If packets are processed, output the number processed, otherwise return an error
+                    if (packetsProcessed > 0)
+                    {
+                        Console.WriteLine($"Packets processed: {packetsProcessed}");
+                    }
+                    else
+                    {
+                        OutputError("Unable to process transport stream - please check it is a valid TS file");
+                    }
+                }
             }
         }
 
