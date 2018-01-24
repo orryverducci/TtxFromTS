@@ -48,8 +48,8 @@ namespace TtxFromTS
             try
             {
                 parser.ParseCommandLine(args);
-                // Return success
-                return true;
+                // Return success if arguments are given, otherwise return failure
+                return (args.Length > 0) ? true : false;
             }
             catch (Exception exception)
             {
