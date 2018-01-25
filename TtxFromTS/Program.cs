@@ -32,7 +32,6 @@ namespace TtxFromTS
                 using (FileStream fileStream = _options.InputFile.OpenRead())
                 {
                     // Setup transport stream decoder
-                    TsDecoder tsDecoder = new TsDecoder();
                     TsPacketFactory packetFactory = new TsPacketFactory();
                     // Setup count of packets processed and buffer for packet data
                     int packetsDecoded = 0;
@@ -53,7 +52,6 @@ namespace TtxFromTS
                                 // If packet is from the wanted identifier, pass it to the decoder and increase count of packets processed
                                 if (packet.Pid == _options.PacketIdentifier)
                                 {
-                                    tsDecoder.AddPacket(packet);
                                     packetsProcessed++;
                                 }
                             }
