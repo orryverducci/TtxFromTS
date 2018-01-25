@@ -35,6 +35,7 @@ namespace TtxFromTS
                     TsDecoder tsDecoder = new TsDecoder();
                     TsPacketFactory packetFactory = new TsPacketFactory();
                     // Setup count of packets processed and buffer for packet data
+                    int packetsDecoded = 0;
                     int packetsProcessed = 0;
                     byte[] data = new byte[1316];
                     // Read the file in a loop until the end of the file
@@ -42,20 +43,31 @@ namespace TtxFromTS
                     {
                         // Retrieve transport stream packets from the data
                         TsPacket[] packets = packetFactory.GetTsPacketsFromData(data);
-                        // If packets are returned add each packet to the TS decoder and increase the count of packets processed
+                        // If packets are returned, process them
                         if (packets != null)
                         {
                             foreach (TsPacket packet in packets)
                             {
-                                tsDecoder.AddPacket(packet);
-                                packetsProcessed++;
+                                // Increase count of packets decoded
+                                packetsDecoded++;
+                                // If packet is from the wanted identifier, pass it to the decoder and increase count of packets processed
+                                if (packet.Pid == _options.PacketIdentifier)
+                                {
+                                    tsDecoder.AddPacket(packet);
+                                    packetsProcessed++;
+                                }
                             }
                         }
                     }
                     // If packets are processed, output the number processed, otherwise return an error
                     if (packetsProcessed > 0)
                     {
+                        Console.WriteLine($"Total number of packets: {packetsDecoded}");
                         Console.WriteLine($"Packets processed: {packetsProcessed}");
+                    }
+                    else if (packetsDecoded > 0)
+                    {
+                        OutputError("Invalid packet identifier provided");
                     }
                     else
                     {
