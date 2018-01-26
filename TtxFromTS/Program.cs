@@ -16,6 +16,10 @@ namespace TtxFromTS
         /// The application options.
         /// </summary>
         private static Options _options = new Options();
+        /// <summary>
+        /// The teletext decoder.
+        /// </summary>
+        private static TeletextDecoder _teletextDecoder = new TeletextDecoder();
         #endregion
 
         #region Main Application Methods
@@ -52,6 +56,15 @@ namespace TtxFromTS
                                 // If packet is from the wanted identifier, pass it to the decoder and increase count of packets processed
                                 if (packet.Pid == _options.PacketIdentifier)
                                 {
+                                    try
+                                    {
+                                        _teletextDecoder.AddPacket(packet);
+                                    }
+                                    catch (InvalidOperationException)
+                                    {
+                                        OutputError("The provided packet identifier is not a teletext service");
+                                        return;
+                                    }
                                     packetsProcessed++;
                                 }
                             }
