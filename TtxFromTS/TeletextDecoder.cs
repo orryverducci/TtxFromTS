@@ -83,6 +83,12 @@ namespace TtxFromTS
                 // Check data unit contains non-subtitle teletext data and process it, otherwise ignore
                 if (_elementaryStreamPacket.Data[teletextPacketOffset] == 0x02)
                 {
+                    // Create array of bytes to contain teletext packet data
+                    byte[] teletextData = new byte[dataUnitLength];
+                    // Copy teletext packet data to array
+                    Buffer.BlockCopy(_elementaryStreamPacket.Data, teletextPacketOffset + 2, teletextData, 0, dataUnitLength);
+                    // Create teletext packet from data
+                    TeletextPacket teletextPacket = new TeletextPacket(teletextData);
                 }
                 // Increase offset to the next data unit
                 teletextPacketOffset += (dataUnitLength + 2);
