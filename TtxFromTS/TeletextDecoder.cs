@@ -17,7 +17,7 @@ namespace TtxFromTS
         /// Gets the teletext magazines.
         /// </summary>
         /// <value>The magazine.</value>
-        internal TeletextMagazine[] Magazine { get; private set; } = new TeletextMagazine[7];
+        internal TeletextMagazine[] Magazine { get; private set; } = new TeletextMagazine[8];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextDecoder"/> class.
