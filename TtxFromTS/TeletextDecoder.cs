@@ -14,6 +14,24 @@ namespace TtxFromTS
         private Pes _elementaryStreamPacket;
 
         /// <summary>
+        /// Gets the teletext magazines.
+        /// </summary>
+        /// <value>The magazine.</value>
+        internal TeletextMagazine[] Magazine { get; private set; } = new TeletextMagazine[7];
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextDecoder"/> class.
+        /// </summary>
+        internal TeletextDecoder()
+        {
+            // Create the magazines to decode packets in to
+            for (int i = 0; i < 8; i++)
+            {
+                Magazine[i] = new TeletextMagazine(i + 1);
+            }
+        }
+
+        /// <summary>
         /// Adds a transport stream packet to the teletext decoder.
         /// </summary>
         /// <param name="packet">The transport stream packet to be decoded.</param>
@@ -89,6 +107,11 @@ namespace TtxFromTS
                     Buffer.BlockCopy(_elementaryStreamPacket.Data, teletextPacketOffset + 2, teletextData, 0, dataUnitLength);
                     // Create teletext packet from data
                     TeletextPacket teletextPacket = new TeletextPacket(teletextData);
+                    // Check packet is free from errors, and if it is add it to its magazine
+                    if (!teletextPacket.DecodingError && teletextPacket.Magazine != null)
+                    {
+                        Magazine[(int)teletextPacket.Magazine].AddPacket(teletextPacket);
+                    }
                 }
                 // Increase offset to the next data unit
                 teletextPacketOffset += (dataUnitLength + 2);
