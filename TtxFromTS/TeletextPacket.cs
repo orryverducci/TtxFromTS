@@ -66,7 +66,8 @@ namespace TtxFromTS
                 DecodingError = true;
             }
             // Retrieve and decode magazine number
-            Magazine = Hamming.Decode84(packetData[2]);
+            byte address1 = Hamming.Decode84(packetData[2]);
+            Magazine = address1 & 0x07;
             // Check magazine number is valid, otherwise mark packet as containing errors, and change 0 to 8
             if (Magazine > 7)
             {
@@ -78,7 +79,8 @@ namespace TtxFromTS
                 Magazine = 8;
             }
             // Retrieve and decode packet number
-            Number = Hamming.Decode84(packetData[3]);
+            byte address2 = Hamming.Decode84(packetData[3]);
+            Number = (address1 >> 3) | (address2 << 1);
             // Check the packet number is valid, otherwise mark packet as containing errors, and set the packet type
             if (Number == 0)
             {
