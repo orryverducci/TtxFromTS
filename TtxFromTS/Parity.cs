@@ -16,7 +16,7 @@ namespace TtxFromTS
         internal static byte OddParity(byte encodedByte)
         {
             // Convert byte to an array of bits
-            BitArray bits = new BitArray(encodedByte);
+            BitArray bits = new BitArray(new byte[] { encodedByte });
             // Count the number of 1 bits
             int bitCount = 0;
             for (int i = 0; i < 8; i++)
