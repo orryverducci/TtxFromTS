@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TtxFromTS
 {
@@ -19,6 +20,12 @@ namespace TtxFromTS
         internal int Number { get; private set; }
 
         /// <summary>
+        /// Gets the list of teletext pages.
+        /// </summary>
+        /// <value>The list of teletext pages.</value>
+        internal List<TeletextPage> Pages { get; private set; } = new List<TeletextPage>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
         /// <param name="number">The magazine number.</param>
@@ -34,9 +41,25 @@ namespace TtxFromTS
         /// <param name="packet">The teletext packet to be added.</param>
         internal void AddPacket(TeletextPacket packet)
         {
-            // If packet is a header create a new page
+            // If packet is a header, save current page if valid, then create a new page
             if (packet.Type == TeletextPacket.PacketType.Header)
             {
+                // Check there is a current page, otherwise skip to creating new page
+                if (_currentPage != null)
+                {
+                    // Check the page number is valid and not an ehancement page
+                    if (_currentPage.Number.Substring(1, 1) != "F" && _currentPage.Subcode != "3F7F")
+                    {
+                        // Check if a page with the same number is already in the list
+                        TeletextPage existingPage = Pages.Find(x => (x.Number == _currentPage.Number) && (x.Subcode == _currentPage.Subcode));
+                        // If an existing page doesn't exist, add the current page to list of pages
+                        if (existingPage != null)
+                        {
+                            Pages.Add(_currentPage);
+                        }
+                    }
+                }
+                // Create new page
                 _currentPage = new TeletextPage { Magazine = Number };
             }
             // If a page is being decoded, add the packet to it
