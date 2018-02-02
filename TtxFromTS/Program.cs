@@ -115,7 +115,7 @@ namespace TtxFromTS
                 switch (exception)
                 {
                     case FileNotFoundException notFoundException: // Input file could not be found
-                        OutputError("ERROR: Input file could not be found");
+                        OutputError("Input file could not be found");
                         break;
                     case MandatoryArgumentNotSetException notSetException: // Required argument not provided
                         OutputError($"The {notSetException.Argument} argument is required");
