@@ -110,7 +110,7 @@ namespace TtxFromTS
                     // Check packet is free from errors, and if it is add it to its magazine
                     if (!teletextPacket.DecodingError && teletextPacket.Magazine != null)
                     {
-                        Magazine[(int)teletextPacket.Magazine].AddPacket(teletextPacket);
+                        Magazine[(int)teletextPacket.Magazine - 1].AddPacket(teletextPacket);
                     }
                 }
                 // Increase offset to the next data unit
