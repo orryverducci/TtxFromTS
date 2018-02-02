@@ -6,7 +6,7 @@ namespace TtxFromTS
     internal static class Parity
     {
         /// <summary>
-        /// Checks an odd parity encoded bit for errors, and returns the original value if there isn't any
+        /// Checks an odd parity encoded bit for errors, and returns the original value if there isn't any.
         /// </summary>
         /// <returns>The original parity byte if there is no errors, or 0x00 if there is.</returns>
         /// <param name="encodedByte">Encoded byte.</param>
