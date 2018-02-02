@@ -3,7 +3,7 @@
 namespace TtxFromTS
 {
     /// <summary>
-    /// Provides methods to decoded Hamming Code data
+    /// Provides methods to decode Hamming Code data.
     /// </summary>
     internal static class Hamming
     {
