@@ -77,7 +77,6 @@ namespace TtxFromTS
             {
                 Magazine = 8;
             }
-
             // Retrieve and decode packet number
             Number = Hamming.Decode84(packetData[3]);
             // Check the packet number is valid, otherwise mark packet as containing errors, and set the packet type
