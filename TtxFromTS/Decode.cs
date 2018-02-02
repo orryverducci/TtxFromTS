@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 
 namespace TtxFromTS
 {
     /// <summary>
-    /// Provides methods to decode Hamming Code data.
+    /// Provides methods to decode data.
     /// </summary>
-    internal static class Hamming
+    internal static class Decode
     {
         /// <summary>
         /// Lookup table of decoded bytes for each Hamming 8/4 encoded byte value.
@@ -30,7 +31,7 @@ namespace TtxFromTS
         };
 
         /// <summary>
-        /// Lookup table of bytes with the bit order reverse.
+        /// Lookup table of bytes with the bit order reversed.
         /// </summary>
         private static readonly byte[] _reverseByte = {
             0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0, 0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
@@ -56,10 +57,39 @@ namespace TtxFromTS
         /// </summary>
         /// <returns>Either the original encoded byte, or 0xff indicating an unrecoverable error.</returns>
         /// <param name="encodedByte">The Hamming encoded byte.</param>
-        internal static byte Decode84(byte encodedByte)
+        internal static byte Hamming84(byte encodedByte)
         {
             // Get decoded byte from the lookup table
             return _hamming84Table[_reverseByte[encodedByte]];
+        }
+
+        /// <summary>
+        /// Checks an odd parity encoded bit for errors, and returns the original value if there isn't any.
+        /// </summary>
+        /// <returns>The original parity byte if there is no errors, or 0x00 if there is.</returns>
+        /// <param name="encodedByte">The odd parity encoded byte.</param>
+        internal static byte OddParity(byte encodedByte)
+        {
+            // Convert byte to an array of bits
+            BitArray bits = new BitArray(new byte[] { encodedByte });
+            // Count the number of 1 bits
+            int bitCount = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                if (bits[i])
+                {
+                    bitCount++;
+                }
+            }
+            // If the number of 1 bits is odd, return the original value byte, otherwise return 0x00
+            if (bitCount % 2 != 0)
+            {
+                return (byte)(encodedByte & 0x7f);
+            }
+            else
+            {
+                return 0x00;
+            }
         }
     }
 }

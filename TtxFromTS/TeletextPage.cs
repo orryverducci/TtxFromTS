@@ -152,20 +152,20 @@ namespace TtxFromTS
             Number = pageNumber.Number;
             Subcode = pageNumber.Subcode;
             // Set control codes in byte 3 if it doesn't contain errors
-            byte controlByte1 = Hamming.Decode84(packet.Data[3]);
+            byte controlByte1 = Decode.Hamming84(packet.Data[3]);
             if (controlByte1 != 0xff)
             {
                 ErasePage = Convert.ToBoolean((byte)(controlByte1 >> 3));
             }
             // Set control codes in byte 5 if it doesn't contain errors
-            byte controlByte2 = Hamming.Decode84(packet.Data[5]);
+            byte controlByte2 = Decode.Hamming84(packet.Data[5]);
             if (controlByte2 != 0xff)
             {
                 Newsflash = Convert.ToBoolean((byte)((controlByte2 & 0x04) >> 2));
                 Subtitles = Convert.ToBoolean((byte)(controlByte2 >> 3));
             }
             // Set control codes in byte 6 if it doesn't contain errors
-            byte controlByte3 = Hamming.Decode84(packet.Data[6]);
+            byte controlByte3 = Decode.Hamming84(packet.Data[6]);
             if (controlByte3 != 0xff)
             {
                 SuppressHeader = Convert.ToBoolean((byte)(controlByte3 & 0x01));
@@ -174,7 +174,7 @@ namespace TtxFromTS
                 InhibitDisplay = Convert.ToBoolean((byte)((controlByte3 & 0x08) >> 3));
             }
             // Set control codes in byte 7 if it doesn't contain errors
-            byte controlByte4 = Hamming.Decode84(packet.Data[7]);
+            byte controlByte4 = Decode.Hamming84(packet.Data[7]);
             if (controlByte4 != 0xff)
             {
                 MagazineSerial = Convert.ToBoolean((byte)(controlByte4 & 0x01));
@@ -189,7 +189,7 @@ namespace TtxFromTS
             byte[] headerCharacters = new byte[packet.Data.Length - 8];
             for (int i = 8; i < packet.Data.Length; i++)
             {
-                headerCharacters[i - 8] = Parity.OddParity(packet.Data[i]);
+                headerCharacters[i - 8] = Decode.OddParity(packet.Data[i]);
             }
             Rows[0] = "        " + Encoding.ASCII.GetString(headerCharacters);
         }
@@ -203,7 +203,7 @@ namespace TtxFromTS
             byte[] characters = new byte[packet.Data.Length];
             for (int i = 0; i < packet.Data.Length; i++)
             {
-                characters[i] = Parity.OddParity(packet.Data[i]);
+                characters[i] = Decode.OddParity(packet.Data[i]);
             }
             Rows[(int)packet.Number] = Encoding.ASCII.GetString(characters);
         }
@@ -215,7 +215,7 @@ namespace TtxFromTS
         private void DecodeLinkedPages(TeletextPacket packet)
         {
             // Check the designation code is 0, otherwise ignore packet
-            if (Hamming.Decode84(packet.Data[0]) == 0)
+            if (Decode.Hamming84(packet.Data[0]) == 0)
             {
                 // Set the offset for the link bytes, starting at byte 1
                 int linkOffset = 1;
@@ -228,8 +228,8 @@ namespace TtxFromTS
                     // Decode page number and subcode
                     (string Number, string Subcode) pageNumber = DecodePageNumber(linkData);
                     // Get bytes containing magazine number bits
-                    byte magazineByte1 = Hamming.Decode84(packet.Data[3]);
-                    byte magazineByte2 = Hamming.Decode84(packet.Data[5]);
+                    byte magazineByte1 = Decode.Hamming84(packet.Data[3]);
+                    byte magazineByte2 = Decode.Hamming84(packet.Data[5]);
                     // If the magazine bytes don't contain errors, decode the magazine number and add to link page number, otherwise add current magazine
                     if (magazineByte1 != 0xff && magazineByte2 != 0xff)
                     {
@@ -246,7 +246,7 @@ namespace TtxFromTS
                     linkOffset += 6;
                 }
                 // Check if link control byte has errors, and set if row 24 should be hidden if it hasn't
-                byte linkControl = Hamming.Decode84(packet.Data[linkOffset]);
+                byte linkControl = Decode.Hamming84(packet.Data[linkOffset]);
                 if (linkControl != 0xff)
                 {
                     DisplayRow24 = Convert.ToBoolean((byte)(linkControl >> 3));
@@ -260,18 +260,18 @@ namespace TtxFromTS
             string number = "FF";
             string subcode = "3F7F";
             // Decode page number digits
-            byte pageUnits = Hamming.Decode84(pageNumberData[0]);
-            byte pageTens = Hamming.Decode84(pageNumberData[1]);
+            byte pageUnits = Decode.Hamming84(pageNumberData[0]);
+            byte pageTens = Decode.Hamming84(pageNumberData[1]);
             // If page number digits don't contain errors, set page number
             if (pageUnits != 0xff && pageTens != 0xff)
             {
                 number = ((pageTens << 4) | pageUnits).ToString("x2");
             }
             // Decode subcode bytes
-            byte subcode1 = Hamming.Decode84(pageNumberData[2]);
-            byte subcode2 = Hamming.Decode84(pageNumberData[3]);
-            byte subcode3 = Hamming.Decode84(pageNumberData[4]);
-            byte subcode4 = Hamming.Decode84(pageNumberData[5]);
+            byte subcode1 = Decode.Hamming84(pageNumberData[2]);
+            byte subcode2 = Decode.Hamming84(pageNumberData[3]);
+            byte subcode3 = Decode.Hamming84(pageNumberData[4]);
+            byte subcode4 = Decode.Hamming84(pageNumberData[5]);
             // If subcode bytes don't contain errors and are valid, set the subcode and the included control bits
             if (subcode1 != 0xff && subcode2 != 0xff && subcode3 != 0xff && subcode4 != 0xff)
             {
