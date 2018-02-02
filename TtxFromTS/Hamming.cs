@@ -32,7 +32,7 @@ namespace TtxFromTS
         /// <summary>
         /// Decodes Hamming 8/4 byte back to original value byte.
         /// </summary>
-        /// <returns>Either the original encoded byte, or 0xff indicating an unrecoverable error</returns>
+        /// <returns>Either the original encoded byte, or 0xff indicating an unrecoverable error.</returns>
         /// <param name="encodedByte">The Hamming encoded byte.</param>
         internal static byte Decode84(byte encodedByte)
         {
