@@ -104,7 +104,7 @@ namespace TtxFromTS
         /// Gets the linked pages
         /// </summary>
         /// <value>The linked page numbers and shortcodes.</value>
-        internal (string Number, string Subcode)[] Links { get; private set; } = new (string Number, string Subcode)[5];
+        internal (string Number, string Subcode)[] Links { get; private set; } = new (string Number, string Subcode)[6];
 
         /// <summary>
         /// Gets if row 24 should be displayed.
@@ -219,8 +219,8 @@ namespace TtxFromTS
             {
                 // Set the offset for the link bytes, starting at byte 1
                 int linkOffset = 1;
-                // Retrieve the 5 links
-                for (int i = 0; i < 5; i++)
+                // Retrieve the 6 links
+                for (int i = 0; i < 6; i++)
                 {
                     // Extract link data from packet
                     byte[] linkData = new byte[6];
