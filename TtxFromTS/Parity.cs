@@ -3,6 +3,9 @@ using System.Collections;
 
 namespace TtxFromTS
 {
+    /// <summary>
+    /// Provides methods to decode data with parity bits.
+    /// </summary>
     internal static class Parity
     {
         /// <summary>
