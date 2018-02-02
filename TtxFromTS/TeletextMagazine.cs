@@ -53,7 +53,7 @@ namespace TtxFromTS
                         // Check if a page with the same number is already in the list
                         TeletextPage existingPage = Pages.Find(x => (x.Number == _currentPage.Number) && (x.Subcode == _currentPage.Subcode));
                         // If an existing page doesn't exist, add the current page to list of pages
-                        if (existingPage != null)
+                        if (existingPage == null)
                         {
                             Pages.Add(_currentPage);
                         }
