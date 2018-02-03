@@ -228,12 +228,12 @@ namespace TtxFromTS
                     // Decode page number and subcode
                     (string Number, string Subcode) pageNumber = DecodePageNumber(linkData);
                     // Get bytes containing magazine number bits
-                    byte magazineByte1 = Decode.Hamming84(packet.Data[3]);
-                    byte magazineByte2 = Decode.Hamming84(packet.Data[5]);
+                    byte magazineByte1 = Decode.Hamming84(packet.Data[linkOffset + 3]);
+                    byte magazineByte2 = Decode.Hamming84(packet.Data[linkOffset + 5]);
                     // If the magazine bytes don't contain errors, decode the magazine number and add to link page number, otherwise add current magazine
                     if (magazineByte1 != 0xff && magazineByte2 != 0xff)
                     {
-                        byte magazineNumber = (byte)(((magazineByte1 >> 3) & ((magazineByte2 & 0x0C) >> 1) ^ Magazine));
+                        byte magazineNumber = (byte)(((magazineByte1 >> 3) | ((magazineByte2 & 0x0C) >> 1) ^ Magazine));
                         pageNumber.Number = magazineNumber.ToString("x1") + pageNumber.Number;
                     }
                     else
