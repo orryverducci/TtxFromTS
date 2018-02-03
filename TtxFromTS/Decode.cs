@@ -66,7 +66,7 @@ namespace TtxFromTS
         /// <summary>
         /// Checks an odd parity encoded bit for errors, and returns the original value if there isn't any.
         /// </summary>
-        /// <returns>The original parity byte if there is no errors, or 0x00 if there is.</returns>
+        /// <returns>The original value byte if there is no errors, or 0x20 (i.e. a space) if there is.</returns>
         /// <param name="encodedByte">The odd parity encoded byte.</param>
         internal static byte OddParity(byte encodedByte)
         {
@@ -88,7 +88,7 @@ namespace TtxFromTS
             }
             else
             {
-                return 0x00;
+                return 0x20;
             }
         }
     }
