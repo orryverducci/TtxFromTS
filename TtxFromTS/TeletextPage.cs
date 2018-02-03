@@ -190,6 +190,11 @@ namespace TtxFromTS
             for (int i = 8; i < packet.Data.Length; i++)
             {
                 headerCharacters[i - 8] = Decode.OddParity(packet.Data[i]);
+                // If character is null (i.e. it had errors), replace with a space
+                if (headerCharacters[i - 8] == 0x00)
+                {
+                    headerCharacters[i - 8] = 0x20;
+                }
             }
             Rows[0] = "        " + Encoding.ASCII.GetString(headerCharacters);
         }
@@ -204,6 +209,11 @@ namespace TtxFromTS
             for (int i = 0; i < packet.Data.Length; i++)
             {
                 characters[i] = Decode.OddParity(packet.Data[i]);
+                // If character is null (i.e. it had errors), replace with a space
+                if (characters[i] == 0x00)
+                {
+                    characters[i] = 0x20;
+                }
             }
             Rows[(int)packet.Number] = Encoding.ASCII.GetString(characters);
         }
