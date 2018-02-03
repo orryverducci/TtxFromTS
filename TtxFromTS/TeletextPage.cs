@@ -275,7 +275,7 @@ namespace TtxFromTS
             // If page number digits don't contain errors, set page number
             if (pageUnits != 0xff && pageTens != 0xff)
             {
-                number = ((pageTens << 4) | pageUnits).ToString("x2");
+                number = ((pageTens << 4) | pageUnits).ToString("X2");
             }
             // Decode subcode bytes
             byte subcode1 = Decode.Hamming84(pageNumberData[2]);
