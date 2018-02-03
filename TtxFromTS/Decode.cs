@@ -84,7 +84,7 @@ namespace TtxFromTS
             // If the number of 1 bits is odd, return the original value byte, otherwise return 0x00
             if (bitCount % 2 != 0)
             {
-                return (byte)(encodedByte & 0x7f);
+                return (byte)(_reverseByte[encodedByte] & 0x7f);
             }
             else
             {
