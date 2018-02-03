@@ -104,7 +104,7 @@ namespace TtxFromTS
         /// Gets the linked pages
         /// </summary>
         /// <value>The linked page numbers and shortcodes.</value>
-        internal (string Number, string Subcode)[] Links { get; private set; } = new (string Number, string Subcode)[6];
+        internal (string Number, string Subcode)[] Links { get; private set; }
 
         /// <summary>
         /// Gets if row 24 should be displayed.
@@ -227,6 +227,8 @@ namespace TtxFromTS
             // Check the designation code is 0, otherwise ignore packet
             if (Decode.Hamming84(packet.Data[0]) == 0)
             {
+                // Initialise links property
+                Links = new (string Number, string Subcode)[6];
                 // Set the offset for the link bytes, starting at byte 1
                 int linkOffset = 1;
                 // Retrieve the 6 links
