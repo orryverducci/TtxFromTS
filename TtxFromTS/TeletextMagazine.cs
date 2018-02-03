@@ -60,7 +60,7 @@ namespace TtxFromTS
                 if (_currentPage != null)
                 {
                     // Check the page number is valid and not an ehancement page
-                    if (_currentPage.Number.Substring(1, 1) != "F" && _currentPage.Subcode != "3F7F")
+                    if (_currentPage.Number.Substring(0, 1) != "F" && _currentPage.Subcode != "3F7F")
                     {
                         // Check if a page with the same number is already in the list
                         TeletextPage existingPage = Pages.Find(x => (x.Number == _currentPage.Number) && (x.Subcode == _currentPage.Subcode));
