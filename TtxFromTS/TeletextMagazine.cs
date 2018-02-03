@@ -26,6 +26,18 @@ namespace TtxFromTS
         internal List<TeletextPage> Pages { get; private set; } = new List<TeletextPage>();
 
         /// <summary>
+        /// Gets the total pages, including subpages, within the magazine.
+        /// </summary>
+        /// <value>The total number of pages.</value>
+        internal int TotalPages
+        {
+            get
+            {
+                return Pages.Count;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
         /// <param name="number">The magazine number.</param>

@@ -20,6 +20,23 @@ namespace TtxFromTS
         internal TeletextMagazine[] Magazine { get; private set; } = new TeletextMagazine[8];
 
         /// <summary>
+        /// Gets the total pages, including subpages, within the teletext service.
+        /// </summary>
+        /// <value>The total number of pages.</value>
+        internal int TotalPages
+        {
+            get
+            {
+                int count = 0;
+                foreach (var magazine in Magazine)
+                {
+                    count += magazine.TotalPages;
+                }
+                return count;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextDecoder"/> class.
         /// </summary>
         internal TeletextDecoder()

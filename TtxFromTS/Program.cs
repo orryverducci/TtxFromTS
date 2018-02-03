@@ -75,6 +75,7 @@ namespace TtxFromTS
                     {
                         Console.WriteLine($"Total number of packets: {packetsDecoded}");
                         Console.WriteLine($"Packets processed: {packetsProcessed}");
+                        Console.WriteLine($"Pages decoded: {_teletextDecoder.TotalPages}");
                     }
                     else if (packetsDecoded > 0)
                     {
