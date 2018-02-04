@@ -202,7 +202,7 @@ namespace TtxFromTS
                                 // Write region code
                                 streamWriter.WriteLine("RE,0");
                                 // Write header
-                                streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(page.Rows[0].Substring(7))}");
+                                streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(page.Rows[0].Substring(8))}");
                                 // Loop through each page row
                                 for (int i = 1; i < page.Rows.Length; i++)
                                 {
