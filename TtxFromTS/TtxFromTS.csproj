@@ -9,6 +9,7 @@
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType></DebugType>
+    <RuntimeIdentifiers>win-x86;win-x64;osx-x64;ubuntu-x64;debian-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineArgumentsParser" Version="3.0.18" />
