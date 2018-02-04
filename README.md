@@ -38,11 +38,15 @@ The current limitations are:
 * The packet identifier (PID) of the specific teletext service must be known. If you do not know it you can use another application such as [DVB Inspector](http://www.digitalekabeltelevisie.nl/dvb_inspector/) or TransEdit to find it.
 * Pages containing subtitles are deliberately ignored.
 * The location of the outputted files can't be changed. If you are outputting multiple services from the same transport stream, you will have to move or rename the output directory after each one to ensure they're not mixed together.
-* Subpages within a carousel are currenly outputted as individual files, instead of combining them in to one file.
 * The cycle time for subpages is currently fixed to 10 seconds.
 * The application has primarily been designed for teletext services trasmitted in parallel. Services that use serial transmission will still be decoded, but there is a chance the last transmitted page of the magazine may be missed.
 * Fastext links pointing to specific subpages currently point to only the page number, ignoring the subpage.
 * This application does not output a vbit2 configuration file. You will need to create one to use the outputted services with vbit2.
+
+Known issues
+------------
+
+* Subpages within a carousel are currenly outputted as individual files, instead of combining them in to one file. This causes an incompatibility with vbit, in which all the subpages of a page are transmitted together sequentially, instead of following the cycle time.
 
 I've found a problem
 --------------------
