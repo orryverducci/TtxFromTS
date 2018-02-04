@@ -178,7 +178,7 @@ namespace TtxFromTS
             if (controlByte4 != 0xff)
             {
                 MagazineSerial = Convert.ToBoolean((byte)(controlByte4 & 0x01));
-                int characterSubset = controlByte4 >> 1;
+                int characterSubset = (controlByte4 >> 3) | ((controlByte4 & 0x04) >> 1) | ((controlByte4 & 0x02) << 1);
                 // Set character subset if a valid option is given, otherwise leave as default
                 if (characterSubset < 7)
                 {
