@@ -36,6 +36,7 @@ Currently there are a number of limitations this application is bound by. These 
 The current limitations are:
 
 * The packet identifier (PID) of the specific teletext service must be known. If you do not know it you can use another application such as [DVB Inspector](http://www.digitalekabeltelevisie.nl/dvb_inspector/) or TransEdit to find it.
+* Only full level one facilities are currently decoded. Level 2.5+ enhancement data is not decoded.
 * Pages containing subtitles are deliberately ignored.
 * The location of the outputted files can't be changed. If you are outputting multiple services from the same transport stream, you will have to move or rename the output directory after each one to ensure they're not mixed together.
 * The cycle time for subpages is currently fixed to 10 seconds.
