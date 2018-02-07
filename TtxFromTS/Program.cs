@@ -135,6 +135,9 @@ namespace TtxFromTS
                     case CommandLineFormatException formatException: // Short argument used with two dashes
                         OutputError("Short arguments must be prefixed with a single '-' character");
                         break;
+                    case CommandLineArgumentOutOfRangeException rangeException: // Short argument used with two dashes
+                        OutputError($"The value for {rangeException.Argument} is outside the valid range");
+                        break;
                     default:
                         throw exception;
                 }
@@ -178,7 +181,7 @@ namespace TtxFromTS
                                 // Write source file
                                 streamWriter.WriteLine($"SP,{_options.InputFile}");
                                 // Write cycle time
-                                streamWriter.WriteLine("CT,10,T");
+                                streamWriter.WriteLine($"CT,{_options.CycleTime},T");
                                 // Write page number
                                 streamWriter.WriteLine($"PN,{magazine.Number}{page.Number}{page.Subcode.Substring(2)}");
                                 // Write subcode

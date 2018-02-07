@@ -22,5 +22,12 @@ namespace TtxFromTS
         /// <value>The packet identifier.</value>
         [ValueArgument(typeof(int), "pid", Description = "Packet identifier of the Teletext service to decode", Optional = false)]
         public int PacketIdentifier { get; set; }
+
+        /// <summary>
+        /// Gets or sets the packet identifier.
+        /// </summary>
+        /// <value>The packet identifier.</value>
+        [BoundedValueArgument(typeof(int), "cycle", Description = "Sets the cycle time to be used between each subpage", DefaultValue = 10, MinValue = 1)]
+        public int CycleTime { get; set; }
     }
 }
