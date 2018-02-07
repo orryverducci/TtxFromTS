@@ -115,8 +115,6 @@ namespace TtxFromTS
             try
             {
                 parser.ParseCommandLine(args);
-                // Return success if arguments are given, otherwise return failure
-                return (args.Length > 0) ? true : false;
             }
             catch (Exception exception)
             {
@@ -144,6 +142,32 @@ namespace TtxFromTS
                 // Return failure
                 return false;
             }
+            // If output directory has been given, check it is valid, output error if it isn't
+            if (_options.OutputPath != null && _options.OutputPath != string.Empty)
+            {
+                try
+                {
+                    DirectoryInfo outputDirectory = new DirectoryInfo(_options.OutputPath);
+                }
+                catch (Exception exception)
+                {
+                    switch (exception)
+                    {
+                        case ArgumentException argumentException: // Characters are invalid
+                            OutputError("The output directory contains invalid characters");
+                            break;
+                        case PathTooLongException lengthException: // Path is too long
+                            OutputError("The output directory path is too long");
+                            break;
+                        default:
+                            throw exception;
+                    }
+                    // Return failure
+                    return false;
+                }
+            }
+            // Return success if arguments are given, otherwise return failure
+            return (args.Length > 0) ? true : false;
         }
 
         /// <summary>
@@ -151,8 +175,16 @@ namespace TtxFromTS
         /// </summary>
         private static void OutputPages()
         {
-            // Get the output directory name from the input filename
-            string directoryName = _options.InputFile.Name.Substring(0, _options.InputFile.Name.LastIndexOf('.'));
+            // Use provided output directory, or get the output directory name from the input filename if not provided
+            string directoryName;
+            if (_options.OutputPath != null && _options.OutputPath != string.Empty)
+            {
+                directoryName = _options.OutputPath;
+            }
+            else
+            {
+                directoryName = _options.InputFile.Name.Substring(0, _options.InputFile.Name.LastIndexOf('.'));
+            }
             // Create the directory to store the pages in
             DirectoryInfo outputDirectory = Directory.CreateDirectory(directoryName);
             // Loop through each magazine to retrieve pages, if any
