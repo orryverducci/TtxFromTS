@@ -136,6 +136,9 @@ namespace TtxFromTS
                     case CommandLineArgumentOutOfRangeException rangeException: // Short argument used with two dashes
                         OutputError($"The value for {rangeException.Argument} is outside the valid range");
                         break;
+                    case TargetInvocationException invocationException: // Short argument used with two dashes
+                        OutputError("The values for one or more arguments are invalid");
+                        break;
                     default:
                         throw exception;
                 }
