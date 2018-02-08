@@ -21,7 +21,7 @@ namespace TtxFromTS
         /// <summary>
         /// The teletext decoder.
         /// </summary>
-        private static TeletextDecoder _teletextDecoder = new TeletextDecoder();
+        private static TeletextDecoder _teletextDecoder;
         #endregion
 
         #region Main Application Methods
@@ -34,6 +34,8 @@ namespace TtxFromTS
             // Parse command line arguments, and run application if successful
             if (ParseArguments(args))
             {
+                // Setup decoder
+                _teletextDecoder = new TeletextDecoder { EnableSubtitles = _options.IncludeSubtitles };
                 // Open the input file
                 using (FileStream fileStream = _options.InputFile.OpenRead())
                 {

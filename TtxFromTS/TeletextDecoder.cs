@@ -20,6 +20,12 @@ namespace TtxFromTS
         internal TeletextMagazine[] Magazine { get; private set; } = new TeletextMagazine[8];
 
         /// <summary>
+        /// Gets and sets if subtitle pages should be decoded.
+        /// </summary>
+        /// <value><c>true</c> if subtitles should be decoded, <c>false</c> if not.</value>
+        internal bool EnableSubtitles { get; set; } = false;
+
+        /// <summary>
         /// Gets the total pages, including subpages, within the teletext service.
         /// </summary>
         /// <value>The total number of pages.</value>
@@ -115,8 +121,8 @@ namespace TtxFromTS
             {
                 // Get length of data unit
                 int dataUnitLength = _elementaryStreamPacket.Data[teletextPacketOffset + 1];
-                // Check data unit contains non-subtitle teletext data and process it, otherwise ignore
-                if (_elementaryStreamPacket.Data[teletextPacketOffset] == 0x02)
+                // Check data unit contains non-subtitle teletext data, or contains subtitles teletext data if subtitles are enabled, otherwise ignore
+                if (_elementaryStreamPacket.Data[teletextPacketOffset] == 0x02 || (EnableSubtitles && _elementaryStreamPacket.Data[teletextPacketOffset] == 0x03))
                 {
                     // Create array of bytes to contain teletext packet data
                     byte[] teletextData = new byte[dataUnitLength];

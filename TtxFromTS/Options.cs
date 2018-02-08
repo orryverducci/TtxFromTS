@@ -36,5 +36,12 @@ namespace TtxFromTS
         /// <value>The output path.</value>
         [ValueArgument(typeof(string), 'o', "output", Description = "Sets the output directory")]
         public string OutputPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets if outputting subtitle pages should be enabled.
+        /// </summary>
+        /// <value><c>true</c> if subtitles should be outputted, <c>false</c> if not.</value>
+        [SwitchArgument("include-subs", false, Description = "Enables the output of subtitle pages")]
+        public bool IncludeSubtitles { get; set; }
     }
 }
