@@ -24,16 +24,16 @@ namespace TtxFromTS
         public int PacketIdentifier { get; set; }
 
         /// <summary>
-        /// Gets or sets the packet identifier.
+        /// Gets or sets the cycle time.
         /// </summary>
-        /// <value>The packet identifier.</value>
+        /// <value>The cycle time in seconds.</value>
         [BoundedValueArgument(typeof(int), "cycle", Description = "Sets the cycle time to be used between each subpage", DefaultValue = 10, MinValue = 1)]
         public int CycleTime { get; set; }
 
         /// <summary>
-        /// Gets or sets the packet identifier.
+        /// Gets or sets the output path.
         /// </summary>
-        /// <value>The packet identifier.</value>
+        /// <value>The output path.</value>
         [ValueArgument(typeof(string), 'o', "output", Description = "Sets the output directory")]
         public string OutputPath { get; set; }
     }
