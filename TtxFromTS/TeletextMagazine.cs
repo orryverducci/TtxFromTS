@@ -23,10 +23,10 @@ namespace TtxFromTS
         /// Gets the list of teletext pages.
         /// </summary>
         /// <value>The list of teletext pages.</value>
-        internal List<TeletextPage> Pages { get; private set; } = new List<TeletextPage>();
+        internal List<TeletextCarousel> Pages { get; private set; } = new List<TeletextCarousel>();
 
         /// <summary>
-        /// Gets the total pages, including subpages, within the magazine.
+        /// Gets the total number of pages within the magazine.
         /// </summary>
         /// <value>The total number of pages.</value>
         internal int TotalPages
@@ -62,12 +62,18 @@ namespace TtxFromTS
                     // Check the page number is valid and not an ehancement page
                     if (_currentPage.Number.Substring(0, 1) != "F" && _currentPage.Subcode != "3F7F")
                     {
-                        // Check if a page with the same number is already in the list
-                        TeletextPage existingPage = Pages.Find(x => (x.Number == _currentPage.Number) && (x.Subcode == _currentPage.Subcode));
-                        // If an existing page doesn't exist, add the current page to list of pages
-                        if (existingPage == null)
+                        // Check if a carousel with the page number exists
+                        TeletextCarousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
+                        // If the carousel exists, add the page to it, otherwise create a carousel and add the page
+                        if (existingCarousel == null)
                         {
-                            Pages.Add(_currentPage);
+                            TeletextCarousel carousel = new TeletextCarousel { Number = _currentPage.Number };
+                            carousel.AddPage(_currentPage);
+                            Pages.Add(carousel);
+                        }
+                        else
+                        {
+                            existingCarousel.AddPage(_currentPage);
                         }
                     }
                 }

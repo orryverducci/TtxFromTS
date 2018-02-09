@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cinegy.TsDecoder.TransportStream;
@@ -199,12 +200,12 @@ namespace TtxFromTS
                 if (magazine.TotalPages > 0)
                 {
                     // Loop through each page and output it
-                    foreach (TeletextPage page in magazine.Pages)
+                    foreach (TeletextCarousel carousel in magazine.Pages)
                     {
                         // Output to the console the page being outputted
-                        Console.WriteLine($"Outputting P{page.Magazine}{page.Number} subpage {page.Subcode}");
+                        Console.WriteLine($"Outputting P{magazine.Number}{carousel.Number}");
                         // Set output file path
-                        string filePath = outputDirectory.FullName + Path.DirectorySeparatorChar + "P" + magazine.Number + page.Number + "-S" + page.Subcode + ".tti";
+                        string filePath = outputDirectory.FullName + Path.DirectorySeparatorChar + "P" + magazine.Number + carousel.Number + ".tti";
                         // Check file doesn't already exist, and output warning if it does
                         if (!File.Exists(filePath))
                         {
@@ -219,49 +220,53 @@ namespace TtxFromTS
                                 streamWriter.WriteLine($"SP,{_options.InputFile}");
                                 // Write cycle time
                                 streamWriter.WriteLine($"CT,{_options.CycleTime},T");
-                                // Write page number
-                                streamWriter.WriteLine($"PN,{magazine.Number}{page.Number}{page.Subcode.Substring(2)}");
-                                // Write subcode
-                                streamWriter.WriteLine($"SC,{page.Subcode}");
-                                // Create page status bits
-                                BitArray statusBits = new BitArray(16);
-                                // Set status bits
-                                statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
-                                statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
-                                statusBits[2] = page.MagazineSerial; // Magazine serial
-                                statusBits[7] = true; // Transmit page
-                                statusBits[8] = page.Newsflash; // Newsflash
-                                statusBits[9] = page.Subtitles; // Subtitle
-                                statusBits[10] = page.SuppressHeader; // Suppress Header
-                                statusBits[13] = page.InhibitDisplay; // Inhibit Display
-                                statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
-                                // Write page status
-                                byte[] statusBytes = new byte[2];
-                                statusBits.CopyTo(statusBytes, 0);
-                                streamWriter.WriteLine($"PS,{BitConverter.ToString(statusBytes).Replace("-", "")}");
-                                // Write region code
-                                streamWriter.WriteLine("RE,0");
-                                // Write header
-                                streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(page.Rows[0].Substring(8))}");
-                                // Loop through each page row
-                                for (int i = 1; i < page.Rows.Length; i++)
+                                // Loop through each subpage in order of subcode, writing each one
+                                foreach (TeletextPage page in carousel.Pages.OrderBy(x => x.Number).ToList())
                                 {
-                                    // Write the row if it contains data, otherwise skip it
-                                    if (page.Rows[i] != null)
+                                    // Write page number
+                                    streamWriter.WriteLine($"PN,{magazine.Number}{page.Number}{page.Subcode.Substring(2)}");
+                                    // Write subcode
+                                    streamWriter.WriteLine($"SC,{page.Subcode}");
+                                    // Create page status bits
+                                    BitArray statusBits = new BitArray(16);
+                                    // Set status bits
+                                    statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
+                                    statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
+                                    statusBits[2] = page.MagazineSerial; // Magazine serial
+                                    statusBits[7] = true; // Transmit page
+                                    statusBits[8] = page.Newsflash; // Newsflash
+                                    statusBits[9] = page.Subtitles; // Subtitle
+                                    statusBits[10] = page.SuppressHeader; // Suppress Header
+                                    statusBits[13] = page.InhibitDisplay; // Inhibit Display
+                                    statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
+                                                                                                                               // Write page status
+                                    byte[] statusBytes = new byte[2];
+                                    statusBits.CopyTo(statusBytes, 0);
+                                    streamWriter.WriteLine($"PS,{BitConverter.ToString(statusBytes).Replace("-", "")}");
+                                    // Write region code
+                                    streamWriter.WriteLine("RE,0");
+                                    // Write header
+                                    streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(page.Rows[0].Substring(8))}");
+                                    // Loop through each page row
+                                    for (int i = 1; i < page.Rows.Length; i++)
                                     {
-                                        streamWriter.WriteLine($"OL,{i},{EncodeText(page.Rows[i])}");
+                                        // Write the row if it contains data, otherwise skip it
+                                        if (page.Rows[i] != null)
+                                        {
+                                            streamWriter.WriteLine($"OL,{i},{EncodeText(page.Rows[i])}");
+                                        }
                                     }
-                                }
-                                // Write fastext links, if page has them
-                                if (page.Links != null)
-                                {
-                                    streamWriter.Write($"FL,{page.Links[0].Number},{page.Links[1].Number},{page.Links[2].Number},{page.Links[3].Number},{page.Links[4].Number},{page.Links[5].Number}");
+                                    // Write fastext links, if page has them
+                                    if (page.Links != null)
+                                    {
+                                        streamWriter.WriteLine($"FL,{page.Links[0].Number},{page.Links[1].Number},{page.Links[2].Number},{page.Links[3].Number},{page.Links[4].Number},{page.Links[5].Number}");
+                                    }
                                 }
                             }
                         }
                         else
                         {
-                            OutputWarning($"P{magazine.Number}{page.Number}-S{page.Subcode}.tti already exists - skipping page");
+                            OutputWarning($"P{magazine.Number}{carousel.Number}.tti already exists - skipping page");
                         }
                     }
                 }
