@@ -13,6 +13,7 @@ namespace TtxFromTS
             PageBody,
             Fastext,
             LinkedPages,
+            BroadcastServiceData,
             Unspecified
         }
 
@@ -97,6 +98,10 @@ namespace TtxFromTS
             else if (Number == 27)
             {
                 Type = PacketType.LinkedPages;
+            }
+            else if (Number == 30 && Magazine == 8)
+            {
+                Type = PacketType.BroadcastServiceData;
             }
             if (Number > 31)
             {
