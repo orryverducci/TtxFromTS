@@ -274,7 +274,7 @@ namespace TtxFromTS
             byte subcode2 = Decode.Hamming84(pageNumberData[3]);
             byte subcode3 = Decode.Hamming84(pageNumberData[4]);
             byte subcode4 = Decode.Hamming84(pageNumberData[5]);
-            // If subcode bytes don't contain errors and are valid, set the subcode and the included control bits
+            // If subcode bytes don't contain errors, set the subcode
             if (subcode1 != 0xff && subcode2 != 0xff && subcode3 != 0xff && subcode4 != 0xff)
             {
                 byte[] fullSubcode = new byte[] { (byte)(((subcode4 & 0x03) << 4) | subcode3), (byte)(((subcode2 & 0x07) << 4) | subcode1) };
