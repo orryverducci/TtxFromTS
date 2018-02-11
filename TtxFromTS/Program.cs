@@ -240,7 +240,7 @@ namespace TtxFromTS
                                     statusBits[10] = page.SuppressHeader; // Suppress Header
                                     statusBits[13] = page.InhibitDisplay; // Inhibit Display
                                     statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
-                                                                                                                               // Write page status
+                                    // Write page status
                                     byte[] statusBytes = new byte[2];
                                     statusBits.CopyTo(statusBytes, 0);
                                     streamWriter.WriteLine($"PS,{BitConverter.ToString(statusBytes).Replace("-", "")}");
