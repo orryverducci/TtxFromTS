@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Cinegy.TsDecoder.TransportStream;
 using CommandLineParser.Exceptions;
 
@@ -269,6 +270,118 @@ namespace TtxFromTS
                             OutputWarning($"P{magazine.Number}{carousel.Number}.tti already exists - skipping page");
                         }
                     }
+                }
+            }
+            // If creation of config file is not disabled, create one
+            if (!_options.DisableConfig)
+            {
+                // Retrieve initial page, if set, to get header template from
+                TeletextPage initialPage = null;
+                if (_teletextDecoder.InitialPage != "8FF")
+                {
+                    int magazineNumber = int.Parse(_teletextDecoder.InitialPage.Substring(0, 1));
+                    TeletextMagazine magazine = _teletextDecoder.Magazine[magazineNumber - 1];
+                    TeletextCarousel carousel = magazine.Pages.Find(x => x.Number == _teletextDecoder.InitialPage);
+                    if (carousel != null)
+                    {
+                        initialPage = carousel.Pages.First();
+                    }
+                }
+                // If no initial page has been retrieved, use the first page from magazine 1
+                if (initialPage == null)
+                {
+                    TeletextCarousel carousel = _teletextDecoder.Magazine[0].Pages.First();
+                    if (carousel != null)
+                    {
+                        initialPage = carousel.Pages.First();
+                    }
+                }
+                // Set header template using initial page, or if there isn't one use default
+                string headerTemplate;
+                if (initialPage != null)
+                {
+                    headerTemplate = initialPage.Rows[0].Substring(8);
+                    // Replace page number in header with number placeholder
+                    headerTemplate = headerTemplate.Replace(initialPage.Magazine.ToString() + initialPage.Number, "%%#");
+                    // Get header clock
+                    string headerClock = headerTemplate.Substring(24);
+                    // Check header clock is actually a clock (i.e. doesn't contain text), don't change if it isn't
+                    if (headerClock.Any(x => !char.IsLetter(x)))
+                    {
+                        // Break up clock in to array of segments, split at start of each number sequence
+                        string[] clockSegments = Regex.Matches(headerClock, "[0-9]+|[^0-9]+").Cast<Match>().Select(x => x.Value).ToArray();
+                        // Set next element to be replaced in clock, 0 for hours, 1 for mins, 2 for secs
+                        int clockPosition = 0;
+                        // Loop through each segment, creating clock placeholder
+                        string clockPlaceholder = string.Empty;
+                        for (int i = 0; i < clockSegments.Length; i++)
+                        {
+                            // If segments is digits, set the placeholder, otherwise use segment text
+                            if(clockSegments[i].All(x => char.IsDigit(x)))
+                            {
+                                // If segment is a valid format set the placeholder, otherwise use segment text
+                                if (clockSegments[i].Length == 2 && clockPosition < 3)
+                                {
+                                    switch (clockPosition)
+                                    {
+                                        case 0:
+                                            clockPlaceholder += "%H";
+                                            break;
+                                        case 1:
+                                            clockPlaceholder += "%M";
+                                            break;
+                                        case 2:
+                                            clockPlaceholder += "%S";
+                                            break;
+                                    }
+                                    clockPosition += 1;
+                                }
+                                else if (clockSegments[i].Length == 4 && clockPosition == 0)
+                                {
+                                    clockPlaceholder += "%H%M";
+                                    clockPosition += 2;
+                                }
+                                else
+                                {
+                                    clockPlaceholder += clockSegments[i];
+                                }
+                            }
+                            else
+                            {
+                                clockPlaceholder += clockSegments[i];
+                            }
+                        }
+                        // Replace the clock in the header with the placeholder
+                        headerTemplate = headerTemplate.Substring(0, 24) + clockPlaceholder;
+                    }
+                }
+                else
+                {
+                    headerTemplate = "Teletext %%# %%a %e %%b %H:%M:%S";
+                }
+                // Set config file path
+                string configPath = outputDirectory.FullName + Path.DirectorySeparatorChar + "vbit.conf";
+                // Check config file doesn't already exist, and output warning if it does
+                if (!File.Exists(configPath))
+                {
+                    // Create file
+                    using (StreamWriter streamWriter = new StreamWriter(File.Open(configPath, FileMode.Create), Encoding.ASCII))
+                    {
+                        // Write header template
+                        streamWriter.WriteLine($"header_template={headerTemplate}");
+                        // Write initial page
+                        streamWriter.WriteLine($"initial_teletext_page={_teletextDecoder.InitialPage}:{_teletextDecoder.InitialSubcode}");
+                        // Write row adaptive setting
+                        streamWriter.WriteLine("row_adaptive_mode=false");
+                        // Write status display
+                        streamWriter.WriteLine($"status_display={_teletextDecoder.StatusDisplay}");
+                        // Write network identification code
+                        streamWriter.Write($"network_identification_code={_teletextDecoder.NetworkID}");
+                    }
+                }
+                else
+                {
+                    OutputWarning($"Unable to create config file - file already exists");
                 }
             }
         }

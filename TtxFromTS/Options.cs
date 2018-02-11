@@ -43,5 +43,12 @@ namespace TtxFromTS
         /// <value><c>true</c> if subtitles should be outputted, <c>false</c> if not.</value>
         [SwitchArgument("include-subs", false, Description = "Enables the output of subtitle pages")]
         public bool IncludeSubtitles { get; set; }
+
+        /// <summary>
+        /// Gets or sets if creating a vbit2 configuration file should be disabled.
+        /// </summary>
+        /// <value><c>true</c> if a config file should not be created, <c>false</c> if it should.</value>
+        [SwitchArgument("no-config", false, Description = "Disabled the creation of a vbit2 config file")]
+        public bool DisableConfig { get; set; }
     }
 }
