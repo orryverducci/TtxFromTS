@@ -4,6 +4,7 @@ Release Notes
 1.1
 ---
 
+* **NEW:** Creates a vbit2 configuration file with the header and broadcast service data from the decoded service
 * **NEW:** Option to set cycle time between subpages
 * **NEW:** Option to specify the directory to export files to
 * **NEW:** Option to include subtitle pages in exported pages
