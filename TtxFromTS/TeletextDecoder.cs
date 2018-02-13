@@ -166,6 +166,27 @@ namespace TtxFromTS
                     {
                         if (teletextPacket.Type != TeletextPacket.PacketType.BroadcastServiceData)
                         {
+                            // If packet is a header, check if it is in serial mode, and if it is signal to the other magazines that a serial header has been received
+                            if (teletextPacket.Type == TeletextPacket.PacketType.Header)
+                            {
+                                // Get serial flag
+                                bool magazineSerial = false;
+                                byte controlByte = Decode.Hamming84(teletextPacket.Data[7]);
+                                if (controlByte != 0xff)
+                                {
+                                    magazineSerial = Convert.ToBoolean((byte)(controlByte & 0x01));
+                                }
+                                // If flag is set, loop through each magazine
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    // Only signal header if magazine is not the one for this header
+                                    if (i + 1 != teletextPacket.Magazine)
+                                    {
+                                        Magazine[i].SerialHeaderReceived();
+                                    }
+                                }
+                            }
+                            // Add packet to its magazine
                             Magazine[(int)teletextPacket.Magazine - 1].AddPacket(teletextPacket);
                         }
                         else

@@ -9,6 +9,7 @@ Release Notes
 * **NEW:** Option to specify the directory to export files to
 * **NEW:** Option to include subtitle pages in exported pages
 * **IMPROVED:** Arguments provided in the wrong format are now handled more gracefully
+* **IMPROVED:** Serially transmitted services are now fully supported
 * **FIXED:** Subpages within a page are now exported in a single TTI file, resolving an issue with vbit2
 
 1.0

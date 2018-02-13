@@ -53,30 +53,10 @@ namespace TtxFromTS
         /// <param name="packet">The teletext packet to be added.</param>
         internal void AddPacket(TeletextPacket packet)
         {
-            // If packet is a header, save current page if valid, then create a new page
+            // If packet is a header, save current page
             if (packet.Type == TeletextPacket.PacketType.Header)
             {
-                // Check there is a current page, otherwise skip to creating new page
-                if (_currentPage != null)
-                {
-                    // Check the page number is valid and not an ehancement page
-                    if (_currentPage.Number.Substring(0, 1) != "F" && _currentPage.Subcode != "3F7F")
-                    {
-                        // Check if a carousel with the page number exists
-                        TeletextCarousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
-                        // If the carousel exists, add the page to it, otherwise create a carousel and add the page
-                        if (existingCarousel == null)
-                        {
-                            TeletextCarousel carousel = new TeletextCarousel { Number = _currentPage.Number };
-                            carousel.AddPage(_currentPage);
-                            Pages.Add(carousel);
-                        }
-                        else
-                        {
-                            existingCarousel.AddPage(_currentPage);
-                        }
-                    }
-                }
+                SavePage();
                 // Create new page
                 _currentPage = new TeletextPage { Magazine = Number };
             }
@@ -85,6 +65,45 @@ namespace TtxFromTS
             {
                 _currentPage.AddPacket(packet);
             }
+        }
+
+        /// <summary>
+        /// Called when a serial header is received from any magazine. Saves the page currently being decoded.
+        /// </summary>
+        internal void SerialHeaderReceived()
+        {
+            SavePage();
+        }
+
+        /// <summary>
+        /// Saves the page currently being decoded.
+        /// </summary>
+        private void SavePage()
+        {
+            // Check there is a current page
+            if (_currentPage == null)
+            {
+                return;
+            }
+            // Check the page number is valid and not an ehancement page
+            if (_currentPage.Number.Substring(0, 1) != "F" && _currentPage.Subcode != "3F7F")
+            {
+                // Check if a carousel with the page number exists
+                TeletextCarousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
+                // If the carousel exists, add the page to it, otherwise create a carousel and add the page
+                if (existingCarousel == null)
+                {
+                    TeletextCarousel carousel = new TeletextCarousel { Number = _currentPage.Number };
+                    carousel.AddPage(_currentPage);
+                    Pages.Add(carousel);
+                }
+                else
+                {
+                    existingCarousel.AddPage(_currentPage);
+                }
+            }
+            // Clear the page
+            _currentPage = null;
         }
     }
 }
