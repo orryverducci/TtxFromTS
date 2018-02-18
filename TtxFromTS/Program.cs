@@ -31,7 +31,7 @@ namespace TtxFromTS
         /// The entry point of the application.
         /// </summary>
         /// <param name="args">The command line arguments.</param>
-        internal static void Main(string[] args)
+        internal static int Main(string[] args)
         {
             // Parse command line arguments, and run application if successful
             if (ParseArguments(args))
@@ -69,7 +69,7 @@ namespace TtxFromTS
                                     catch (InvalidOperationException)
                                     {
                                         OutputError("The provided packet identifier is not a teletext service");
-                                        return;
+                                        return 3;
                                     }
                                     packetsProcessed++;
                                 }
@@ -88,16 +88,24 @@ namespace TtxFromTS
                         Console.WriteLine($"Total number of packets: {packetsDecoded}");
                         Console.WriteLine($"Packets processed: {packetsProcessed}");
                         Console.WriteLine($"Pages decoded: {_teletextDecoder.TotalPages}");
+                        // Output success exit code
+                        return 0;
                     }
                     else if (packetsDecoded > 0)
                     {
                         OutputError("Invalid packet identifier provided");
+                        return 4;
                     }
                     else
                     {
                         OutputError("Unable to process transport stream - please check it is a valid TS file");
+                        return 5;
                     }
                 }
+            }
+            else
+            {
+                return -1;
             }
         }
 
