@@ -15,6 +15,10 @@ The output files will be placed in a directory with the same name as input file 
 These arguments are available to use:
 
 * `--pid` **(required)** The packet identifier of the teletext elementary stream to be decoded.
+* `--cycle` The cycle time to be used between subpages in seconds. Must be greater than 1 second, defaults to 10 seconds.
+* `--include-subs` Enables decoding of teletext subtitle packets.
+* `--no-config` Disables creation of a vbit2 configuration file.
+* `--output` The directory to output the TTI files to. If no directory is given a directory is created in the current working directory with the same name as the input file.
 * `-i` **(required)** The input transport stream file.
 
 ### Example Command Line
@@ -37,17 +41,7 @@ The current limitations are:
 
 * The packet identifier (PID) of the specific teletext service must be known. If you do not know it you can use another application such as [DVB Inspector](http://www.digitalekabeltelevisie.nl/dvb_inspector/) or TransEdit to find it.
 * Only full level one facilities are currently decoded. Level 2.5+ enhancement data is not decoded.
-* Pages containing subtitles are deliberately ignored.
-* The location of the outputted files can't be changed. If you are outputting multiple services from the same transport stream, you will have to move or rename the output directory after each one to ensure they're not mixed together.
-* The cycle time for subpages is currently fixed to 10 seconds.
-* The application has primarily been designed for teletext services trasmitted in parallel. Services that use serial transmission will still be decoded, but there is a chance the last transmitted page of the magazine may be missed.
 * Fastext links pointing to specific subpages currently point to only the page number, ignoring the subpage.
-* This application does not output a vbit2 configuration file. You will need to create one to use the outputted services with vbit2.
-
-Known issues
-------------
-
-* Subpages within a carousel are currenly outputted as individual files, instead of combining them in to one file. This causes an incompatibility with vbit, in which all the subpages of a page are transmitted together sequentially, instead of following the cycle time.
 
 I've found a problem
 --------------------
