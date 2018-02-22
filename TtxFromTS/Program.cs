@@ -278,6 +278,57 @@ namespace TtxFromTS
                             OutputWarning($"P{magazine.Number}{carousel.Number}.tti already exists - skipping page");
                         }
                     }
+                    // If the magazine has enhancements, output them
+                    if (magazine.EnhancementData.Any(x => x != null))
+                    {
+                        // Output to the console that enhancements are being outputted
+                        Console.WriteLine($"Outputting enhancements for magazine {magazine.Number}");
+                        // Set output file path
+                        string filePath = outputDirectory.FullName + Path.DirectorySeparatorChar + "P" + magazine.Number + "FF.tti";
+                        // Write page number
+                        // Check file doesn't already exist, and output warning if it does
+                        if (!File.Exists(filePath))
+                        {
+                            // Create file
+                            using (StreamWriter streamWriter = new StreamWriter(File.Open(filePath, FileMode.Create), Encoding.ASCII))
+                            {
+                                // Write description
+                                streamWriter.WriteLine("DE,Exported by TtxFromTS");
+                                // Write destination inserter
+                                streamWriter.WriteLine("DS,inserter");
+                                // Write source file
+                                streamWriter.WriteLine($"SP,{_options.InputFile}");
+                                // Write page number (time filling page is used for magazine enhancements)
+                                streamWriter.WriteLine($"PN,{magazine.Number}FF00");
+                                // Set subcode
+                                streamWriter.WriteLine("SC,0000");
+                                // Set page status, set to not transmit so page is not outputted
+                                streamWriter.WriteLine("PS,0000");
+                                // Write each enhancement packet
+                                for (int i = 0; i < magazine.EnhancementData.Length; i++)
+                                {
+                                    if (magazine.EnhancementData[i] != null)
+                                    {
+                                        // Create string to be written
+                                        StringBuilder enhancementString = new StringBuilder(40);
+                                        // Write designation code
+                                        enhancementString.Append((char)(i | 0x40));
+                                        // Add each byte to the string
+                                        for (int x = 0; x < magazine.EnhancementData[i].Length; x++)
+                                        {
+                                            enhancementString.Append((char)(magazine.EnhancementData[i][x] | 0x40));
+                                        }
+                                        // Write the string
+                                        streamWriter.WriteLine($"OL,29,{enhancementString.ToString()}");
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            OutputWarning($"P{magazine.Number}FF.tti already exists - skipping enhancements");
+                        }
+                    }
                 }
             }
             // If creation of config file is not disabled, create one

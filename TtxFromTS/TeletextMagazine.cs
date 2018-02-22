@@ -37,6 +37,8 @@ namespace TtxFromTS
             }
         }
 
+        internal byte[][] EnhancementData { get; private set; } = new byte[4][];
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
@@ -60,10 +62,18 @@ namespace TtxFromTS
                 // Create new page
                 _currentPage = new TeletextPage { Magazine = Number };
             }
-            // If a page is being decoded, add the packet to it
-            if (_currentPage != null)
+            // If the packet is not a magazine enhancements packet, add it to a page, otherwise process the enhancements
+            if (packet.Type != TeletextPacket.PacketType.MagazineEnhancements)
             {
-                _currentPage.AddPacket(packet);
+                // If a page is being decoded, add the packet to it
+                if (_currentPage != null)
+                {
+                    _currentPage.AddPacket(packet);
+                }
+            }
+            else
+            {
+                DecodeEnhancements(packet);
             }
         }
 
@@ -104,6 +114,47 @@ namespace TtxFromTS
             }
             // Clear the page
             _currentPage = null;
+        }
+
+        /// <summary>
+        /// Decodes magazine enhancement data.
+        /// </summary>
+        /// <param name="packet">The packet containing enhancement triplets.</param>
+        private void DecodeEnhancements(TeletextPacket packet)
+        {
+            // Get designation code
+            int designation = Decode.Hamming84(packet.Data[0]);
+            // Check designation code is valid and below 4, otherwise treat as an invalid packet and ignore it
+            if (designation == 0xff || designation > 4)
+            {
+                return;
+            }
+            // Set offset for initial triplet
+            int tripletOffset = 1;
+            // Create array to store decoded packet data in
+            byte[] decodedPacket = new byte[39];
+            // Loop through each triplet and process it
+            while (tripletOffset + 2 < packet.Data.Length)
+            {
+                // Get the triplet
+                byte[] triplet = new byte[3];
+                Buffer.BlockCopy(packet.Data, tripletOffset, triplet, 0, 3);
+                // Decode the triplet
+                byte[] decodedTriplet = Decode.Hamming2418(triplet);
+                // If triplet has unrecoverable errors, set it to a blank triplet
+                if (decodedTriplet[0] == 0xff)
+                {
+                    decodedTriplet[0] = 0x00;
+                    decodedTriplet[1] = 0x00;
+                    decodedTriplet[2] = 0x00;
+                }
+                // Copy the decoded triplet to the full decoded packet data
+                Buffer.BlockCopy(decodedTriplet, 0, decodedPacket, tripletOffset - 1, 3);
+                // Increase the offset to the next triplet
+                tripletOffset += 3;
+            }
+            // Store decoded packet
+            EnhancementData[designation] = decodedPacket;
         }
     }
 }
