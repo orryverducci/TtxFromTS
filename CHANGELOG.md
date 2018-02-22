@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+1.2
+---
+
+* **IMPROVED:** The last received version of a page is now exported instead of the first
+
 1.1
 ---
 
