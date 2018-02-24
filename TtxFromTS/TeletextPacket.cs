@@ -12,7 +12,9 @@ namespace TtxFromTS
             Header,
             PageBody,
             Fastext,
+            PageReplacements,
             LinkedPages,
+            PageEnhancements,
             MagazineEnhancements,
             BroadcastServiceData,
             Unspecified
@@ -96,9 +98,17 @@ namespace TtxFromTS
             {
                 Type = PacketType.Fastext;
             }
+            else if (Number == 26)
+            {
+                Type = PacketType.PageReplacements;
+            }
             else if (Number == 27)
             {
                 Type = PacketType.LinkedPages;
+            }
+            else if (Number == 28)
+            {
+                Type = PacketType.PageEnhancements;
             }
             else if (Number == 29)
             {

@@ -111,6 +111,18 @@ namespace TtxFromTS
         /// </summary>
         /// <value>True if row 24 should be displayed, false if not.</value>
         internal bool DisplayRow24 { get; private set; } = false;
+
+        /// <summary>
+        /// Gets character replacement and object data (i.e. packet 26) for the page.
+        /// </summary>
+        /// <value>The enhancement data packets.</value>
+        internal byte[][] ReplacementData { get; private set; } = new byte[16][];
+
+        /// <summary>
+        /// Gets enhancement data (i.e. packet 28) for the page.
+        /// </summary>
+        /// <value>The enhancement data packets.</value>
+        internal byte[][] EnhancementData { get; private set; } = new byte[4][];
         #endregion
 
         #region Packet Methods
@@ -130,8 +142,14 @@ namespace TtxFromTS
                 case TeletextPacket.PacketType.Fastext:
                     DecodeRow(packet);
                     break;
+                case TeletextPacket.PacketType.PageReplacements:
+                    DecodePageReplacements(packet);
+                    break;
                 case TeletextPacket.PacketType.LinkedPages:
                     DecodeLinkedPages(packet);
+                    break;
+                case TeletextPacket.PacketType.PageEnhancements:
+                    DecodePageEnhancements(packet);
                     break;
             }
         }
@@ -254,6 +272,78 @@ namespace TtxFromTS
                     DisplayRow24 = Convert.ToBoolean((byte)(linkControl >> 3));
                 }
             }
+        }
+
+        /// <summary>
+        /// Decodes character replacement enhancement data for the page.
+        /// </summary>
+        /// <param name="packet">The enhancement packet.</param>
+        private void DecodePageReplacements(TeletextPacket packet)
+        {
+            // Get designation code
+            int designation = Decode.Hamming84(packet.Data[0]);
+            // Check designation code is valid, otherwise treat as an invalid packet and ignore it
+            if (designation == 0xff)
+            {
+                return;
+            }
+            // Decode the packet
+            byte[] decodedPacket = DecodeEnhancementPacket(packet);
+            // Store decoded packet
+            ReplacementData[designation] = decodedPacket;
+        }
+
+        /// <summary>
+        /// Decodes enhancement data for the page.
+        /// </summary>
+        /// <param name="packet">The enhancement packet.</param>
+        private void DecodePageEnhancements(TeletextPacket packet)
+        {
+            // Get designation code
+            int designation = Decode.Hamming84(packet.Data[0]);
+            // Check designation code is valid and below 4, otherwise treat as an invalid packet and ignore it
+            if (designation == 0xff || designation > 4)
+            {
+                return;
+            }
+            // Decode the packet
+            byte[] decodedPacket = DecodeEnhancementPacket(packet);
+            // Store decoded packet
+            EnhancementData[designation] = decodedPacket;
+        }
+
+        /// <summary>
+        /// Decodes an enhancement data packet.
+        /// </summary>
+        /// <param name="packet">The enhancement packet.</param>
+        private byte[] DecodeEnhancementPacket(TeletextPacket packet)
+        {
+            // Set offset for initial triplet
+            int tripletOffset = 1;
+            // Create array to store decoded packet data in
+            byte[] decodedPacket = new byte[39];
+            // Loop through each triplet and process it
+            while (tripletOffset + 2 < packet.Data.Length)
+            {
+                // Get the triplet
+                byte[] triplet = new byte[3];
+                Buffer.BlockCopy(packet.Data, tripletOffset, triplet, 0, 3);
+                // Decode the triplet
+                byte[] decodedTriplet = Decode.Hamming2418(triplet);
+                // If triplet has unrecoverable errors, set it to a blank triplet
+                if (decodedTriplet[0] == 0xff)
+                {
+                    decodedTriplet[0] = 0x00;
+                    decodedTriplet[1] = 0x00;
+                    decodedTriplet[2] = 0x00;
+                }
+                // Copy the decoded triplet to the full decoded packet data
+                Buffer.BlockCopy(decodedTriplet, 0, decodedPacket, tripletOffset - 1, 3);
+                // Increase the offset to the next triplet
+                tripletOffset += 3;
+            }
+            // Return decoded packet
+            return decodedPacket;
         }
 
         private (string Number, string Subcode) DecodePageNumber(byte[] pageNumberData)

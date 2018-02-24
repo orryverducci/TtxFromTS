@@ -256,6 +256,49 @@ namespace TtxFromTS
                                     streamWriter.WriteLine("RE,0");
                                     // Write header
                                     streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(page.Rows[0].Substring(8))}");
+                                    // Write page enhancements, if the page has them
+                                    if (page.ReplacementData.Any(x => x != null))
+                                    {
+                                        // Write each enhancement packet
+                                        for (int i = 0; i < page.ReplacementData.Length; i++)
+                                        {
+                                            if (page.ReplacementData[i] != null)
+                                            {
+                                                // Create string to be written
+                                                StringBuilder enhancementString = new StringBuilder(40);
+                                                // Write designation code
+                                                enhancementString.Append((char)(i | 0x40));
+                                                // Add each byte to the string
+                                                for (int x = 0; x < page.ReplacementData[i].Length; x++)
+                                                {
+                                                    enhancementString.Append((char)(page.ReplacementData[i][x] | 0x40));
+                                                }
+                                                // Write the string
+                                                streamWriter.WriteLine($"OL,26,{enhancementString.ToString()}");
+                                            }
+                                        }
+                                    }
+                                    if (page.EnhancementData.Any(x => x != null))
+                                    {
+                                        // Write each enhancement packet
+                                        for (int i = 0; i < page.EnhancementData.Length; i++)
+                                        {
+                                            if (page.EnhancementData[i] != null)
+                                            {
+                                                // Create string to be written
+                                                StringBuilder enhancementString = new StringBuilder(40);
+                                                // Write designation code
+                                                enhancementString.Append((char)(i | 0x40));
+                                                // Add each byte to the string
+                                                for (int x = 0; x < page.EnhancementData[i].Length; x++)
+                                                {
+                                                    enhancementString.Append((char)(page.EnhancementData[i][x] | 0x40));
+                                                }
+                                                // Write the string
+                                                streamWriter.WriteLine($"OL,28,{enhancementString.ToString()}");
+                                            }
+                                        }
+                                    }
                                     // Loop through each page row
                                     for (int i = 1; i < page.Rows.Length; i++)
                                     {
