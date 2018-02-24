@@ -230,7 +230,7 @@ namespace TtxFromTS
                                 // Write cycle time
                                 streamWriter.WriteLine($"CT,{_options.CycleTime},T");
                                 // Loop through each subpage in order of subcode, writing each one
-                                foreach (TeletextPage page in carousel.Pages.OrderBy(x => x.Number).ToList())
+                                foreach (TeletextPage page in carousel.Pages.OrderBy(x => x.Subcode).ToList())
                                 {
                                     // Write page number
                                     streamWriter.WriteLine($"PN,{magazine.Number}{page.Number}{page.Subcode.Substring(2)}");

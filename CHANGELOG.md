@@ -5,6 +5,7 @@ Release Notes
 ---
 
 * **IMPROVED:** The last received version of a page is now exported instead of the first
+* **FIXED:** Subpages are now exported in the right order
 
 1.1
 ---
