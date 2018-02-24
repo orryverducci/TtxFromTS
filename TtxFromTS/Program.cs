@@ -255,7 +255,9 @@ namespace TtxFromTS
                                     // Write region code
                                     streamWriter.WriteLine("RE,0");
                                     // Write header
-                                    streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(page.Rows[0].Substring(8))}");
+                                    byte[] headerBytes = new byte[page.Rows[0].Length - 8];
+                                    Buffer.BlockCopy(page.Rows[0], 8, headerBytes, 0, headerBytes.Length);
+                                    streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(headerBytes)}");
                                     // Write page enhancements, if the page has them
                                     if (page.ReplacementData.Any(x => x != null))
                                     {
@@ -402,7 +404,13 @@ namespace TtxFromTS
                 string headerTemplate;
                 if (initialPage != null)
                 {
-                    headerTemplate = initialPage.Rows[0].Substring(8);
+                    // Decode the header from the initial page
+                    byte[] decodedHeader = new byte[initialPage.Rows[0].Length - 8];
+                    for (int i = 8; i < initialPage.Rows[0].Length; i++)
+                    {
+                        decodedHeader[i - 8] = Decode.OddParity(initialPage.Rows[0][i]);
+                    }
+                    headerTemplate = Encoding.ASCII.GetString(decodedHeader);
                     // Replace page number in header with number placeholder
                     headerTemplate = headerTemplate.Replace(initialPage.Magazine.ToString() + initialPage.Number, "%%#");
                     // Get header clock
@@ -493,24 +501,24 @@ namespace TtxFromTS
         /// </summary>
         /// <returns>The encoded string.</returns>
         /// <param name="text">The text to be encoded.</param>
-        private static string EncodeText(string text)
+        private static string EncodeText(byte[] text)
         {
-            // Get bytes from row string
-            byte[] inputBytes = Encoding.ASCII.GetBytes(text);
             // Initialise output
             StringBuilder outputString = new StringBuilder();
             // Go through each byte
-            for (int i = 0; i < inputBytes.Length; i++)
+            for (int i = 0; i < text.Length; i++)
             {
+                // Decode the character
+                byte decodedChar = Decode.OddParity(text[i]);
                 // If hex code is 0x20 or greater, output it as is, otherwise add 0x40 and prefix with an escape
-                if (inputBytes[i] >= 0x20)
+                if (decodedChar >= 0x20)
                 {
-                    outputString.Append(Encoding.ASCII.GetString(new byte[] { inputBytes[i] }));
+                    outputString.Append(Encoding.ASCII.GetString(new byte[] { decodedChar }));
                 }
                 else
                 {
                     outputString.Append(Encoding.ASCII.GetString(new byte[] { 0x1b }));
-                    outputString.Append(Encoding.ASCII.GetString(new byte[] { (byte)(inputBytes[i] + 0x40) }));
+                    outputString.Append(Encoding.ASCII.GetString(new byte[] { (byte)(decodedChar + 0x40) }));
                 }
             }
             return outputString.ToString();

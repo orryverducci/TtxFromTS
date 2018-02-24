@@ -98,7 +98,7 @@ namespace TtxFromTS
         /// Gets the rows of the page.
         /// </summary>
         /// <value>The rows of the page.</value>
-        internal string[] Rows { get; private set; } = new string[25];
+        internal byte[][] Rows { get; private set; } = new byte[25][];
 
         /// <summary>
         /// Gets the linked pages
@@ -204,12 +204,19 @@ namespace TtxFromTS
                 }
             }
             // Decode the part of the header to be displayed on row 0
-            byte[] headerCharacters = new byte[packet.Data.Length - 8];
-            for (int i = 8; i < packet.Data.Length; i++)
+            byte[] headerCharacters = new byte[packet.Data.Length];
+            for (int i = 0; i < packet.Data.Length; i++)
             {
-                headerCharacters[i - 8] = Decode.OddParity(packet.Data[i]);
+                if (i < 7)
+                {
+                    headerCharacters[i] = 0x04;
+                }
+                else
+                {
+                    headerCharacters[i] = packet.Data[i];
+                }
             }
-            Rows[0] = "        " + Encoding.ASCII.GetString(headerCharacters);
+            Rows[0] = headerCharacters;
         }
 
         /// <summary>
@@ -221,9 +228,9 @@ namespace TtxFromTS
             byte[] characters = new byte[packet.Data.Length];
             for (int i = 0; i < packet.Data.Length; i++)
             {
-                characters[i] = Decode.OddParity(packet.Data[i]);
+                characters[i] = packet.Data[i];
             }
-            Rows[(int)packet.Number] = Encoding.ASCII.GetString(characters);
+            Rows[(int)packet.Number] = characters;
         }
 
         /// <summary>
