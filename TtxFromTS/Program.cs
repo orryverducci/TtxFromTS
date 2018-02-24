@@ -252,8 +252,6 @@ namespace TtxFromTS
                                     byte[] statusBytes = new byte[2];
                                     statusBits.CopyTo(statusBytes, 0);
                                     streamWriter.WriteLine($"PS,{BitConverter.ToString(statusBytes).Replace("-", "")}");
-                                    // Write region code
-                                    streamWriter.WriteLine("RE,0");
                                     // Write header
                                     byte[] headerBytes = new byte[page.Rows[0].Length - 8];
                                     Buffer.BlockCopy(page.Rows[0], 8, headerBytes, 0, headerBytes.Length);
