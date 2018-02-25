@@ -129,32 +129,11 @@ namespace TtxFromTS
             {
                 return;
             }
-            // Set offset for initial triplet
-            int tripletOffset = 1;
-            // Create array to store decoded packet data in
-            byte[] decodedPacket = new byte[39];
-            // Loop through each triplet and process it
-            while (tripletOffset + 2 < packet.Data.Length)
-            {
-                // Get the triplet
-                byte[] triplet = new byte[3];
-                Buffer.BlockCopy(packet.Data, tripletOffset, triplet, 0, 3);
-                // Decode the triplet
-                byte[] decodedTriplet = Decode.Hamming2418(triplet);
-                // If triplet has unrecoverable errors, set it to a blank triplet
-                if (decodedTriplet[0] == 0xff)
-                {
-                    decodedTriplet[0] = 0x00;
-                    decodedTriplet[1] = 0x00;
-                    decodedTriplet[2] = 0x00;
-                }
-                // Copy the decoded triplet to the full decoded packet data
-                Buffer.BlockCopy(decodedTriplet, 0, decodedPacket, tripletOffset - 1, 3);
-                // Increase the offset to the next triplet
-                tripletOffset += 3;
-            }
+            // Get the triplets from the packet
+            byte[] enhancementTriplets = new byte[packet.Data.Length - 1];
+            Buffer.BlockCopy(packet.Data, 1, enhancementTriplets, 0, enhancementTriplets.Length);
             // Store decoded packet
-            EnhancementData[designation] = decodedPacket;
+            EnhancementData[designation] = enhancementTriplets;
         }
     }
 }

@@ -264,17 +264,8 @@ namespace TtxFromTS
                                         {
                                             if (page.ReplacementData[i] != null)
                                             {
-                                                // Create string to be written
-                                                StringBuilder enhancementString = new StringBuilder(40);
-                                                // Write designation code
-                                                enhancementString.Append((char)(i | 0x40));
-                                                // Add each byte to the string
-                                                for (int x = 0; x < page.ReplacementData[i].Length; x++)
-                                                {
-                                                    enhancementString.Append((char)(page.ReplacementData[i][x] | 0x40));
-                                                }
                                                 // Write the string
-                                                streamWriter.WriteLine($"OL,26,{enhancementString.ToString()}");
+                                                streamWriter.WriteLine($"OL,26,{EncodeEnhancement(i, page.ReplacementData[i])}");
                                             }
                                         }
                                     }
@@ -285,17 +276,8 @@ namespace TtxFromTS
                                         {
                                             if (page.EnhancementData[i] != null)
                                             {
-                                                // Create string to be written
-                                                StringBuilder enhancementString = new StringBuilder(40);
-                                                // Write designation code
-                                                enhancementString.Append((char)(i | 0x40));
-                                                // Add each byte to the string
-                                                for (int x = 0; x < page.EnhancementData[i].Length; x++)
-                                                {
-                                                    enhancementString.Append((char)(page.EnhancementData[i][x] | 0x40));
-                                                }
                                                 // Write the string
-                                                streamWriter.WriteLine($"OL,28,{enhancementString.ToString()}");
+                                                streamWriter.WriteLine($"OL,28,{EncodeEnhancement(i, page.EnhancementData[i])}");
                                             }
                                         }
                                     }
@@ -352,17 +334,8 @@ namespace TtxFromTS
                                 {
                                     if (magazine.EnhancementData[i] != null)
                                     {
-                                        // Create string to be written
-                                        StringBuilder enhancementString = new StringBuilder(40);
-                                        // Write designation code
-                                        enhancementString.Append((char)(i | 0x40));
-                                        // Add each byte to the string
-                                        for (int x = 0; x < magazine.EnhancementData[i].Length; x++)
-                                        {
-                                            enhancementString.Append((char)(magazine.EnhancementData[i][x] | 0x40));
-                                        }
                                         // Write the string
-                                        streamWriter.WriteLine($"OL,29,{enhancementString.ToString()}");
+                                        streamWriter.WriteLine($"OL,29,{EncodeEnhancement(i, magazine.EnhancementData[i])}");
                                     }
                                 }
                             }
@@ -519,6 +492,48 @@ namespace TtxFromTS
                     outputString.Append(Encoding.ASCII.GetString(new byte[] { (byte)(decodedChar + 0x40) }));
                 }
             }
+            return outputString.ToString();
+        }
+
+        /// <summary>
+        /// Encodes enhancement packets to a format valid for TTI files.
+        /// </summary>
+        /// <returns>The encoded string.</returns>
+        /// <param name="designation">The designation code for the enhancement data.</param>
+        /// <param name="enhancementPacket">The enhancement data to be encoded.</param>
+        private static string EncodeEnhancement(int designation, byte[] enhancementPacket)
+        {
+            // Create string to be written
+            StringBuilder outputString = new StringBuilder(enhancementPacket.Length);
+            // Write designation code
+            outputString.Append((char)(designation | 0x40));
+            // Set offset for initial triplet
+            int tripletOffset = 0;
+            // Loop through each triplet and process it
+            while (tripletOffset + 2 < enhancementPacket.Length)
+            {
+                // Get the triplet
+                byte[] triplet = new byte[3];
+                Buffer.BlockCopy(enhancementPacket, tripletOffset, triplet, 0, 3);
+                // Decode the triplet
+                byte[] decodedTriplet = Decode.Hamming2418(triplet);
+                // If triplet doesn't have unrecoverable errors, encoded it and add it to the packet, otherwise add a blank triplet
+                if (decodedTriplet[0] != 0xff)
+                {
+                    outputString.Append((char)(decodedTriplet[0] | 0x40));
+                    outputString.Append((char)(decodedTriplet[1] | 0x40));
+                    outputString.Append((char)(decodedTriplet[2] | 0x40));
+                }
+                else
+                {
+                    outputString.Append((char)(0x40));
+                    outputString.Append((char)(0x40));
+                    outputString.Append((char)(0x40));
+                }
+                // Increase the offset to the next triplet
+                tripletOffset += 3;
+            }
+            // Return string
             return outputString.ToString();
         }
         #endregion
