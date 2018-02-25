@@ -248,6 +248,11 @@ namespace TtxFromTS
                                     statusBits[10] = page.SuppressHeader; // Suppress Header
                                     statusBits[13] = page.InhibitDisplay; // Inhibit Display
                                     statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
+                                    // Write page function for pages using encoding other than text
+                                    if (page.Number == "FE") // MOT
+                                    {
+                                        streamWriter.WriteLine("PF,6,3");
+                                    }
                                     // Write page status
                                     byte[] statusBytes = new byte[2];
                                     statusBits.CopyTo(statusBytes, 0);
@@ -287,7 +292,15 @@ namespace TtxFromTS
                                         // Write the row if it contains data, otherwise skip it
                                         if (page.Rows[i] != null)
                                         {
-                                            streamWriter.WriteLine($"OL,{i},{EncodeText(page.Rows[i])}");
+                                            // Write row using correct encoding for the page
+                                            if (page.Number == "FE") // MOT
+                                            {
+                                                streamWriter.WriteLine($"OL,{i},{EncodeHammedData(page.Rows[i])}");
+                                            }
+                                            else // Normal page
+                                            {
+                                                streamWriter.WriteLine($"OL,{i},{EncodeText(page.Rows[i])}");
+                                            }
                                         }
                                     }
                                     // Write fastext links, if page has them
@@ -534,6 +547,26 @@ namespace TtxFromTS
                 tripletOffset += 3;
             }
             // Return string
+            return outputString.ToString();
+        }
+
+        /// <summary>
+        /// Encodes hamming encoded packets to a format valid for TTI files.
+        /// </summary>
+        /// <returns>The encoded string.</returns>
+        /// <param name="dataPacket">The text to be encoded.</param>
+        private static string EncodeHammedData(byte[] dataPacket)
+        {
+            // Create string to be written
+            StringBuilder outputString = new StringBuilder();
+            // Go through each byte
+            for (int i = 0; i < dataPacket.Length; i++)
+            {
+                // Decode the byte
+                byte decodedChar = Decode.Hamming84(dataPacket[i]);
+                // If the byte doesn't have an unrecoverable error
+                outputString.Append((char)(decodedChar | 0x40));
+            }
             return outputString.ToString();
         }
         #endregion

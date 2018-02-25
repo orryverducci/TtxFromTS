@@ -95,8 +95,8 @@ namespace TtxFromTS
             {
                 return;
             }
-            // Check the page number is valid and not an ehancement page
-            if (_currentPage.Number != "FE" && _currentPage.Number != "FF")
+            // Check the page number is valid (i.e. not a time filler)
+            if (_currentPage.Number != "FF")
             {
                 // Check if a carousel with the page number exists
                 TeletextCarousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
