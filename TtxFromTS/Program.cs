@@ -249,7 +249,11 @@ namespace TtxFromTS
                                     statusBits[13] = page.InhibitDisplay; // Inhibit Display
                                     statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
                                     // Write page function for pages using encoding other than text
-                                    if (page.Number == "FE") // MOT
+                                    if (page.Number == "F0") // TOP BTT
+                                    {
+                                        streamWriter.WriteLine("PF,8,3");
+                                    }
+                                    else if (page.Number == "FE") // MOT
                                     {
                                         streamWriter.WriteLine("PF,6,3");
                                     }
@@ -293,7 +297,7 @@ namespace TtxFromTS
                                         if (page.Rows[i] != null)
                                         {
                                             // Write row using correct encoding for the page
-                                            if (page.Number == "FE") // MOT
+                                            if (page.Number == "F0" || page.Number == "FE") // MOT or BTT
                                             {
                                                 streamWriter.WriteLine($"OL,{i},{EncodeHammedData(page.Rows[i])}");
                                             }
