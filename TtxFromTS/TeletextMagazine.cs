@@ -37,6 +37,10 @@ namespace TtxFromTS
             }
         }
 
+        /// <summary>
+        /// Gets enhancement data (i.e. packet 29) for the magazine.
+        /// </summary>
+        /// <value>The enhancement data packets.</value>
         internal byte[][] EnhancementData { get; private set; } = new byte[4][];
 
         /// <summary>
