@@ -257,6 +257,22 @@ namespace TtxFromTS
                                     {
                                         streamWriter.WriteLine("PF,6,3");
                                     }
+                                    else if (magazine.GlobalObjectPage == magazine.Number.ToString() + page.Number) // GPOP
+                                    {
+                                        streamWriter.WriteLine("PF,2,2");
+                                    }
+                                    else if (magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number)) // POP
+                                    {
+                                        streamWriter.WriteLine("PF,3,2");
+                                    }
+                                    else if (magazine.GDRCSPages.Contains(magazine.Number.ToString() + page.Number)) // GDRCS
+                                    {
+                                        streamWriter.WriteLine("PF,4,0");
+                                    }
+                                    else if (magazine.DRCSPages.Contains(magazine.Number.ToString() + page.Number)) // DRCS
+                                    {
+                                        streamWriter.WriteLine("PF,5,0");
+                                    }
                                     // Write page status
                                     byte[] statusBytes = new byte[2];
                                     statusBits.CopyTo(statusBytes, 0);
@@ -300,6 +316,10 @@ namespace TtxFromTS
                                             if (page.Number == "F0" || page.Number == "FE") // MOT or BTT
                                             {
                                                 streamWriter.WriteLine($"OL,{i},{EncodeHammedData(page.Rows[i])}");
+                                            }
+                                            else if (magazine.GlobalObjectPage == magazine.Number.ToString() + page.Number || magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number)) // Object page
+                                            {
+                                                streamWriter.WriteLine($"OL,{i},{EncodeEnhancement(0, page.Rows[i])}");
                                             }
                                             else // Normal page
                                             {

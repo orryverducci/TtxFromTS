@@ -40,6 +40,30 @@ namespace TtxFromTS
         internal byte[][] EnhancementData { get; private set; } = new byte[4][];
 
         /// <summary>
+        /// Gets the page number of the Global Public Object Page for the magazine.
+        /// </summary>
+        /// <value>The GPOP page number, or 8FF if not defined.</value>
+        internal string GlobalObjectPage { get; private set; } = "8FF";
+
+        /// <summary>
+        /// Gets a list of page numbers for Public Object Pages for the magazine.
+        /// </summary>
+        /// <value>The list of POP page numbers.</value>
+        internal List<string> ObjectPages { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// Gets a list of page numbers for the Global Dynamically Redefinable Character Set pages for the magazine.
+        /// </summary>
+        /// <value>The list of GDRCS page numbers.</value>
+        internal List<string> GDRCSPages { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// Gets a list of page numbers for the Dynamically Redefinable Character Set pages for the magazine.
+        /// </summary>
+        /// <value>The list of DRCS page numbers.</value>
+        internal List<string> DRCSPages { get; private set; } = new List<string>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
         /// <param name="number">The magazine number.</param>
@@ -98,6 +122,11 @@ namespace TtxFromTS
             // Check the page number is valid (i.e. not a time filler)
             if (_currentPage.Number != "FF")
             {
+                // If the page is a Magazine Organisation Table, decode the page numbers of object and DRCS pages
+                if (_currentPage.Number == "FE")
+                {
+                    DecodeMOT();
+                }
                 // Check if a carousel with the page number exists
                 TeletextCarousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
                 // If the carousel exists, add the page to it, otherwise create a carousel and add the page
@@ -134,6 +163,103 @@ namespace TtxFromTS
             Buffer.BlockCopy(packet.Data, 1, enhancementTriplets, 0, enhancementTriplets.Length);
             // Store decoded packet
             EnhancementData[designation] = enhancementTriplets;
+        }
+
+        /// <summary>
+        /// Decodes object and DRCS page numbers from the Magazine Organisation Table.
+        /// </summary>
+        private void DecodeMOT()
+        {
+            // Decode object page links
+            for (int i = 0; i < 4; i++)
+            {
+                // Set packet number
+                int packetNum = 19 + i;
+                if (i > 1)
+                {
+                    packetNum++;
+                }
+                // If packet is set, decode links from it
+                if (_currentPage.Rows[packetNum] != null)
+                {
+                    for (int x = 0; x < 4; x++)
+                    {
+                        // Set link offset
+                        int linkOffset = 10 * x;
+                        // Decode link page number
+                        byte[] linkBytes = new byte[3];
+                        Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
+                        string link = DecodePageLink(linkBytes);
+                        // If a valid link is decoded and set to a value, add it to the global object link or list of object pages
+                        if (link != null)
+                        {
+                            if (link.Substring(1) != "FF" && linkOffset == 0)
+                            {
+                                GlobalObjectPage = link;
+                            }
+                            else if (link.Substring(1) != "FF")
+                            {
+                                ObjectPages.Add(link);
+                            }
+                        }
+                    }
+                }
+            }
+            // Decode DRCS page links
+            for (int i = 0; i < 2; i++)
+            {
+                // Set packet number
+                int packetNum = 21 + (3 * i);
+                // If packet is set, decode links from it
+                if (_currentPage.Rows[packetNum] != null)
+                {
+                    for (int x = 0; x < 8; x++)
+                    {
+                        // Set link offset
+                        int linkOffset = 4 * x;
+                        // Decode link page number
+                        byte[] linkBytes = new byte[3];
+                        Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
+                        string link = DecodePageLink(linkBytes);
+                        // If a valid link is decoded and set to a value, add it to the list of DRCS pages
+                        if (link != null)
+                        {
+                            if (link.Substring(1) != "FF" && linkOffset == 0)
+                            {
+                                GDRCSPages.Add(link);
+                            }
+                            else if (link.Substring(1) != "FF")
+                            {
+                                DRCSPages.Add(link);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Decodes a page link from a MOT.
+        /// </summary>
+        /// <param name="link">The bytes containing the link.</param>
+        private string DecodePageLink(byte[] link)
+        {
+            // Get linked page number
+            byte magazine = Decode.Hamming84(link[0]);
+            byte pageTens = Decode.Hamming84(link[1]);
+            byte pageUnits = Decode.Hamming84(link[2]);
+            // If link doesn't have unrecoverable errors, decode it, otherwise return null
+            if (magazine != 0xff && pageTens != 0xff & pageUnits != 0xff)
+            {
+                // Mask X/27/4 flag from magazine number
+                magazine = (byte)(magazine & 0x07);
+                // Decode and return full page number
+                return magazine.ToString() + ((pageTens << 4) | pageUnits).ToString("X2");
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
