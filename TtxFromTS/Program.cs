@@ -263,16 +263,20 @@ namespace TtxFromTS
                                     }
                                     // Create page status bits
                                     BitArray statusBits = new BitArray(16);
-                                    // Set status bits
-                                    statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
-                                    statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
+                                    // Set status flag bits
                                     statusBits[2] = page.MagazineSerial; // Magazine serial
                                     statusBits[7] = true; // Transmit page
                                     statusBits[8] = page.Newsflash; // Newsflash
                                     statusBits[9] = page.Subtitles; // Subtitle
                                     statusBits[10] = page.SuppressHeader; // Suppress Header
                                     statusBits[13] = page.InhibitDisplay; // Inhibit Display
-                                    statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
+                                    // Set status language bits if page is not an enhancements page
+                                    if (page.Number != "F0" && page.Number != "FE" && magazine.GlobalObjectPage != magazine.Number.ToString() + page.Number && !magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.GDRCSPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.DRCSPages.Contains(magazine.Number.ToString() + page.Number))
+                                    {
+                                        statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
+                                        statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
+                                        statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
+                                    }
                                     // Write page status
                                     byte[] statusBytes = new byte[2];
                                     statusBits.CopyTo(statusBytes, 0);
