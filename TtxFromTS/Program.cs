@@ -282,18 +282,6 @@ namespace TtxFromTS
                                     Buffer.BlockCopy(page.Rows[0], 8, headerBytes, 0, headerBytes.Length);
                                     streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(headerBytes)}");
                                     // Write page enhancements, if the page has them
-                                    if (page.ReplacementData.Any(x => x != null))
-                                    {
-                                        // Write each enhancement packet
-                                        for (int i = 0; i < page.ReplacementData.Length; i++)
-                                        {
-                                            if (page.ReplacementData[i] != null)
-                                            {
-                                                // Write the string
-                                                streamWriter.WriteLine($"OL,26,{EncodeEnhancement(i, page.ReplacementData[i])}");
-                                            }
-                                        }
-                                    }
                                     if (page.EnhancementData.Any(x => x != null))
                                     {
                                         // Write each enhancement packet
@@ -303,6 +291,18 @@ namespace TtxFromTS
                                             {
                                                 // Write the string
                                                 streamWriter.WriteLine($"OL,28,{EncodeEnhancement(i, page.EnhancementData[i])}");
+                                            }
+                                        }
+                                    }
+                                    if (page.ReplacementData.Any(x => x != null))
+                                    {
+                                        // Write each enhancement packet
+                                        for (int i = 0; i < page.ReplacementData.Length; i++)
+                                        {
+                                            if (page.ReplacementData[i] != null)
+                                            {
+                                                // Write the string
+                                                streamWriter.WriteLine($"OL,26,{EncodeEnhancement(i, page.ReplacementData[i])}");
                                             }
                                         }
                                     }
