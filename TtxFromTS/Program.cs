@@ -285,8 +285,8 @@ namespace TtxFromTS
                                     byte[] headerBytes = new byte[page.Rows[0].Length - 8];
                                     Buffer.BlockCopy(page.Rows[0], 8, headerBytes, 0, headerBytes.Length);
                                     streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(headerBytes)}");
-                                    // Write page enhancements, if the page has them
-                                    if (page.EnhancementData.Any(x => x != null))
+                                    // Write page enhancements, if the page has them and the page is not itself an enhancement page
+                                    if (page.EnhancementData.Any(x => x != null) && page.Number != "F0" && page.Number != "FE" && magazine.GlobalObjectPage != magazine.Number.ToString() + page.Number && !magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.GDRCSPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.DRCSPages.Contains(magazine.Number.ToString() + page.Number))
                                     {
                                         // Write each enhancement packet
                                         for (int i = 0; i < page.EnhancementData.Length; i++)
