@@ -4,7 +4,7 @@ Release Notes
 1.2
 ---
 
-* **IMPROVED:** The last received version of a page is now exported instead of the first
+* **IMPROVED:** Updates to pages are now processed and applied to pages
 * **FIXED:** Subpages are now exported in the right order
 
 1.1

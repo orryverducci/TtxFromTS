@@ -28,13 +28,25 @@ namespace TtxFromTS
         {
             // Check if a page with the same subcode is already in the list
             TeletextPage existingPage = Pages.Find(x => x.Subcode == page.Subcode);
-            // If the subpage already exists, remove it first
+            // If the subpage already exists, merge new subpage with existing one, otherwise add to the list of subpages
             if (existingPage != null)
             {
-                Pages.Remove(existingPage);
+                // If new page has rows and the erase flag set, replace existing page, otherwise merge with the existing page
+                if (page.ErasePage && page.UsedRows > 0)
+                {
+                    Pages.Remove(existingPage);
+                    Pages.Add(page);
+                }
+                else
+                {
+                    existingPage.MergeUpdate(page);
+                }
             }
-            // Add the page to the list of pages
-            Pages.Add(page);
+            else
+            {
+                // Add the page to the list of pages
+                Pages.Add(page);
+            }
         }
     }
 }

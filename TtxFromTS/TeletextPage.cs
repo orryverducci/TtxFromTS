@@ -123,9 +123,28 @@ namespace TtxFromTS
         /// </summary>
         /// <value>The enhancement data packets.</value>
         internal byte[][] EnhancementData { get; private set; } = new byte[4][];
+
+        /// <summary>
+        /// Gets the number of rows that contain data.
+        /// </summary>
+        /// <value>The number of rows with data.</value>
+        internal int UsedRows {
+            get
+            {
+                int usedRows = 0;
+                foreach (byte[] row in Rows)
+                {
+                    if (row != null)
+                    {
+                        usedRows++;
+                    }
+                }
+                return usedRows;
+            }
+        }
         #endregion
 
-        #region Packet Methods
+        #region Page Update Methods
         /// <summary>
         /// Adds a teletext packet to the page.
         /// </summary>
@@ -151,6 +170,48 @@ namespace TtxFromTS
                 case TeletextPacket.PacketType.PageEnhancements:
                     DecodePageEnhancements(packet);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Merges and updated subpage with this page.
+        /// </summary>
+        /// <param name="packet">The teletext page to be merged.</param>
+        internal void MergeUpdate(TeletextPage page)
+        {
+            // Update properties with new ones
+            Newsflash = page.Newsflash;
+            Subtitles = page.Subtitles;
+            SuppressHeader = page.SuppressHeader;
+            Update = page.Update;
+            InhibitDisplay = page.InhibitDisplay;
+            InterruptedSequence = page.InterruptedSequence;
+            MagazineSerial = page.MagazineSerial;
+            NationalOptionCharacterSubset = page.NationalOptionCharacterSubset;
+            // Update rows with new ones
+            for (int i = 0; i < Rows.Length; i++)
+            {
+                if (page.Rows[i] != null)
+                {
+                    Rows[i] = page.Rows[i];
+                }
+            }
+            // Update links with new ones
+            Links = page.Links;
+            // Update enhancements with new ones
+            for (int i = 0; i < EnhancementData.Length; i++)
+            {
+                if (page.EnhancementData[i] != null)
+                {
+                    EnhancementData[i] = page.EnhancementData[i];
+                }
+            }
+            for (int i = 0; i < ReplacementData.Length; i++)
+            {
+                if (page.ReplacementData[i] != null)
+                {
+                    ReplacementData[i] = page.ReplacementData[i];
+                }
             }
         }
         #endregion
