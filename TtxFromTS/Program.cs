@@ -236,18 +236,6 @@ namespace TtxFromTS
                                     streamWriter.WriteLine($"PN,{magazine.Number}{page.Number}{page.Subcode.Substring(2)}");
                                     // Write subcode
                                     streamWriter.WriteLine($"SC,{page.Subcode}");
-                                    // Create page status bits
-                                    BitArray statusBits = new BitArray(16);
-                                    // Set status bits
-                                    statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
-                                    statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
-                                    statusBits[2] = page.MagazineSerial; // Magazine serial
-                                    statusBits[7] = true; // Transmit page
-                                    statusBits[8] = page.Newsflash; // Newsflash
-                                    statusBits[9] = page.Subtitles; // Subtitle
-                                    statusBits[10] = page.SuppressHeader; // Suppress Header
-                                    statusBits[13] = page.InhibitDisplay; // Inhibit Display
-                                    statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
                                     // Write page function for pages using encoding other than text
                                     if (page.Number == "F0") // TOP BTT
                                     {
@@ -273,6 +261,18 @@ namespace TtxFromTS
                                     {
                                         streamWriter.WriteLine("PF,5,0");
                                     }
+                                    // Create page status bits
+                                    BitArray statusBits = new BitArray(16);
+                                    // Set status bits
+                                    statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
+                                    statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
+                                    statusBits[2] = page.MagazineSerial; // Magazine serial
+                                    statusBits[7] = true; // Transmit page
+                                    statusBits[8] = page.Newsflash; // Newsflash
+                                    statusBits[9] = page.Subtitles; // Subtitle
+                                    statusBits[10] = page.SuppressHeader; // Suppress Header
+                                    statusBits[13] = page.InhibitDisplay; // Inhibit Display
+                                    statusBits[15] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x03) >> 2); // Language (C12)
                                     // Write page status
                                     byte[] statusBytes = new byte[2];
                                     statusBits.CopyTo(statusBytes, 0);
