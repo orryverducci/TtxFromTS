@@ -331,8 +331,8 @@ namespace TtxFromTS
                                             }
                                         }
                                     }
-                                    // Write fastext links, if page has them
-                                    if (page.Links != null)
+                                    // Write fastext links, if page has them, and service does not have TOP pages
+                                    if (page.Links != null && !magazine.Pages.Any(x => x.Number == "F0" ))
                                     {
                                         streamWriter.WriteLine($"FL,{page.Links[0].Number},{page.Links[1].Number},{page.Links[2].Number},{page.Links[3].Number},{page.Links[4].Number},{page.Links[5].Number}");
                                     }
