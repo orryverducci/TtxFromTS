@@ -12,6 +12,7 @@ namespace TtxFromTS
             Header,
             PageBody,
             Fastext,
+            TOPCommentary,
             PageReplacements,
             LinkedPages,
             PageEnhancements,
@@ -97,6 +98,10 @@ namespace TtxFromTS
             else if (Number == 24)
             {
                 Type = PacketType.Fastext;
+            }
+            else if (Number == 25)
+            {
+                Type = PacketType.TOPCommentary;
             }
             else if (Number == 26)
             {

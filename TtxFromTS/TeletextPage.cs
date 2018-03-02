@@ -98,7 +98,7 @@ namespace TtxFromTS
         /// Gets the rows of the page.
         /// </summary>
         /// <value>The rows of the page.</value>
-        internal byte[][] Rows { get; private set; } = new byte[25][];
+        internal byte[][] Rows { get; private set; } = new byte[26][];
 
         /// <summary>
         /// Gets the linked pages
@@ -159,6 +159,7 @@ namespace TtxFromTS
                     break;
                 case TeletextPacket.PacketType.PageBody:
                 case TeletextPacket.PacketType.Fastext:
+                case TeletextPacket.PacketType.TOPCommentary:
                     DecodeRow(packet);
                     break;
                 case TeletextPacket.PacketType.PageReplacements:

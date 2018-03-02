@@ -6,6 +6,7 @@ Release Notes
 
 * **NEW:** TOP data pages are now properly decoded and exported
 * **IMPROVED:** Updates to pages are now processed and applied to pages
+* **IMPROVED:** Packet X/25 is now decoded and exported
 * **FIXED:** Subpages are now exported in the right order
 
 1.1
