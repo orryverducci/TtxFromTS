@@ -15,6 +15,34 @@ namespace TtxFromTS
     /// </summary>
     internal class Program
     {
+        #region Enumerations
+        enum PageType
+        {
+            BasicLevel1 = 0,
+            DataBroadcasting = 1,
+            GlobalObjectDefinition = 2,
+            ObjectDefinition = 3,
+            GlobalDRCS = 4,
+            DRCS = 5,
+            MagazineOrganisationTable = 6,
+            MagazineInventory = 7,
+            BasicTOPTable = 8,
+            AdditionalInformationTable = 9,
+            MultipageTable = 10,
+            MultipageExtension = 11
+        }
+
+        enum PageEncoding
+        {
+            OddParity = 0,
+            AllData = 1,
+            Hamming2418 = 2,
+            Hamming84 = 3,
+            HammingWithOddParity = 4,
+            FirstByteDesignated = 5
+        }
+        #endregion
+
         #region Private Fields
         /// <summary>
         /// The application options.
@@ -232,34 +260,52 @@ namespace TtxFromTS
                                 // Loop through each subpage in order of subcode, writing each one
                                 foreach (TeletextPage page in carousel.Pages.OrderBy(x => x.Subcode).ToList())
                                 {
+                                    // Set page type and encoding
+                                    PageType pageType;
+                                    PageEncoding pageEncoding;
+                                    if (page.Number == "F0") // TOP BTT
+                                    {
+                                        pageType = PageType.BasicTOPTable;
+                                        pageEncoding = PageEncoding.Hamming84;
+                                    }
+                                    else if (page.Number == "FE") // MOT
+                                    {
+                                        pageType = PageType.MagazineOrganisationTable;
+                                        pageEncoding = PageEncoding.Hamming84;
+                                    }
+                                    else if (magazine.GlobalObjectPage == magazine.Number.ToString() + page.Number) // GPOP
+                                    {
+                                        pageType = PageType.GlobalObjectDefinition;
+                                        pageEncoding = PageEncoding.Hamming2418;
+                                    }
+                                    else if (magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number)) // POP
+                                    {
+                                        pageType = PageType.ObjectDefinition;
+                                        pageEncoding = PageEncoding.Hamming2418;
+                                    }
+                                    else if (magazine.GDRCSPages.Contains(magazine.Number.ToString() + page.Number)) // GDRCS
+                                    {
+                                        pageType = PageType.GlobalDRCS;
+                                        pageEncoding = PageEncoding.OddParity;
+                                    }
+                                    else if (magazine.DRCSPages.Contains(magazine.Number.ToString() + page.Number)) // DRCS
+                                    {
+                                        pageType = PageType.DRCS;
+                                        pageEncoding = PageEncoding.OddParity;
+                                    }
+                                    else
+                                    {
+                                        pageType = PageType.BasicLevel1;
+                                        pageEncoding = PageEncoding.OddParity;
+                                    }
                                     // Write page number
                                     streamWriter.WriteLine($"PN,{magazine.Number}{page.Number}{page.Subcode.Substring(2)}");
                                     // Write subcode
                                     streamWriter.WriteLine($"SC,{page.Subcode}");
-                                    // Write page function for pages using encoding other than text
-                                    if (page.Number == "F0") // TOP BTT
+                                    // Write page function for pages that aren't standard level 1 pages
+                                    if (pageType != PageType.BasicLevel1 || pageEncoding != PageEncoding.OddParity)
                                     {
-                                        streamWriter.WriteLine("PF,8,3");
-                                    }
-                                    else if (page.Number == "FE") // MOT
-                                    {
-                                        streamWriter.WriteLine("PF,6,3");
-                                    }
-                                    else if (magazine.GlobalObjectPage == magazine.Number.ToString() + page.Number) // GPOP
-                                    {
-                                        streamWriter.WriteLine("PF,2,2");
-                                    }
-                                    else if (magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number)) // POP
-                                    {
-                                        streamWriter.WriteLine("PF,3,2");
-                                    }
-                                    else if (magazine.GDRCSPages.Contains(magazine.Number.ToString() + page.Number)) // GDRCS
-                                    {
-                                        streamWriter.WriteLine("PF,4,0");
-                                    }
-                                    else if (magazine.DRCSPages.Contains(magazine.Number.ToString() + page.Number)) // DRCS
-                                    {
-                                        streamWriter.WriteLine("PF,5,0");
+                                        streamWriter.WriteLine($"PF,{(int)pageType},{(int)pageEncoding}");
                                     }
                                     // Create page status bits
                                     BitArray statusBits = new BitArray(16);
@@ -271,7 +317,7 @@ namespace TtxFromTS
                                     statusBits[10] = page.SuppressHeader; // Suppress Header
                                     statusBits[13] = page.InhibitDisplay; // Inhibit Display
                                     // Set status language bits if page is not an enhancements page
-                                    if (page.Number != "F0" && page.Number != "FE" && magazine.GlobalObjectPage != magazine.Number.ToString() + page.Number && !magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.GDRCSPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.DRCSPages.Contains(magazine.Number.ToString() + page.Number))
+                                    if (pageType == PageType.BasicLevel1)
                                     {
                                         statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
                                         statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
@@ -286,7 +332,7 @@ namespace TtxFromTS
                                     Buffer.BlockCopy(page.Rows[0], 8, headerBytes, 0, headerBytes.Length);
                                     streamWriter.WriteLine($"OL,0,XXXXXXXX{EncodeText(headerBytes)}");
                                     // Write page enhancements, if the page has them and the page is not itself an enhancement page
-                                    if (page.EnhancementData.Any(x => x != null) && page.Number != "F0" && page.Number != "FE" && magazine.GlobalObjectPage != magazine.Number.ToString() + page.Number && !magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.GDRCSPages.Contains(magazine.Number.ToString() + page.Number) && !magazine.DRCSPages.Contains(magazine.Number.ToString() + page.Number))
+                                    if (pageType == PageType.BasicLevel1 && page.EnhancementData.Any(x => x != null))
                                     {
                                         // Write each enhancement packet
                                         for (int i = 0; i < page.EnhancementData.Length; i++)
@@ -317,17 +363,17 @@ namespace TtxFromTS
                                         if (page.Rows[i] != null)
                                         {
                                             // Write row using correct encoding for the page
-                                            if (page.Number == "F0" || page.Number == "FE") // MOT or BTT
+                                            switch (pageEncoding)
                                             {
-                                                streamWriter.WriteLine($"OL,{i},{EncodeHammedData(page.Rows[i])}");
-                                            }
-                                            else if (magazine.GlobalObjectPage == magazine.Number.ToString() + page.Number || magazine.ObjectPages.Contains(magazine.Number.ToString() + page.Number)) // Object page
-                                            {
-                                                streamWriter.WriteLine($"OL,{i},{EncodeEnhancement(0, page.Rows[i])}");
-                                            }
-                                            else // Normal page
-                                            {
-                                                streamWriter.WriteLine($"OL,{i},{EncodeText(page.Rows[i])}");
+                                                case PageEncoding.Hamming84:
+                                                    streamWriter.WriteLine($"OL,{i},{EncodeHammedData(page.Rows[i])}");
+                                                    break;
+                                                case PageEncoding.Hamming2418:
+                                                    streamWriter.WriteLine($"OL,{i},{EncodeEnhancement(0, page.Rows[i])}");
+                                                    break;
+                                                default:
+                                                    streamWriter.WriteLine($"OL,{i},{EncodeText(page.Rows[i])}");
+                                                    break;
                                             }
                                         }
                                     }
