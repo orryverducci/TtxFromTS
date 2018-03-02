@@ -287,12 +287,7 @@ namespace TtxFromTS
         /// <param name="packet">The row packet.</param>
         private void DecodeRow(TeletextPacket packet)
         {
-            byte[] characters = new byte[packet.Data.Length];
-            for (int i = 0; i < packet.Data.Length; i++)
-            {
-                characters[i] = packet.Data[i];
-            }
-            Rows[(int)packet.Number] = characters;
+            Rows[(int)packet.Number] = packet.Data;
         }
 
         /// <summary>
