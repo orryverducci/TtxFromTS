@@ -68,6 +68,24 @@ namespace TtxFromTS
         internal List<string> DRCSPages { get; private set; } = new List<string>();
 
         /// <summary>
+        /// Gets a list of page numbers for the TOP Multipage Table pages for the magazine.
+        /// </summary>
+        /// <value>The list of MPT page numbers.</value>
+        internal List<string> MultipageTablePages { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// Gets a list of page numbers for the TOP Multipage Table Extension pages for the magazine.
+        /// </summary>
+        /// <value>The list of MPT-EX page numbers.</value>
+        internal List<string> MultipageExtensionPages { get; private set; } = new List<string>();
+
+        /// <summary>
+        /// Gets a list of page numbers for the TOP Additional Information Table pages for the magazine.
+        /// </summary>
+        /// <value>The list of AIT page numbers.</value>
+        internal List<string> AdditionalInformationTablePages { get; private set; } = new List<string>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
         /// <param name="number">The magazine number.</param>
@@ -130,6 +148,11 @@ namespace TtxFromTS
                 if (_currentPage.Number == "FE")
                 {
                     DecodeMOT();
+                }
+                // If the page is a Basic TOP Table, decode the page numbers of additional TOP pages
+                if (_currentPage.Number == "F0")
+                {
+                    DecodeTOP();
                 }
                 // Check if a carousel with the page number exists
                 TeletextCarousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
@@ -235,6 +258,50 @@ namespace TtxFromTS
                             else if (link.Substring(1) != "FF")
                             {
                                 DRCSPages.Add(link);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Decodes additional TOP page numbers from the Basic TOP Table.
+        /// </summary>
+        private void DecodeTOP()
+        {
+            // Decode page linking table
+            for (int i = 0; i < 2; i++)
+            {
+                // Set packet number
+                int packetNum = 21 + i;
+                // If packet is set, decode links from it
+                if (_currentPage.Rows[packetNum] != null)
+                {
+                    for (int x = 0; x < 5; x++)
+                    {
+                        // Set link offset
+                        int linkOffset = 8 * x;
+                        // Decode link page number
+                        byte[] linkBytes = new byte[3];
+                        Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
+                        string link = DecodePageLink(linkBytes);
+                        // If a valid link is decoded, add it to the appropriate list
+                        if (link != null)
+                        {
+                            // Decode page type
+                            int type = Decode.Hamming84(_currentPage.Rows[packetNum][linkOffset + 7]);
+                            switch (type)
+                            {
+                                case 1:
+                                    MultipageTablePages.Add(link);
+                                    break;
+                                case 2:
+                                    AdditionalInformationTablePages.Add(link);
+                                    break;
+                                case 3:
+                                    MultipageExtensionPages.Add(link);
+                                    break;
                             }
                         }
                     }

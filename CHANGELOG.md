@@ -4,6 +4,7 @@ Release Notes
 1.2
 ---
 
+* **NEW:** TOP data pages are now properly decoded and exported
 * **IMPROVED:** Updates to pages are now processed and applied to pages
 * **FIXED:** Subpages are now exported in the right order
 

@@ -268,6 +268,21 @@ namespace TtxFromTS
                                         pageType = PageType.BasicTOPTable;
                                         pageEncoding = PageEncoding.Hamming84;
                                     }
+                                    else if (magazine.MultipageTablePages.Contains(magazine.Number.ToString() + page.Number)) // TOP MPT
+                                    {
+                                        pageType = PageType.MultipageTable;
+                                        pageEncoding = PageEncoding.Hamming84;
+                                    }
+                                    else if (magazine.AdditionalInformationTablePages.Contains(magazine.Number.ToString() + page.Number)) // TOP AIT
+                                    {
+                                        pageType = PageType.AdditionalInformationTable;
+                                        pageEncoding = PageEncoding.HammingWithOddParity;
+                                    }
+                                    else if (magazine.MultipageExtensionPages.Contains(magazine.Number.ToString() + page.Number)) // TOP MPT-EX
+                                    {
+                                        pageType = PageType.MultipageExtension;
+                                        pageEncoding = PageEncoding.Hamming84;
+                                    }
                                     else if (page.Number == "FE") // MOT
                                     {
                                         pageType = PageType.MagazineOrganisationTable;
@@ -370,6 +385,9 @@ namespace TtxFromTS
                                                     break;
                                                 case PageEncoding.Hamming2418:
                                                     streamWriter.WriteLine($"OL,{i},{EncodeEnhancement(0, page.Rows[i])}");
+                                                    break;
+                                                case PageEncoding.HammingWithOddParity:
+                                                    streamWriter.WriteLine($"OL,{i},{EncodeMixedData(page.Rows[i])}");
                                                     break;
                                                 default:
                                                     streamWriter.WriteLine($"OL,{i},{EncodeText(page.Rows[i])}");
@@ -640,6 +658,45 @@ namespace TtxFromTS
                 byte decodedChar = Decode.Hamming84(dataPacket[i]);
                 // If the byte doesn't have an unrecoverable error
                 outputString.Append((char)(decodedChar | 0x40));
+            }
+            return outputString.ToString();
+        }
+
+        /// <summary>
+        /// Encodes packets with both hamming and odd parity (i.e. TOP AIT) to a format valid for TTI files.
+        /// </summary>
+        /// <returns>The encoded string.</returns>
+        /// <param name="dataPacket">The data to be encoded.</param>
+        private static string EncodeMixedData(byte[] dataPacket)
+        {
+            // Create string to be written
+            StringBuilder outputString = new StringBuilder();
+            // Go through each byte
+            for (int i = 0; i < dataPacket.Length; i++)
+            {
+                // Encode byte based on appropraite formatting for the character position
+                if (i < 8 || (i > 19 && i < 28))
+                {
+                    // Decode the byte
+                    byte decodedChar = Decode.Hamming84(dataPacket[i]);
+                    // If the byte doesn't have an unrecoverable error
+                    outputString.Append((char)(decodedChar | 0x40));
+                }
+                else
+                {
+                    // Decode the character
+                    byte decodedChar = Decode.OddParity(dataPacket[i]);
+                    // If hex code is 0x20 or greater, output it as is, otherwise add 0x40 and prefix with an escape
+                    if (decodedChar >= 0x20)
+                    {
+                        outputString.Append(Encoding.ASCII.GetString(new byte[] { decodedChar }));
+                    }
+                    else
+                    {
+                        outputString.Append(Encoding.ASCII.GetString(new byte[] { 0x1b }));
+                        outputString.Append(Encoding.ASCII.GetString(new byte[] { (byte)(decodedChar + 0x40) }));
+                    }
+                }
             }
             return outputString.ToString();
         }
