@@ -331,8 +331,8 @@ namespace TtxFromTS
                                     statusBits[9] = page.Subtitles; // Subtitle
                                     statusBits[10] = page.SuppressHeader; // Suppress Header
                                     statusBits[13] = page.InhibitDisplay; // Inhibit Display
-                                    // Set status language bits if page is not an enhancements page
-                                    if (pageType == PageType.BasicLevel1)
+                                    // Set status language bits if page is a standard level 1 page or a TOP Additional Information Table
+                                    if (pageType == PageType.BasicLevel1 || pageType == PageType.AdditionalInformationTable)
                                     {
                                         statusBits[0] = Convert.ToBoolean(((int)page.NationalOptionCharacterSubset & 0x02) >> 1); // Language (C13)
                                         statusBits[1] = Convert.ToBoolean((int)page.NationalOptionCharacterSubset & 0x01); // Language (C14)
