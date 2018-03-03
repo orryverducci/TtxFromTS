@@ -317,7 +317,12 @@ namespace TtxFromTS
                     // If the magazine bytes don't contain errors, decode the magazine number and add to link page number, otherwise add current magazine
                     if (magazineByte1 != 0xff && magazineByte2 != 0xff)
                     {
-                        byte magazineNumber = (byte)(((magazineByte1 >> 3) | ((magazineByte2 & 0x0C) >> 1) ^ Magazine));
+                        int rawMagNumber = Magazine < 8 ? Magazine : 0;
+                        byte magazineNumber = (byte)(((magazineByte1 >> 3) | ((magazineByte2 & 0x0C) >> 1)) ^ rawMagNumber);
+                        if (magazineNumber == 0x00)
+                        {
+                            magazineNumber = 0x08;
+                        }
                         pageNumber.Number = magazineNumber.ToString("x1") + pageNumber.Number;
                     }
                     else
