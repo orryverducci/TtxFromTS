@@ -16,6 +16,6 @@
   <ItemGroup>
     <PackageReference Include="CommandLineArgumentsParser" Version="3.0.18" />
     <PackageReference Include="Cinegy.TsDecoder" Version="2.0.90" />
-    <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" />
+    <PackageReference Include="ILLink.Tasks" Version="0.1.5-preview-1461378" />
   </ItemGroup>
 </Project>
