@@ -4,6 +4,7 @@ Release Notes
 1.2
 ---
 
+* **NEW:** Level 2.5+ enhancements are now decoded and exported
 * **NEW:** TOP data pages are now properly decoded and exported
 * **IMPROVED:** Updates to pages are now processed and applied to pages
 * **IMPROVED:** Packet X/25 is now decoded and exported
