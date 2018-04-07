@@ -40,7 +40,6 @@ Currently there are a number of limitations this application is bound by. These 
 The current limitations are:
 
 * The packet identifier (PID) of the specific teletext service must be known. If you do not know it you can use another application such as [DVB Inspector](http://www.digitalekabeltelevisie.nl/dvb_inspector/) or TransEdit to find it.
-* Only full level one facilities are currently decoded. Level 2.5+ enhancement data is not decoded.
 * Fastext links pointing to specific subpages currently point to only the page number, ignoring the subpage.
 
 I've found a problem
