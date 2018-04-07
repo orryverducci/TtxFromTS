@@ -177,12 +177,15 @@ namespace TtxFromTS
                                     magazineSerial = Convert.ToBoolean((byte)(controlByte & 0x01));
                                 }
                                 // If flag is set, loop through each magazine
-                                for (int i = 0; i < 8; i++)
+                                if (magazineSerial)
                                 {
-                                    // Only signal header if magazine is not the one for this header
-                                    if (i + 1 != teletextPacket.Magazine)
+                                    for (int i = 0; i < 8; i++)
                                     {
-                                        Magazine[i].SerialHeaderReceived();
+                                        // Only signal header if magazine is not the one for this header
+                                        if (i + 1 != teletextPacket.Magazine)
+                                        {
+                                            Magazine[i].SerialHeaderReceived();
+                                        }
                                     }
                                 }
                             }

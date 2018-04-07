@@ -10,6 +10,7 @@ Release Notes
 * **IMPROVED:** Packet X/25 is now decoded and exported
 * **FIXED:** Subpages are now exported in the right order
 * **FIXED:** Fastext link numbers are no longer corrupted on magazine 8
+* **FIXED:** Services using parallel transmission are now decoded correctly again
 
 1.1
 ---
