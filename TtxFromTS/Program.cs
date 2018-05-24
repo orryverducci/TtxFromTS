@@ -384,7 +384,7 @@ namespace TtxFromTS
                                                     streamWriter.WriteLine($"OL,{i},{EncodeHammedData(page.Rows[i])}");
                                                     break;
                                                 case PageEncoding.Hamming2418:
-                                                    streamWriter.WriteLine($"OL,{i},{EncodeEnhancement(0, page.Rows[i])}");
+                                                    streamWriter.WriteLine($"OL,{i},{EncodeEnhancement(Decode.Hamming84(page.Rows[i][0]), page.Rows[i])}");
                                                     break;
                                                 case PageEncoding.HammingWithOddParity:
                                                     streamWriter.WriteLine($"OL,{i},{EncodeMixedData(page.Rows[i])}");
@@ -609,11 +609,19 @@ namespace TtxFromTS
         private static string EncodeEnhancement(int designation, byte[] enhancementPacket)
         {
             // Create string to be written
-            StringBuilder outputString = new StringBuilder(enhancementPacket.Length);
+            StringBuilder outputString = new StringBuilder(40);
             // Write designation code
             outputString.Append((char)(designation | 0x40));
             // Set offset for initial triplet
-            int tripletOffset = 0;
+            int tripletOffset;
+            if (enhancementPacket.Length == 40)
+            {
+                tripletOffset = 1;
+            }
+            else
+            {
+                tripletOffset = 0;
+            }
             // Loop through each triplet and process it
             while (tripletOffset + 2 < enhancementPacket.Length)
             {

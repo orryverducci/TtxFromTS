@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+1.2.1
+-----
+
+* **FIXED:** Invalid encoding of Hamming 24/18 protected packets has been fixed
+
 1.2
 ---
 
