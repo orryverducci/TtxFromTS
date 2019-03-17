@@ -61,79 +61,76 @@ namespace TtxFromTS
         /// <param name="args">The command line arguments.</param>
         internal static int Main(string[] args)
         {
-            // Parse command line arguments, and run application if successful
-            if (ParseArguments(args))
+            // Parse command line arguments, and exit if invalid
+            if (!ParseArguments(args))
             {
-                // Setup decoder
-                _teletextDecoder = new TeletextDecoder { EnableSubtitles = _options.IncludeSubtitles };
-                // Open the input file
-                using (FileStream fileStream = _options.InputFile.OpenRead())
+                return -1;
+            }
+            // Setup decoder
+            _teletextDecoder = new TeletextDecoder { EnableSubtitles = _options.IncludeSubtitles };
+            // Open the input file
+            using (FileStream fileStream = _options.InputFile.OpenRead())
+            {
+                // Setup transport stream decoder
+                TsPacketFactory packetFactory = new TsPacketFactory();
+                // Setup count of packets processed and buffer for packet data
+                int packetsDecoded = 0;
+                int packetsProcessed = 0;
+                byte[] data = new byte[1316];
+                // Read the file in a loop until the end of the file
+                while (fileStream.Read(data, 0, 1316) > 0)
                 {
-                    // Setup transport stream decoder
-                    TsPacketFactory packetFactory = new TsPacketFactory();
-                    // Setup count of packets processed and buffer for packet data
-                    int packetsDecoded = 0;
-                    int packetsProcessed = 0;
-                    byte[] data = new byte[1316];
-                    // Read the file in a loop until the end of the file
-                    while (fileStream.Read(data, 0, 1316) > 0)
+                    // Retrieve transport stream packets from the data
+                    TsPacket[] packets = packetFactory.GetTsPacketsFromData(data);
+                    // If packets are returned, process them
+                    if (packets != null)
                     {
-                        // Retrieve transport stream packets from the data
-                        TsPacket[] packets = packetFactory.GetTsPacketsFromData(data);
-                        // If packets are returned, process them
-                        if (packets != null)
+                        foreach (TsPacket packet in packets)
                         {
-                            foreach (TsPacket packet in packets)
+                            // Increase count of packets decoded
+                            packetsDecoded++;
+                            // If packet is from the wanted identifier, pass it to the decoder and increase count of packets processed
+                            if (packet.Pid == _options.PacketIdentifier)
                             {
-                                // Increase count of packets decoded
-                                packetsDecoded++;
-                                // If packet is from the wanted identifier, pass it to the decoder and increase count of packets processed
-                                if (packet.Pid == _options.PacketIdentifier)
+                                try
                                 {
-                                    try
-                                    {
-                                        _teletextDecoder.AddPacket(packet);
-                                    }
-                                    catch (InvalidOperationException)
-                                    {
-                                        OutputError("The provided packet identifier is not a teletext service");
-                                        return 3;
-                                    }
-                                    packetsProcessed++;
+                                    _teletextDecoder.AddPacket(packet);
                                 }
+                                catch (InvalidOperationException)
+                                {
+                                    OutputError("The provided packet identifier is not a teletext service");
+                                    return 3;
+                                }
+                                packetsProcessed++;
                             }
                         }
                     }
-                    // If packets are processed, output pages and the number processed, otherwise return an error
-                    if (packetsProcessed > 0)
-                    {
-                        // If pages have been decoded, output them
-                        if (_teletextDecoder.TotalPages > 0)
-                        {
-                            OutputPages();
-                        }
-                        // Output stats
-                        Console.WriteLine($"Total number of packets: {packetsDecoded}");
-                        Console.WriteLine($"Packets processed: {packetsProcessed}");
-                        Console.WriteLine($"Pages decoded: {_teletextDecoder.TotalPages}");
-                        // Output success exit code
-                        return 0;
-                    }
-                    else if (packetsDecoded > 0)
-                    {
-                        OutputError("Invalid packet identifier provided");
-                        return 4;
-                    }
-                    else
-                    {
-                        OutputError("Unable to process transport stream - please check it is a valid TS file");
-                        return 5;
-                    }
                 }
-            }
-            else
-            {
-                return -1;
+                // If packets are processed, output pages and the number processed, otherwise return an error
+                if (packetsProcessed > 0)
+                {
+                    // If pages have been decoded, output them
+                    if (_teletextDecoder.TotalPages > 0)
+                    {
+                        OutputPages();
+                    }
+                    // Output stats
+                    Console.WriteLine($"Total number of packets: {packetsDecoded}");
+                    Console.WriteLine($"Packets processed: {packetsProcessed}");
+                    Console.WriteLine($"Pages decoded: {_teletextDecoder.TotalPages}");
+                    // Output success exit code
+                    return 0;
+                }
+                else if (packetsDecoded > 0)
+                {
+                    OutputError("Invalid packet identifier provided");
+                    return 4;
+                }
+                else
+                {
+                    OutputError("Unable to process transport stream - please check it is a valid TS file");
+                    return 5;
+                }
             }
         }
 
