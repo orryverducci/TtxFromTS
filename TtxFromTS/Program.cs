@@ -64,7 +64,7 @@ namespace TtxFromTS
             // Parse command line arguments, and exit if invalid
             if (!ParseArguments(args))
             {
-                return -1;
+                return (int)ExitCodes.InvalidArgs;
             }
             // Setup decoder
             _teletextDecoder = new TeletextDecoder { EnableSubtitles = _options.IncludeSubtitles };
@@ -99,7 +99,7 @@ namespace TtxFromTS
                                 catch (InvalidOperationException)
                                 {
                                     OutputError("The provided packet identifier is not a teletext service");
-                                    return 3;
+                                    return (int)ExitCodes.InvalidService;
                                 }
                                 packetsProcessed++;
                             }
@@ -119,17 +119,17 @@ namespace TtxFromTS
                     Console.WriteLine($"Packets processed: {packetsProcessed}");
                     Console.WriteLine($"Pages decoded: {_teletextDecoder.TotalPages}");
                     // Output success exit code
-                    return 0;
+                    return (int)ExitCodes.Success;
                 }
                 else if (packetsDecoded > 0)
                 {
                     OutputError("Invalid packet identifier provided");
-                    return 4;
+                    return (int)ExitCodes.InvalidPID;
                 }
                 else
                 {
                     OutputError("Unable to process transport stream - please check it is a valid TS file");
-                    return 5;
+                    return (int)ExitCodes.TSError;
                 }
             }
         }
