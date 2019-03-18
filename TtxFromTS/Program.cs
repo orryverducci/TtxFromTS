@@ -61,6 +61,8 @@ namespace TtxFromTS
         /// <param name="args">The command line arguments.</param>
         internal static int Main(string[] args)
         {
+            // Catch any unhandled exceptions
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrap;
             // Parse command line arguments, and exit if invalid
             if (!ParseArguments(args))
             {
@@ -208,6 +210,12 @@ namespace TtxFromTS
             }
             // Return success if arguments are given, otherwise return failure
             return (args.Length > 0) ? true : false;
+        }
+
+        private static void UnhandledExceptionTrap(object sender, UnhandledExceptionEventArgs e)
+        {
+            OutputError($"An unexpected error occurred {e.ExceptionObject.ToString()}");
+            Environment.Exit((int)ExitCodes.Unspecified);
         }
 
         /// <summary>

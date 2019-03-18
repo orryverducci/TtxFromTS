@@ -8,6 +8,7 @@ namespace TtxFromTS
         InvalidArgs = 1,
         InvalidService = 2,
         InvalidPID = 3,
-        TSError = 4
+        TSError = 4,
+        Unspecified = 5
     }
 }
