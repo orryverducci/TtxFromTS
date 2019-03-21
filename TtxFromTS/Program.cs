@@ -106,9 +106,7 @@ namespace TtxFromTS
                         OutputPages();
                     }
                     // Output stats
-                    Console.WriteLine($"Total number of packets: {tsDecoder.PacketsReceived}");
-                    Console.WriteLine($"Packets processed: {tsDecoder.PacketsDecoded}");
-                    Console.WriteLine($"Pages decoded: {_teletextDecoder.TotalPages}");
+                    OutputStats(tsDecoder.PacketsReceived, tsDecoder.PacketsDecoded, _teletextDecoder.TotalPages);
                     // Output success exit code
                     return (int)ExitCodes.Success;
                 }
@@ -751,6 +749,23 @@ namespace TtxFromTS
             Console.Error.Write("[WARNING] ");
             Console.ResetColor();
             Console.Error.WriteLine(warningMessage);
+        }
+
+        /// <summary>
+        /// Outputs decoding stats to the console's standard error output.
+        /// </summary>
+        /// <param name="packetsReceived">The number of packets received.</param>
+        /// <param name="packetsProcessed">The number of packets processed.</param>
+        /// <param name="pagesDecoded">The number of pages decoded.</param>
+        private static void OutputStats(int packetsReceived, int packetsProcessed, int pagesDecoded)
+        {
+            Console.Error.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Error.WriteLine("[STATISTICS]");
+            Console.ResetColor();
+            Console.Error.WriteLine($"Total number of packets: {packetsReceived}");
+            Console.Error.WriteLine($"Packets processed: {packetsProcessed}");
+            Console.Error.WriteLine($"Pages decoded: {pagesDecoded}");
         }
         #endregion
     }
