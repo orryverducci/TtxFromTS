@@ -60,6 +60,8 @@ namespace TtxFromTS
         /// <param name="args">The command line arguments.</param>
         internal static int Main(string[] args)
         {
+            // Output application header
+            OutputHeader();
             // Catch any unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrap;
             // Parse command line arguments, and exit if invalid
@@ -131,8 +133,6 @@ namespace TtxFromTS
         {
             // Create parser
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
-            // Set help header
-            parser.ShowUsageHeader = $"TtxFromTS {Assembly.GetEntryAssembly().GetName().Version.ToString(2)}{Environment.NewLine}";
             // Show help information if no arguments are provided
             parser.ShowUsageOnEmptyCommandline = true;
             // Parse command line arguments into the options class
@@ -702,6 +702,20 @@ namespace TtxFromTS
         #endregion
 
         #region Console Output Methods
+        /// <summary>
+        /// Outputs an introductory header message to the console's standard error output.
+        /// </summary>
+        /// <param name="errorMessage">The error message to be displayed.</param>
+        private static void OutputHeader()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.Error.Write($" TtxFromTS {Assembly.GetEntryAssembly().GetName().Version.ToString(2)} ");
+            Console.ResetColor();
+            Console.Error.WriteLine();
+            Console.Error.WriteLine();
+        }
+
         /// <summary>
         /// Outputs an error message to the console's standard error output.
         /// </summary>
