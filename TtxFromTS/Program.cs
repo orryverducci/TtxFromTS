@@ -47,6 +47,7 @@ namespace TtxFromTS
         /// The application options.
         /// </summary>
         private static Options _options = new Options();
+
         /// <summary>
         /// The teletext decoder.
         /// </summary>
