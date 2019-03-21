@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Cinegy.TsDecoder.TransportStream;
 using CommandLineParser.Exceptions;
 
 namespace TtxFromTS
@@ -68,48 +67,35 @@ namespace TtxFromTS
             {
                 return (int)ExitCodes.InvalidArgs;
             }
-            // Setup decoder
-            _teletextDecoder = new TeletextDecoder { EnableSubtitles = _options.IncludeSubtitles };
-            // Open the input file
+            // Setup decoders
+            TSDecoder tsDecoder = new TSDecoder
+            {
+                PacketID = _options.PacketIdentifier
+            };
+            tsDecoder.PacketDecoded += (sender, packet) => _teletextDecoder.AddPacket(packet);
+            _teletextDecoder = new TeletextDecoder
+            {
+                EnableSubtitles = _options.IncludeSubtitles
+            };
+            // Open the input file and read it in a loop until the end of the file
             using (FileStream fileStream = _options.InputFile.OpenRead())
             {
-                // Setup transport stream decoder
-                TsPacketFactory packetFactory = new TsPacketFactory();
-                // Setup count of packets processed and buffer for packet data
-                int packetsDecoded = 0;
-                int packetsProcessed = 0;
                 byte[] data = new byte[1316];
-                // Read the file in a loop until the end of the file
                 while (fileStream.Read(data, 0, 1316) > 0)
                 {
-                    // Retrieve transport stream packets from the data
-                    TsPacket[] packets = packetFactory.GetTsPacketsFromData(data);
-                    // If packets are returned, process them
-                    if (packets != null)
+                    try
                     {
-                        foreach (TsPacket packet in packets)
-                        {
-                            // Increase count of packets decoded
-                            packetsDecoded++;
-                            // If packet is from the wanted identifier, pass it to the decoder and increase count of packets processed
-                            if (packet.Pid == _options.PacketIdentifier)
-                            {
-                                try
-                                {
-                                    _teletextDecoder.AddPacket(packet);
-                                }
-                                catch (InvalidOperationException)
-                                {
-                                    OutputError("The provided packet identifier is not a teletext service");
-                                    return (int)ExitCodes.InvalidService;
-                                }
-                                packetsProcessed++;
-                            }
-                        }
+                        tsDecoder.DecodeData(data);
                     }
+                    catch (InvalidOperationException)
+                    {
+                        OutputError("The provided packet identifier is not a teletext service");
+                        return (int)ExitCodes.InvalidService;
+                    }
+                    tsDecoder.DecodeData(data);
                 }
                 // If packets are processed, output pages and the number processed, otherwise return an error
-                if (packetsProcessed > 0)
+                if (tsDecoder.PacketsDecoded > 0)
                 {
                     // If pages have been decoded, output them
                     if (_teletextDecoder.TotalPages > 0)
@@ -117,13 +103,13 @@ namespace TtxFromTS
                         OutputPages();
                     }
                     // Output stats
-                    Console.WriteLine($"Total number of packets: {packetsDecoded}");
-                    Console.WriteLine($"Packets processed: {packetsProcessed}");
+                    Console.WriteLine($"Total number of packets: {tsDecoder.PacketsReceived}");
+                    Console.WriteLine($"Packets processed: {tsDecoder.PacketsDecoded}");
                     Console.WriteLine($"Pages decoded: {_teletextDecoder.TotalPages}");
                     // Output success exit code
                     return (int)ExitCodes.Success;
                 }
-                else if (packetsDecoded > 0)
+                else if (tsDecoder.PacketsReceived > 0)
                 {
                     OutputError("Invalid packet identifier provided");
                     return (int)ExitCodes.InvalidPID;
