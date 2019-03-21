@@ -232,7 +232,7 @@ namespace TtxFromTS
                     foreach (TeletextCarousel carousel in magazine.Pages)
                     {
                         // Output to the console the page being outputted
-                        Console.WriteLine($"Outputting P{magazine.Number}{carousel.Number}");
+                        OutputInfo($"Outputting P{magazine.Number}{carousel.Number}");
                         // Set output file path
                         string filePath = outputDirectory.FullName + Path.DirectorySeparatorChar + "P" + magazine.Number + carousel.Number + ".tti";
                         // Check file doesn't already exist, and output warning if it does
@@ -404,7 +404,7 @@ namespace TtxFromTS
                     if (magazine.EnhancementData.Any(x => x != null))
                     {
                         // Output to the console that enhancements are being outputted
-                        Console.WriteLine($"Outputting enhancements for magazine {magazine.Number}");
+                        OutputInfo($"Outputting enhancements for magazine {magazine.Number}");
                         // Set output file path
                         string filePath = outputDirectory.FullName + Path.DirectorySeparatorChar + "P" + magazine.Number + "FF.tti";
                         // Write page number
@@ -715,6 +715,18 @@ namespace TtxFromTS
             Console.ResetColor();
             Console.Error.WriteLine();
             Console.Error.WriteLine();
+        }
+
+        /// <summary>
+        /// Outputs an info message to the console's standard error output.
+        /// </summary>
+        /// <param name="infoMessage">The info message to be displayed.</param>
+        private static void OutputInfo(string infoMessage)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Error.Write("[INFO] ");
+            Console.ResetColor();
+            Console.Error.WriteLine(infoMessage);
         }
 
         /// <summary>
