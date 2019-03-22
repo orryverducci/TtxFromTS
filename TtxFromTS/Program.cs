@@ -75,7 +75,7 @@ namespace TtxFromTS
             {
                 PacketID = _options.PacketIdentifier
             };
-            tsDecoder.PacketDecoded += (sender, packet) => _teletextDecoder.AddPacket(packet);
+            tsDecoder.PacketDecoded += (sender, packet) => _teletextDecoder.DecodePacket(packet);
             _teletextDecoder = new TeletextDecoder
             {
                 EnableSubtitles = _options.IncludeSubtitles

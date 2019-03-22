@@ -11,6 +11,21 @@ namespace TtxFromTS
         #region Private Fields
         // Setup transport stream decoder
         TsPacketFactory _packetFactory = new TsPacketFactory();
+
+        /// <summary>
+        /// Buffer for an elementary stream packet.
+        /// </summary>
+        private Pes _elementaryStreamPacket;
+
+        /// <summary>
+        /// Indicates if a PES error warning has been output.
+        /// </summary>
+        private bool _errorWarning;
+
+        /// <summary>
+        /// Indicates if an encrypted warning has been output.
+        /// </summary>
+        private bool _encryptedWarning;
         #endregion
 
         #region Properties
@@ -35,9 +50,9 @@ namespace TtxFromTS
 
         #region Events
         /// <summary>
-        /// Occurs when a TS packet has been successfully decoded from the specified Packet ID.
+        /// Occurs when a teletext packet has been successfully decoded from the specified Packet ID.
         /// </summary>
-        internal EventHandler<TsPacket> PacketDecoded;
+        internal EventHandler<Pes> PacketDecoded;
         #endregion
 
         #region Methods
@@ -54,15 +69,63 @@ namespace TtxFromTS
             {
                 return;
             }
-            // For each packet decoded, increase the packet counters and fire the decoded event if the packet is from the specified packet ID
+            // For each packet decoded, process it and increase the packet counters if the packet is from the specified packet ID
             foreach (TsPacket packet in packets)
             {
                 PacketsReceived++;
                 if (PacketID == -1 || packet.Pid == PacketID)
                 {
                     PacketsDecoded++;
-                    PacketDecoded?.Invoke(this, packet);
+                    ProcessPacket(packet);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Processes TS packets and retrieves elementary stream packets from them.
+        /// </summary>
+        /// <param name="data">The packet to be processed.</param>
+        private void ProcessPacket(TsPacket packet)
+        {
+            // Check packet is free from errors
+            if (packet.TransportErrorIndicator)
+            {
+                if (!_errorWarning)
+                {
+                    Logger.OutputWarning("The transport stream contains errors which will be ignored, possibly as a result of poor reception");
+                    _errorWarning = true;
+                }
+                return;
+            }
+            // Check packet is not encrypted
+            if (packet.ScramblingControl != 0)
+            {
+                if (!_encryptedWarning)
+                {
+                    Logger.OutputWarning("The specified packet ID contains encrypted packets which will be ignored");
+                    _encryptedWarning = true;
+                }
+                return;
+            }
+            // If the TS packet is the start of a PES, create a new elementary stream packet, otherwise add to an existing one
+            if (packet.PayloadUnitStartIndicator)
+            {
+                _elementaryStreamPacket = new Pes(packet);
+            }
+            else
+            {
+                // Only add the packet if not starting midway through a PES
+                if (_elementaryStreamPacket != null)
+                {
+                    _elementaryStreamPacket.Add(packet);
+                }
+            }
+            // If the TS packet completes a PES, decode it and fire the packet decoded event
+            if (_elementaryStreamPacket != null && _elementaryStreamPacket.HasAllBytes())
+            {
+                _elementaryStreamPacket.Decode();
+                PacketDecoded?.Invoke(this, _elementaryStreamPacket);
+                _elementaryStreamPacket = null;
             }
         }
         #endregion
