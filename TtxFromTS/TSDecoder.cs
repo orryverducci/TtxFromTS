@@ -9,7 +9,9 @@ namespace TtxFromTS
     internal class TSDecoder
     {
         #region Private Fields
-        // Setup transport stream decoder
+        /// <summary>
+        /// A processor which generates TS packets from raw data.
+        /// </summary>
         TsPacketFactory _packetFactory = new TsPacketFactory();
 
         /// <summary>
