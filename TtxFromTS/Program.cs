@@ -62,7 +62,7 @@ namespace TtxFromTS
         internal static int Main(string[] args)
         {
             // Output application header
-            OutputHeader();
+            Logger.OutputHeader();
             // Catch any unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrap;
             // Parse command line arguments, and exit if invalid
@@ -92,7 +92,7 @@ namespace TtxFromTS
                     }
                     catch (InvalidOperationException)
                     {
-                        OutputError("The provided packet identifier is not a teletext service");
+                        Logger.OutputError("The provided packet identifier is not a teletext service");
                         return (int)ExitCodes.InvalidService;
                     }
                     tsDecoder.DecodeData(data);
@@ -106,18 +106,18 @@ namespace TtxFromTS
                         OutputPages();
                     }
                     // Output stats
-                    OutputStats(tsDecoder.PacketsReceived, tsDecoder.PacketsDecoded, _teletextDecoder.TotalPages);
+                    Logger.OutputStats(tsDecoder.PacketsReceived, tsDecoder.PacketsDecoded, _teletextDecoder.TotalPages);
                     // Output success exit code
                     return (int)ExitCodes.Success;
                 }
                 else if (tsDecoder.PacketsReceived > 0)
                 {
-                    OutputError("Invalid packet identifier provided");
+                    Logger.OutputError("Invalid packet identifier provided");
                     return (int)ExitCodes.InvalidPID;
                 }
                 else
                 {
-                    OutputError("Unable to process transport stream - please check it is a valid TS file");
+                    Logger.OutputError("Unable to process transport stream - please check it is a valid TS file");
                     return (int)ExitCodes.TSError;
                 }
             }
@@ -146,22 +146,22 @@ namespace TtxFromTS
                 switch (exception)
                 {
                     case FileNotFoundException notFoundException: // Input file could not be found
-                        OutputError("Input file could not be found");
+                        Logger.OutputError("Input file could not be found");
                         break;
                     case MandatoryArgumentNotSetException notSetException: // Required argument not provided
-                        OutputError($"The {notSetException.Argument} argument is required");
+                        Logger.OutputError($"The {notSetException.Argument} argument is required");
                         break;
                     case UnknownArgumentException unknownException: // Not a valid argument
-                        OutputError($"{unknownException.Argument} is not a valid argument");
+                        Logger.OutputError($"{unknownException.Argument} is not a valid argument");
                         break;
                     case CommandLineFormatException formatException: // Short argument used with two dashes
-                        OutputError("Short arguments must be prefixed with a single '-' character");
+                        Logger.OutputError("Short arguments must be prefixed with a single '-' character");
                         break;
                     case CommandLineArgumentOutOfRangeException rangeException: // Short argument used with two dashes
-                        OutputError($"The value for {rangeException.Argument} is outside the valid range");
+                        Logger.OutputError($"The value for {rangeException.Argument} is outside the valid range");
                         break;
                     case TargetInvocationException invocationException: // Short argument used with two dashes
-                        OutputError("The values for one or more arguments are invalid");
+                        Logger.OutputError("The values for one or more arguments are invalid");
                         break;
                     default:
                         throw exception;
@@ -181,10 +181,10 @@ namespace TtxFromTS
                     switch (exception)
                     {
                         case ArgumentException argumentException: // Characters are invalid
-                            OutputError("The output directory contains invalid characters");
+                            Logger.OutputError("The output directory contains invalid characters");
                             break;
                         case PathTooLongException lengthException: // Path is too long
-                            OutputError("The output directory path is too long");
+                            Logger.OutputError("The output directory path is too long");
                             break;
                         default:
                             throw exception;
@@ -199,7 +199,7 @@ namespace TtxFromTS
 
         private static void UnhandledExceptionTrap(object sender, UnhandledExceptionEventArgs e)
         {
-            OutputError($"An unexpected error occurred {e.ExceptionObject.ToString()}");
+            Logger.OutputError($"An unexpected error occurred {e.ExceptionObject.ToString()}");
             Environment.Exit((int)ExitCodes.Unspecified);
         }
 
@@ -230,7 +230,7 @@ namespace TtxFromTS
                     foreach (TeletextCarousel carousel in magazine.Pages)
                     {
                         // Output to the console the page being outputted
-                        OutputInfo($"Outputting P{magazine.Number}{carousel.Number}");
+                        Logger.OutputInfo($"Outputting P{magazine.Number}{carousel.Number}");
                         // Set output file path
                         string filePath = outputDirectory.FullName + Path.DirectorySeparatorChar + "P" + magazine.Number + carousel.Number + ".tti";
                         // Check file doesn't already exist, and output warning if it does
@@ -395,14 +395,14 @@ namespace TtxFromTS
                         }
                         else
                         {
-                            OutputWarning($"P{magazine.Number}{carousel.Number}.tti already exists - skipping page");
+                            Logger.OutputWarning($"P{magazine.Number}{carousel.Number}.tti already exists - skipping page");
                         }
                     }
                     // If the magazine has enhancements, output them
                     if (magazine.EnhancementData.Any(x => x != null))
                     {
                         // Output to the console that enhancements are being outputted
-                        OutputInfo($"Outputting enhancements for magazine {magazine.Number}");
+                        Logger.OutputInfo($"Outputting enhancements for magazine {magazine.Number}");
                         // Set output file path
                         string filePath = outputDirectory.FullName + Path.DirectorySeparatorChar + "P" + magazine.Number + "FF.tti";
                         // Write page number
@@ -437,7 +437,7 @@ namespace TtxFromTS
                         }
                         else
                         {
-                            OutputWarning($"P{magazine.Number}FF.tti already exists - skipping enhancements");
+                            Logger.OutputWarning($"P{magazine.Number}FF.tti already exists - skipping enhancements");
                         }
                     }
                 }
@@ -557,7 +557,7 @@ namespace TtxFromTS
                 }
                 else
                 {
-                    OutputWarning($"Unable to create config file - file already exists");
+                    Logger.OutputWarning($"Unable to create config file - file already exists");
                 }
             }
         }
@@ -697,75 +697,6 @@ namespace TtxFromTS
                 }
             }
             return outputString.ToString();
-        }
-        #endregion
-
-        #region Console Output Methods
-        /// <summary>
-        /// Outputs an introductory header message to the console's standard error output.
-        /// </summary>
-        /// <param name="errorMessage">The error message to be displayed.</param>
-        private static void OutputHeader()
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.BackgroundColor = ConsoleColor.Blue;
-            Console.Error.Write($" TtxFromTS {Assembly.GetEntryAssembly().GetName().Version.ToString(2)} ");
-            Console.ResetColor();
-            Console.Error.WriteLine();
-            Console.Error.WriteLine();
-        }
-
-        /// <summary>
-        /// Outputs an info message to the console's standard error output.
-        /// </summary>
-        /// <param name="infoMessage">The info message to be displayed.</param>
-        private static void OutputInfo(string infoMessage)
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Error.Write("[INFO] ");
-            Console.ResetColor();
-            Console.Error.WriteLine(infoMessage);
-        }
-
-        /// <summary>
-        /// Outputs an error message to the console's standard error output.
-        /// </summary>
-        /// <param name="errorMessage">The error message to be displayed.</param>
-        private static void OutputError(string errorMessage)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.Write("[ERROR] ");
-            Console.ResetColor();
-            Console.Error.WriteLine(errorMessage);
-        }
-
-        /// <summary>
-        /// Outputs a warning message to the console's standard error output.
-        /// </summary>
-        /// <param name="warningMessage">The warning message to be displayed.</param>
-        private static void OutputWarning(string warningMessage)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Error.Write("[WARNING] ");
-            Console.ResetColor();
-            Console.Error.WriteLine(warningMessage);
-        }
-
-        /// <summary>
-        /// Outputs decoding stats to the console's standard error output.
-        /// </summary>
-        /// <param name="packetsReceived">The number of packets received.</param>
-        /// <param name="packetsProcessed">The number of packets processed.</param>
-        /// <param name="pagesDecoded">The number of pages decoded.</param>
-        private static void OutputStats(int packetsReceived, int packetsProcessed, int pagesDecoded)
-        {
-            Console.Error.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Error.WriteLine("[STATISTICS]");
-            Console.ResetColor();
-            Console.Error.WriteLine($"Total number of packets: {packetsReceived}");
-            Console.Error.WriteLine($"Packets processed: {packetsProcessed}");
-            Console.Error.WriteLine($"Pages decoded: {pagesDecoded}");
         }
         #endregion
     }
