@@ -46,7 +46,7 @@ namespace TtxFromTS
         /// <summary>
         /// The application options.
         /// </summary>
-        private static Options _options = new Options();
+        internal static Options Options { get; private set; } = new Options();
 
         /// <summary>
         /// The teletext decoder.
@@ -73,15 +73,15 @@ namespace TtxFromTS
             // Setup decoders
             TSDecoder tsDecoder = new TSDecoder
             {
-                PacketID = _options.PacketIdentifier
+                PacketID = Options.PacketIdentifier
             };
             tsDecoder.PacketDecoded += (sender, packet) => _teletextDecoder.DecodePacket(packet);
             _teletextDecoder = new TeletextDecoder
             {
-                EnableSubtitles = _options.IncludeSubtitles
+                EnableSubtitles = Options.IncludeSubtitles
             };
             // Open the input file and read it in a loop until the end of the file
-            using (FileStream fileStream = _options.InputFile.OpenRead())
+            using (FileStream fileStream = Options.InputFile.OpenRead())
             {
                 byte[] data = new byte[1316];
                 while (fileStream.Read(data, 0, 1316) > 0)
@@ -135,7 +135,7 @@ namespace TtxFromTS
             // Show help information if no arguments are provided
             parser.ShowUsageOnEmptyCommandline = true;
             // Parse command line arguments into the options class
-            parser.ExtractArgumentAttributes(_options);
+            parser.ExtractArgumentAttributes(Options);
             try
             {
                 parser.ParseCommandLine(args);
@@ -170,11 +170,11 @@ namespace TtxFromTS
                 return false;
             }
             // If output directory has been given, check it is valid, output error if it isn't
-            if (_options.OutputPath != null && _options.OutputPath != string.Empty)
+            if (Options.OutputPath != null && Options.OutputPath != string.Empty)
             {
                 try
                 {
-                    DirectoryInfo outputDirectory = new DirectoryInfo(_options.OutputPath);
+                    DirectoryInfo outputDirectory = new DirectoryInfo(Options.OutputPath);
                 }
                 catch (Exception exception)
                 {
@@ -210,13 +210,13 @@ namespace TtxFromTS
         {
             // Use provided output directory, or get the output directory name from the input filename if not provided
             string directoryName;
-            if (_options.OutputPath != null && _options.OutputPath != string.Empty)
+            if (Options.OutputPath != null && Options.OutputPath != string.Empty)
             {
-                directoryName = _options.OutputPath;
+                directoryName = Options.OutputPath;
             }
             else
             {
-                directoryName = _options.InputFile.Name.Substring(0, _options.InputFile.Name.LastIndexOf('.'));
+                directoryName = Options.InputFile.Name.Substring(0, Options.InputFile.Name.LastIndexOf('.'));
             }
             // Create the directory to store the pages in
             DirectoryInfo outputDirectory = Directory.CreateDirectory(directoryName);
@@ -244,9 +244,9 @@ namespace TtxFromTS
                                 // Write destination inserter
                                 streamWriter.WriteLine("DS,inserter");
                                 // Write source file
-                                streamWriter.WriteLine($"SP,{_options.InputFile}");
+                                streamWriter.WriteLine($"SP,{Options.InputFile}");
                                 // Write cycle time
-                                streamWriter.WriteLine($"CT,{_options.CycleTime},T");
+                                streamWriter.WriteLine($"CT,{Options.CycleTime},T");
                                 // Loop through each subpage in order of subcode, writing each one
                                 foreach (TeletextPage page in carousel.Pages.OrderBy(x => x.Subcode).ToList())
                                 {
@@ -417,7 +417,7 @@ namespace TtxFromTS
                                 // Write destination inserter
                                 streamWriter.WriteLine("DS,inserter");
                                 // Write source file
-                                streamWriter.WriteLine($"SP,{_options.InputFile}");
+                                streamWriter.WriteLine($"SP,{Options.InputFile}");
                                 // Write page number (time filling page is used for magazine enhancements)
                                 streamWriter.WriteLine($"PN,{magazine.Number}FF00");
                                 // Set subcode
@@ -443,7 +443,7 @@ namespace TtxFromTS
                 }
             }
             // If creation of config file is not disabled, create one
-            if (!_options.DisableConfig)
+            if (!Options.DisableConfig)
             {
                 // Retrieve initial page, if set, to get header template from
                 TeletextPage initialPage = null;
