@@ -63,8 +63,8 @@ namespace TtxFromTS
         /// </summary>
         /// <param name="packetsReceived">The number of packets received.</param>
         /// <param name="packetsProcessed">The number of packets processed.</param>
-        /// <param name="pagesDecoded">The number of pages decoded.</param>
-        internal static void OutputStats(int packetsReceived, int packetsProcessed, int pagesDecoded)
+        /// <param name="outputStats">Statistics provided by the output.</param>
+        internal static void OutputStats(int packetsReceived, int packetsProcessed, (string, string)[] outputStats)
         {
             Console.Error.WriteLine();
             Console.ForegroundColor = ConsoleColor.Green;
@@ -72,7 +72,10 @@ namespace TtxFromTS
             Console.ResetColor();
             Console.Error.WriteLine($"Total number of packets: {packetsReceived}");
             Console.Error.WriteLine($"Packets processed: {packetsProcessed}");
-            Console.Error.WriteLine($"Pages decoded: {pagesDecoded}");
+            foreach (var statistic in outputStats)
+            {
+                Console.Error.WriteLine($"{statistic.Item1}: {statistic.Item2}");
+            }
         }
     }
 }
