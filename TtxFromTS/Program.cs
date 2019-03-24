@@ -57,7 +57,6 @@ namespace TtxFromTS
                         Logger.OutputError("The provided packet identifier is not a teletext service");
                         return (int)ExitCodes.InvalidService;
                     }
-                    tsDecoder.DecodeData(data);
                 }
                 // If packets are processed, finish the output and log stats, otherwise return an error
                 if (tsDecoder.PacketsDecoded > 0)
