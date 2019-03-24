@@ -10,6 +10,11 @@ namespace TtxFromTS
     internal class TeletextDecoder
     {
         /// <summary>
+        /// Indicates if a warning for non-teletext packets has been output.
+        /// </summary>
+        private bool _invalidPacketWarning;
+
+        /// <summary>
         /// Gets the teletext magazines.
         /// </summary>
         /// <value>The magazine.</value>
@@ -86,10 +91,15 @@ namespace TtxFromTS
         /// <param name="packet">The packet to be decoded.</param>
         internal void DecodePacket(Pes packet)
         {
-            // Check the PES is a private stream packet, otherwise throw exception
+            // Check the PES is a private stream packet
             if (packet.StreamId != (byte)PesStreamTypes.PrivateStream1)
             {
-                throw new InvalidOperationException("The packet is not a private stream packet as used for teletext.");
+                if (!_invalidPacketWarning)
+                {
+                    Logger.OutputWarning("Packets for the specified packet ID do not contain a teletext service and will be ignored");
+                    _invalidPacketWarning = true;
+                }
+                return;
             }
             // Set offset in bytes for teletext packet data
             int teletextPacketOffset;
@@ -103,10 +113,15 @@ namespace TtxFromTS
                 // If no optional header is present, teletext data starts after 6 bytes
                 teletextPacketOffset = 6;
             }
-            // Check the data identifier is within the range for EBU teletext, otherwise throw exception
+            // Check the data identifier is within the range for EBU teletext
             if (packet.Data[teletextPacketOffset] < 0x10 || packet.Data[teletextPacketOffset] > 0x1F)
             {
-                throw new InvalidOperationException("The packet is not a teletext service.");
+                if (!_invalidPacketWarning)
+                {
+                    Logger.OutputWarning("Packets for the specified packet ID do not contain a teletext service and will be ignored");
+                    _invalidPacketWarning = true;
+                }
+                return;
             }
             // Increase offset by 1 to the start of the first teletext data unit
             teletextPacketOffset++;

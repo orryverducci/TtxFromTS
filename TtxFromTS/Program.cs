@@ -48,15 +48,7 @@ namespace TtxFromTS
                 byte[] data = new byte[1316];
                 while (fileStream.Read(data, 0, 1316) > 0)
                 {
-                    try
-                    {
-                        tsDecoder.DecodeData(data);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        Logger.OutputError("The provided packet identifier is not a teletext service");
-                        return (int)ExitCodes.InvalidService;
-                    }
+                    tsDecoder.DecodeData(data);
                 }
                 // If packets are processed, finish the output and log stats, otherwise return an error
                 if (tsDecoder.PacketsDecoded > 0)
