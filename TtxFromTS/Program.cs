@@ -153,6 +153,11 @@ namespace TtxFromTS
             return (args.Length > 0) ? true : false;
         }
 
+        /// <summary>
+        /// Writes an unhandled exception to the console and exits the application.
+        /// </summary>
+        /// <param name="sender">The sending object.</param>
+        /// <param name="e">The event arguments.</param>
         private static void UnhandledExceptionTrap(object sender, UnhandledExceptionEventArgs e)
         {
             Logger.OutputError($"An unexpected error occurred {e.ExceptionObject.ToString()}");
