@@ -11,10 +11,11 @@ namespace TtxFromTS
     /// </summary>
     internal class Program
     {
-        #region Private Fields
+        #region Properties
         /// <summary>
         /// The application options.
         /// </summary>
+        /// <value>The options.</value>
         internal static Options Options { get; private set; } = new Options();
         #endregion
 
