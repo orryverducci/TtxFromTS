@@ -129,7 +129,7 @@ namespace TtxFromTS
                 return false;
             }
             // If an output directory has been given, check it is valid, logging an error if it isn't
-            if (Options.OutputPath != null && Options.OutputPath != string.Empty)
+            if (!string.IsNullOrEmpty(Options.OutputPath))
             {
                 try
                 {
@@ -153,7 +153,7 @@ namespace TtxFromTS
                 }
             }
             // Return success if arguments are given, otherwise return failure
-            return (args.Length > 0) ? true : false;
+            return args.Length > 0;
         }
 
         /// <summary>
