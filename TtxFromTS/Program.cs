@@ -85,15 +85,15 @@ namespace TtxFromTS
         /// <summary>
         /// Parses and validates the command line arguments.
         /// </summary>
-        /// <returns><c>true</c> if arguments was successfully parsed, <c>false</c> otherwise.</returns>
-        /// <param name="args">The command line arguments</param>
+        /// <returns><c>true</c> if the arguments were successfully parsed, <c>false</c> otherwise.</returns>
+        /// <param name="args">The command line arguments.</param>
         private static bool ParseArguments(string[] args)
         {
             // Create parser
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             // Show help information if no arguments are provided
             parser.ShowUsageOnEmptyCommandline = true;
-            // Parse command line arguments into the options class
+            // Parse command line arguments into the application options, catching any exceptions
             parser.ExtractArgumentAttributes(Options);
             try
             {
@@ -128,7 +128,7 @@ namespace TtxFromTS
                 // Return failure
                 return false;
             }
-            // If output directory has been given, check it is valid, output error if it isn't
+            // If an output directory has been given, check it is valid, logging an error if it isn't
             if (Options.OutputPath != null && Options.OutputPath != string.Empty)
             {
                 try
