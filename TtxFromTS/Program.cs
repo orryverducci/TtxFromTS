@@ -47,9 +47,20 @@ namespace TtxFromTS
             using (FileStream fileStream = Options.InputFile.OpenRead())
             {
                 byte[] data = new byte[1316];
+                int loggedPercentage = 0;
                 while (fileStream.Read(data, 0, 1316) > 0)
                 {
                     tsDecoder.DecodeData(data);
+                    double currentPercentage = (double)fileStream.Position / (double)fileStream.Length * 100;
+                    if (currentPercentage > loggedPercentage + 10)
+                    {
+                        loggedPercentage = (int)currentPercentage;
+                        Logger.OutputInfo($"Reading TS file: {loggedPercentage}%");
+                    }
+                }
+                if (loggedPercentage < 100)
+                {
+                    Logger.OutputInfo("Reading TS file: 100%");
                 }
                 // If packets are processed, finish the output and log stats, otherwise return an error
                 if (tsDecoder.PacketsDecoded > 0)
