@@ -90,10 +90,11 @@ namespace TtxFromTS
         /// <param name="args">The command line arguments.</param>
         private static bool ParseArguments(string[] args)
         {
-            // Create parser
-            CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
-            // Show help information if no arguments are provided
-            parser.ShowUsageOnEmptyCommandline = true;
+            // Create parser set to show help information if no arguments are provided
+            CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser
+            {
+                ShowUsageOnEmptyCommandline = true
+            };
             // Parse command line arguments into the application options, catching any exceptions
             parser.ExtractArgumentAttributes(Options);
             try
