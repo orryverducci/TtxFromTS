@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace TtxFromTS
+namespace TtxFromTS.Teletext
 {
     /// <summary>
     /// Provides an individual teletext packet.
     /// </summary>
-    internal class TeletextPacket
+    internal class Packet
     {
         internal enum PacketType
         {
@@ -61,7 +61,7 @@ namespace TtxFromTS
         /// Initialises a new instance of the <see cref="T:TtxFromTS.TeletextPacket"/> class.
         /// </summary>
         /// <param name="packetData">The teletext packet data to be decoded.</param>
-        internal TeletextPacket(byte[] packetData)
+        internal Packet(byte[] packetData)
         {
             // Retrieve framing code
             FramingCode = packetData[1];

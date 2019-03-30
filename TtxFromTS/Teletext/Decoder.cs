@@ -2,12 +2,12 @@
 using System.Text;
 using Cinegy.TsDecoder.TransportStream;
 
-namespace TtxFromTS
+namespace TtxFromTS.Teletext
 {
     /// <summary>
     /// Provides a teletext decoder, to decode received packets in to full pages.
     /// </summary>
-    internal class TeletextDecoder
+    internal class Decoder
     {
         /// <summary>
         /// Indicates if a warning for non-teletext packets has been output.
@@ -18,7 +18,7 @@ namespace TtxFromTS
         /// Gets the teletext magazines.
         /// </summary>
         /// <value>The magazine.</value>
-        internal TeletextMagazine[] Magazine { get; private set; } = new TeletextMagazine[8];
+        internal Magazine[] Magazine { get; private set; } = new Magazine[8];
 
         /// <summary>
         /// Gets and sets if subtitle pages should be decoded.
@@ -76,12 +76,12 @@ namespace TtxFromTS
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextDecoder"/> class.
         /// </summary>
-        internal TeletextDecoder()
+        internal Decoder()
         {
             // Create the magazines to decode packets in to
             for (int i = 0; i < 8; i++)
             {
-                Magazine[i] = new TeletextMagazine(i + 1);
+                Magazine[i] = new Magazine(i + 1);
             }
         }
 
@@ -138,14 +138,14 @@ namespace TtxFromTS
                     // Copy teletext packet data to array
                     Buffer.BlockCopy(packet.Data, teletextPacketOffset + 2, teletextData, 0, dataUnitLength);
                     // Create teletext packet from data
-                    TeletextPacket teletextPacket = new TeletextPacket(teletextData);
+                    Packet teletextPacket = new Packet(teletextData);
                     // Check packet is free from errors, and if it is add it to its magazine, or decode broadcast services data
                     if (!teletextPacket.DecodingError && teletextPacket.Magazine != null)
                     {
-                        if (teletextPacket.Type != TeletextPacket.PacketType.BroadcastServiceData)
+                        if (teletextPacket.Type != Packet.PacketType.BroadcastServiceData)
                         {
                             // If packet is a header, check if it is in serial mode, and if it is signal to the other magazines that a serial header has been received
-                            if (teletextPacket.Type == TeletextPacket.PacketType.Header)
+                            if (teletextPacket.Type == Packet.PacketType.Header)
                             {
                                 // Get serial flag
                                 bool magazineSerial = false;
@@ -185,7 +185,7 @@ namespace TtxFromTS
         /// Decodes information from a broadcast services data packet.
         /// </summary>
         /// <param name="packet">The teletext packet to decode from.</param>
-        private void DecodeBroadcastServiceData(TeletextPacket packet)
+        private void DecodeBroadcastServiceData(Packet packet)
         {
             // Get designation byte
             byte designationByte = Decode.Hamming84(packet.Data[0]);

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TtxFromTS
+namespace TtxFromTS.Teletext
 {
     /// <summary>
     /// Provides a teletext magazine
     /// </summary>
-    internal class TeletextMagazine
+    internal class Magazine
     {
         /// <summary>
         /// The teletext page currently being decoded.
         /// </summary>
-        private TeletextPage _currentPage;
+        private Page _currentPage;
 
         /// <summary>
         /// Gets the magazine number.
@@ -23,7 +23,7 @@ namespace TtxFromTS
         /// Gets the list of teletext pages.
         /// </summary>
         /// <value>The list of teletext pages.</value>
-        internal List<TeletextCarousel> Pages { get; private set; } = new List<TeletextCarousel>();
+        internal List<Carousel> Pages { get; private set; } = new List<Carousel>();
 
         /// <summary>
         /// Gets the total number of pages within the magazine.
@@ -89,7 +89,7 @@ namespace TtxFromTS
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
         /// <param name="number">The magazine number.</param>
-        internal TeletextMagazine(int number)
+        internal Magazine(int number)
         {
             // Set the magazine number
             Number = number;
@@ -99,17 +99,17 @@ namespace TtxFromTS
         /// Adds a teletext packet to the magazine.
         /// </summary>
         /// <param name="packet">The teletext packet to be added.</param>
-        internal void AddPacket(TeletextPacket packet)
+        internal void AddPacket(Packet packet)
         {
             // If packet is a header, save current page
-            if (packet.Type == TeletextPacket.PacketType.Header)
+            if (packet.Type == Packet.PacketType.Header)
             {
                 SavePage();
                 // Create new page
-                _currentPage = new TeletextPage { Magazine = Number };
+                _currentPage = new Page { Magazine = Number };
             }
             // If the packet is not a magazine enhancements packet, add it to a page, otherwise process the enhancements
-            if (packet.Type != TeletextPacket.PacketType.MagazineEnhancements)
+            if (packet.Type != Packet.PacketType.MagazineEnhancements)
             {
                 // If a page is being decoded, add the packet to it
                 if (_currentPage != null)
@@ -155,11 +155,11 @@ namespace TtxFromTS
                     DecodeTOP();
                 }
                 // Check if a carousel with the page number exists
-                TeletextCarousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
+                Carousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
                 // If the carousel exists, add the page to it, otherwise create a carousel and add the page
                 if (existingCarousel == null)
                 {
-                    TeletextCarousel carousel = new TeletextCarousel { Number = _currentPage.Number };
+                    Carousel carousel = new Carousel { Number = _currentPage.Number };
                     carousel.AddPage(_currentPage);
                     Pages.Add(carousel);
                 }
@@ -176,7 +176,7 @@ namespace TtxFromTS
         /// Decodes magazine enhancement data.
         /// </summary>
         /// <param name="packet">The packet containing enhancement triplets.</param>
-        private void DecodeEnhancements(TeletextPacket packet)
+        private void DecodeEnhancements(Packet packet)
         {
             // Get designation code
             int designation = Decode.Hamming84(packet.Data[0]);

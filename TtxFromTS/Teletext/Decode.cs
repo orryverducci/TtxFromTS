@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace TtxFromTS
+namespace TtxFromTS.Teletext
 {
     /// <summary>
     /// Provides methods to decode data.

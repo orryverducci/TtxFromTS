@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Cinegy.TsDecoder.TransportStream;
+using TtxFromTS.Teletext;
+using Decoder = TtxFromTS.Teletext.Decoder;
 
 namespace TtxFromTS.Output
 {
@@ -44,7 +46,7 @@ namespace TtxFromTS.Output
         /// <summary>
         /// The teletext decoder.
         /// </summary>
-        private TeletextDecoder _teletextDecoder;
+        private Decoder _teletextDecoder;
 
         #region Properties
         /// <summary>
@@ -66,7 +68,7 @@ namespace TtxFromTS.Output
         #region Constructor
         internal TTIOutput()
         {
-            _teletextDecoder = new TeletextDecoder
+            _teletextDecoder = new Decoder
             {
                 EnableSubtitles = Program.Options.IncludeSubtitles
             };
@@ -115,13 +117,13 @@ namespace TtxFromTS.Output
             // Create the directory to store the pages in
             DirectoryInfo outputDirectory = Directory.CreateDirectory(directoryName);
             // Loop through each magazine to retrieve pages, if any
-            foreach (TeletextMagazine magazine in _teletextDecoder.Magazine)
+            foreach (Magazine magazine in _teletextDecoder.Magazine)
             {
                 // Check magazine has pages, otherwise ignore magazine
                 if (magazine.TotalPages > 0)
                 {
                     // Loop through each page and output it
-                    foreach (TeletextCarousel carousel in magazine.Pages)
+                    foreach (Carousel carousel in magazine.Pages)
                     {
                         // Output to the console the page being outputted
                         Logger.OutputInfo($"Outputting P{magazine.Number}{carousel.Number}");
@@ -142,7 +144,7 @@ namespace TtxFromTS.Output
                                 // Write cycle time
                                 streamWriter.WriteLine($"CT,{Program.Options.CycleTime},T");
                                 // Loop through each subpage in order of subcode, writing each one
-                                foreach (TeletextPage page in carousel.Pages.OrderBy(x => x.Subcode).ToList())
+                                foreach (Page page in carousel.Pages.OrderBy(x => x.Subcode).ToList())
                                 {
                                     // Set page type and encoding
                                     PageType pageType;
@@ -340,12 +342,12 @@ namespace TtxFromTS.Output
             if (!Program.Options.DisableConfig)
             {
                 // Retrieve initial page, if set, to get header template from
-                TeletextPage initialPage = null;
+                Page initialPage = null;
                 if (_teletextDecoder.InitialPage != "8FF")
                 {
                     int magazineNumber = int.Parse(_teletextDecoder.InitialPage.Substring(0, 1));
-                    TeletextMagazine magazine = _teletextDecoder.Magazine[magazineNumber - 1];
-                    TeletextCarousel carousel = magazine.Pages.Find(x => x.Number == _teletextDecoder.InitialPage);
+                    Magazine magazine = _teletextDecoder.Magazine[magazineNumber - 1];
+                    Carousel carousel = magazine.Pages.Find(x => x.Number == _teletextDecoder.InitialPage);
                     if (carousel != null)
                     {
                         initialPage = carousel.Pages.First();
@@ -354,7 +356,7 @@ namespace TtxFromTS.Output
                 // If no initial page has been retrieved, use the first page from magazine 1
                 if (initialPage == null)
                 {
-                    TeletextCarousel carousel = _teletextDecoder.Magazine[0].Pages.First();
+                    Carousel carousel = _teletextDecoder.Magazine[0].Pages.First();
                     if (carousel != null)
                     {
                         initialPage = carousel.Pages.First();

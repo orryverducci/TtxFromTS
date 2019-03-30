@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
 
-namespace TtxFromTS
+namespace TtxFromTS.Teletext
 {
     /// <summary>
     /// Provides a teletext page.
     /// </summary>
-    internal class TeletextPage
+    internal class Page
     {
         #region Enumerations
         internal enum CharacterSubset
@@ -149,26 +149,26 @@ namespace TtxFromTS
         /// Adds a teletext packet to the page.
         /// </summary>
         /// <param name="packet">The teletext packet to be added.</param>
-        internal void AddPacket(TeletextPacket packet)
+        internal void AddPacket(Packet packet)
         {
             // Choose how to decode the packet based on its type
             switch (packet.Type)
             {
-                case TeletextPacket.PacketType.Header:
+                case Packet.PacketType.Header:
                     DecodeHeader(packet);
                     break;
-                case TeletextPacket.PacketType.PageBody:
-                case TeletextPacket.PacketType.Fastext:
-                case TeletextPacket.PacketType.TOPCommentary:
+                case Packet.PacketType.PageBody:
+                case Packet.PacketType.Fastext:
+                case Packet.PacketType.TOPCommentary:
                     DecodeRow(packet);
                     break;
-                case TeletextPacket.PacketType.PageReplacements:
+                case Packet.PacketType.PageReplacements:
                     DecodePageReplacements(packet);
                     break;
-                case TeletextPacket.PacketType.LinkedPages:
+                case Packet.PacketType.LinkedPages:
                     DecodeLinkedPages(packet);
                     break;
-                case TeletextPacket.PacketType.PageEnhancements:
+                case Packet.PacketType.PageEnhancements:
                     DecodePageEnhancements(packet);
                     break;
             }
@@ -178,7 +178,7 @@ namespace TtxFromTS
         /// Merges and updated subpage with this page.
         /// </summary>
         /// <param name="packet">The teletext page to be merged.</param>
-        internal void MergeUpdate(TeletextPage page)
+        internal void MergeUpdate(Page page)
         {
             // Update properties with new ones
             Newsflash = page.Newsflash;
@@ -222,7 +222,7 @@ namespace TtxFromTS
         /// Decodes the header.
         /// </summary>
         /// <param name="packet">The header packet.</param>
-        private void DecodeHeader(TeletextPacket packet)
+        private void DecodeHeader(Packet packet)
         {
             // Extract page number data from packet
             byte[] pageData = new byte[6];
@@ -285,7 +285,7 @@ namespace TtxFromTS
         /// Decodes a row for display.
         /// </summary>
         /// <param name="packet">The row packet.</param>
-        private void DecodeRow(TeletextPacket packet)
+        private void DecodeRow(Packet packet)
         {
             Rows[(int)packet.Number] = packet.Data;
         }
@@ -294,7 +294,7 @@ namespace TtxFromTS
         /// Decodes the linked pages used for fastext.
         /// </summary>
         /// <param name="packet">The linked pages packet.</param>
-        private void DecodeLinkedPages(TeletextPacket packet)
+        private void DecodeLinkedPages(Packet packet)
         {
             // Check the designation code is 0, otherwise ignore packet
             if (Decode.Hamming84(packet.Data[0]) == 0)
@@ -347,7 +347,7 @@ namespace TtxFromTS
         /// Decodes character replacement enhancement data for the page.
         /// </summary>
         /// <param name="packet">The enhancement packet.</param>
-        private void DecodePageReplacements(TeletextPacket packet)
+        private void DecodePageReplacements(Packet packet)
         {
             // Get designation code
             int designation = Decode.Hamming84(packet.Data[0]);
@@ -367,7 +367,7 @@ namespace TtxFromTS
         /// Decodes enhancement data for the page.
         /// </summary>
         /// <param name="packet">The enhancement packet.</param>
-        private void DecodePageEnhancements(TeletextPacket packet)
+        private void DecodePageEnhancements(Packet packet)
         {
             // Get designation code
             int designation = Decode.Hamming84(packet.Data[0]);
