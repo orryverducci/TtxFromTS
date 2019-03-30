@@ -18,4 +18,7 @@
     <PackageReference Include="Cinegy.TsDecoder" Version="2.0.90" />
     <PackageReference Include="ILLink.Tasks" Version="0.1.4-preview-981901" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Output\" />
+  </ItemGroup>
 </Project>

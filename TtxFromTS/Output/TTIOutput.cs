@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Cinegy.TsDecoder.TransportStream;
 
-namespace TtxFromTS
+namespace TtxFromTS.Output
 {
     /// <summary>
     /// Provides output to TTI files.

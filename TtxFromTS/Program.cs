@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Reflection;
 using CommandLineParser.Exceptions;
+using TtxFromTS.Output;
 
 namespace TtxFromTS
 {

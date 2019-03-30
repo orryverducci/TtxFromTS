@@ -1,7 +1,7 @@
 using System;
 using Cinegy.TsDecoder.TransportStream;
 
-namespace TtxFromTS
+namespace TtxFromTS.Output
 {
     /// <summary>
     /// Provides an interface to teletext data outputs.
