@@ -5,9 +5,9 @@ namespace TtxFromTS.Teletext
     /// <summary>
     /// Provides an individual teletext packet.
     /// </summary>
-    internal class Packet
+    public class Packet
     {
-        internal enum PacketType
+        public enum PacketType
         {
             Header,
             PageBody,
@@ -25,43 +25,43 @@ namespace TtxFromTS.Teletext
         /// Gets the framing code for the teletext packet.
         /// </summary>
         /// <value>The packet data.</value>
-        internal byte FramingCode { get; private set; }
+        public byte FramingCode { get; private set; }
 
         /// <summary>
         /// Gets the magazine number the packet corresponds to.
         /// </summary>
         /// <value>The magazine number.</value>
-        internal int? Magazine { get; private set; }
+        public int? Magazine { get; private set; }
 
         /// <summary>
         /// Gets the packet number.
         /// </summary>
         /// <value>The packet number.</value>
-        internal int? Number { get; private set; }
+        public int? Number { get; private set; }
 
         /// <summary>
         /// Gets the data contained within the packet.
         /// </summary>
         /// <value>The packet data.</value>
-        internal byte[] Data { get; private set; }
+        public byte[] Data { get; private set; }
 
         /// <summary>
         /// Gets if the packet has been determined to contain unrecoverable errors.
         /// </summary>
         /// <value>True if there is an error, false if there isn't.</value>
-        internal bool DecodingError { get; private set; } = false;
+        public bool DecodingError { get; private set; } = false;
 
         /// <summary>
         /// Gets the type of packet
         /// </summary>
         /// <value>The packet type.</value>
-        internal PacketType Type { get; private set; } = PacketType.Unspecified;
+        public PacketType Type { get; private set; } = PacketType.Unspecified;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="T:TtxFromTS.TeletextPacket"/> class.
         /// </summary>
         /// <param name="packetData">The teletext packet data to be decoded.</param>
-        internal Packet(byte[] packetData)
+        public Packet(byte[] packetData)
         {
             // Retrieve framing code
             FramingCode = packetData[1];
