@@ -58,11 +58,19 @@ namespace TtxFromTS.Teletext
         public PacketType Type { get; private set; } = PacketType.Unspecified;
 
         /// <summary>
+        /// Gets the full packet data with framing code, magazine and row.
+        /// </summary>
+        /// <value>The full packet data.</value>
+        public byte[] FullPacketData { get; private set; } 
+
+        /// <summary>
         /// Initialises a new instance of the <see cref="T:TtxFromTS.TeletextPacket"/> class.
         /// </summary>
         /// <param name="packetData">The teletext packet data to be decoded.</param>
         public Packet(byte[] packetData)
         {
+            // Store the original full packet data
+            FullPacketData = packetData;
             // Retrieve framing code
             FramingCode = packetData[1];
             // Check the framing code is valid, otherwise mark packet as containing errors
