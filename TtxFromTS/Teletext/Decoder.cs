@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using Cinegy.TsDecoder.TransportStream;
 
 namespace TtxFromTS.Teletext
 {
@@ -10,21 +9,10 @@ namespace TtxFromTS.Teletext
     internal class Decoder
     {
         /// <summary>
-        /// Indicates if a warning for non-teletext packets has been output.
-        /// </summary>
-        private bool _invalidPacketWarning;
-
-        /// <summary>
         /// Gets the teletext magazines.
         /// </summary>
         /// <value>The magazine.</value>
         internal Magazine[] Magazine { get; private set; } = new Magazine[8];
-
-        /// <summary>
-        /// Gets and sets if subtitle pages should be decoded.
-        /// </summary>
-        /// <value><c>true</c> if subtitles should be decoded, <c>false</c> if not.</value>
-        internal bool EnableSubtitles { get; set; } = false;
 
         /// <summary>
         /// Gets if the teletext data is multiplexed with video.
@@ -86,98 +74,46 @@ namespace TtxFromTS.Teletext
         }
 
         /// <summary>
-        /// Decodes teletext data from a elementary stream packet.
+        /// Decodes a teletext packet.
         /// </summary>
         /// <param name="packet">The packet to be decoded.</param>
-        internal void DecodePacket(Pes packet)
+        internal void DecodePacket(Packet packet)
         {
-            // Check the PES is a private stream packet
-            if (packet.StreamId != (byte)PesStreamTypes.PrivateStream1)
+            // Check packet is free from errors, and if it is add it to its magazine, or decode broadcast services data
+            if (!packet.DecodingError && packet.Magazine != null)
             {
-                if (!_invalidPacketWarning)
+                if (packet.Type != Packet.PacketType.BroadcastServiceData)
                 {
-                    Logger.OutputWarning("Packets for the specified packet ID do not contain a teletext service and will be ignored");
-                    _invalidPacketWarning = true;
-                }
-                return;
-            }
-            // Set offset in bytes for teletext packet data
-            int teletextPacketOffset;
-            if (packet.OptionalPesHeader.MarkerBits == 2) // If optional PES header is present
-            {
-                // If optional header is present, teletext data starts after 9 bytes plus header bytes
-                teletextPacketOffset = 9 + packet.OptionalPesHeader.PesHeaderLength;
-            }
-            else
-            {
-                // If no optional header is present, teletext data starts after 6 bytes
-                teletextPacketOffset = 6;
-            }
-            // Check the data identifier is within the range for EBU teletext
-            if (packet.Data[teletextPacketOffset] < 0x10 || packet.Data[teletextPacketOffset] > 0x1F)
-            {
-                if (!_invalidPacketWarning)
-                {
-                    Logger.OutputWarning("Packets for the specified packet ID do not contain a teletext service and will be ignored");
-                    _invalidPacketWarning = true;
-                }
-                return;
-            }
-            // Increase offset by 1 to the start of the first teletext data unit
-            teletextPacketOffset++;
-            // Loop through each teletext data unit within the PES
-            while (teletextPacketOffset < packet.PesPacketLength)
-            {
-                // Get length of data unit
-                int dataUnitLength = packet.Data[teletextPacketOffset + 1];
-                // Check data unit contains non-subtitle teletext data, or contains subtitles teletext data if subtitles are enabled, otherwise ignore
-                if (packet.Data[teletextPacketOffset] == 0x02 || (EnableSubtitles && packet.Data[teletextPacketOffset] == 0x03))
-                {
-                    // Create array of bytes to contain teletext packet data
-                    byte[] teletextData = new byte[dataUnitLength];
-                    // Copy teletext packet data to array
-                    Buffer.BlockCopy(packet.Data, teletextPacketOffset + 2, teletextData, 0, dataUnitLength);
-                    // Create teletext packet from data
-                    Packet teletextPacket = new Packet(teletextData);
-                    // Check packet is free from errors, and if it is add it to its magazine, or decode broadcast services data
-                    if (!teletextPacket.DecodingError && teletextPacket.Magazine != null)
+                    // If packet is a header, check if it is in serial mode, and if it is signal to the other magazines that a serial header has been received
+                    if (packet.Type == Packet.PacketType.Header)
                     {
-                        if (teletextPacket.Type != Packet.PacketType.BroadcastServiceData)
+                        // Get serial flag
+                        bool magazineSerial = false;
+                        byte controlByte = Decode.Hamming84(packet.Data[7]);
+                        if (controlByte != 0xff)
                         {
-                            // If packet is a header, check if it is in serial mode, and if it is signal to the other magazines that a serial header has been received
-                            if (teletextPacket.Type == Packet.PacketType.Header)
+                            magazineSerial = Convert.ToBoolean((byte)(controlByte & 0x01));
+                        }
+                        // If flag is set, loop through each magazine
+                        if (magazineSerial)
+                        {
+                            for (int i = 0; i < 8; i++)
                             {
-                                // Get serial flag
-                                bool magazineSerial = false;
-                                byte controlByte = Decode.Hamming84(teletextPacket.Data[7]);
-                                if (controlByte != 0xff)
+                                // Only signal header if magazine is not the one for this header
+                                if (i + 1 != packet.Magazine)
                                 {
-                                    magazineSerial = Convert.ToBoolean((byte)(controlByte & 0x01));
-                                }
-                                // If flag is set, loop through each magazine
-                                if (magazineSerial)
-                                {
-                                    for (int i = 0; i < 8; i++)
-                                    {
-                                        // Only signal header if magazine is not the one for this header
-                                        if (i + 1 != teletextPacket.Magazine)
-                                        {
-                                            Magazine[i].SerialHeaderReceived();
-                                        }
-                                    }
+                                    Magazine[i].SerialHeaderReceived();
                                 }
                             }
-                            // Add packet to its magazine
-                            Magazine[(int)teletextPacket.Magazine - 1].AddPacket(teletextPacket);
-                        }
-                        else
-                        {
-                            DecodeBroadcastServiceData(teletextPacket);
                         }
                     }
+                    // Add packet to its magazine
+                    Magazine[(int)packet.Magazine - 1].AddPacket(packet);
                 }
-                // Increase offset to the next data unit
-                teletextPacketOffset += (dataUnitLength + 2);
+                else
+                {
+                    DecodeBroadcastServiceData(packet);
+                }
             }
         }
 

@@ -1,5 +1,5 @@
 using System;
-using Cinegy.TsDecoder.TransportStream;
+using TtxFromTS.Teletext;
 
 namespace TtxFromTS.Output
 {
@@ -15,10 +15,10 @@ namespace TtxFromTS.Output
         (string, string)[] Statistics { get; }
 
         /// <summary>
-        /// Provides an elementary stream packet to the output.
+        /// Provides a teletext packet to the output.
         /// </summary>
-        /// <param name="packet">The elementary stream packet.</param>
-        void AddPacket(Pes packet);
+        /// <param name="packet">The teletext packet.</param>
+        void AddPacket(Packet packet);
 
         /// <summary>
         /// Finalise the output.

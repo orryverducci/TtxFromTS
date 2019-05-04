@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Cinegy.TsDecoder.TransportStream;
 using TtxFromTS.Teletext;
 using Decoder = TtxFromTS.Teletext.Decoder;
 
@@ -68,19 +67,16 @@ namespace TtxFromTS.Output
         #region Constructor
         internal TTIOutput()
         {
-            _teletextDecoder = new Decoder
-            {
-                EnableSubtitles = Program.Options.IncludeSubtitles
-            };
+            _teletextDecoder = new Decoder();
         }
         #endregion
 
         #region Generic Output Methods
         /// <summary>
-        /// Provides an elementary stream packet to the output.
+        /// Provides a teletext packet to the output.
         /// </summary>
-        /// <param name="packet">The elementary stream packet.</param>
-        public void AddPacket(Pes packet)
+        /// <param name="packet">The teletext packet.</param>
+        public void AddPacket(Packet packet)
         {
             _teletextDecoder.DecodePacket(packet);
         }

@@ -41,7 +41,8 @@ namespace TtxFromTS
             // Setup TS decoder
             TSDecoder tsDecoder = new TSDecoder
             {
-                PacketID = Options.PacketIdentifier
+                PacketID = Options.PacketIdentifier,
+                EnableSubtitles = Options.IncludeSubtitles
             };
             tsDecoder.PacketDecoded += (sender, packet) => output.AddPacket(packet);
             // Open the input file and read it in a loop until the end of the file

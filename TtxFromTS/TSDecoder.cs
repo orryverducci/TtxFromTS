@@ -1,5 +1,6 @@
 ﻿using System;
 using Cinegy.TsDecoder.TransportStream;
+using TtxFromTS.Teletext;
 
 namespace TtxFromTS
 {
@@ -28,6 +29,11 @@ namespace TtxFromTS
         /// Indicates if an encrypted warning has been output.
         /// </summary>
         private bool _encryptedWarning;
+
+        /// <summary>
+        /// Indicates if a warning for non-teletext packets has been output.
+        /// </summary>
+        private bool _invalidPacketWarning;
         #endregion
 
         #region Properties
@@ -48,13 +54,19 @@ namespace TtxFromTS
         /// </summary>
         /// <value>The packets decoded.</value>
         internal int PacketsDecoded { private set; get; }
+
+        /// <summary>
+        /// Gets and sets if subtitle pages should be decoded.
+        /// </summary>
+        /// <value><c>true</c> if subtitles should be decoded, <c>false</c> if not.</value>
+        internal bool EnableSubtitles { get; set; } = false;
         #endregion
 
         #region Events
         /// <summary>
         /// Occurs when a teletext packet has been successfully decoded from the specified Packet ID.
         /// </summary>
-        internal EventHandler<Pes> PacketDecoded;
+        internal EventHandler<Packet> PacketDecoded;
         #endregion
 
         #region Methods
@@ -86,7 +98,7 @@ namespace TtxFromTS
         /// <summary>
         /// Processes TS packets and retrieves elementary stream packets from them.
         /// </summary>
-        /// <param name="data">The packet to be processed.</param>
+        /// <param name="packet">The packet to be processed.</param>
         private void ProcessPacket(TsPacket packet)
         {
             // Check packet is free from errors
@@ -109,25 +121,82 @@ namespace TtxFromTS
                 }
                 return;
             }
-            // If the TS packet is the start of a PES, create a new elementary stream packet, otherwise add to an existing one
+            // If the TS packet is the start of a PES, create a new elementary stream packet
             if (packet.PayloadUnitStartIndicator)
             {
                 _elementaryStreamPacket = new Pes(packet);
             }
-            else
+            // If we have an elementary stream packet, add the packet and decode the PES if it is complete
+            if (_elementaryStreamPacket != null)
             {
-                // Only add the packet if not starting midway through a PES
-                if (_elementaryStreamPacket != null)
+                _elementaryStreamPacket.Add(packet);
+                if (_elementaryStreamPacket.HasAllBytes())
                 {
-                    _elementaryStreamPacket.Add(packet);
+                    _elementaryStreamPacket.Decode();
+                    DecodeTeletextPackets();
+                    _elementaryStreamPacket = null;
                 }
             }
-            // If the TS packet completes a PES, decode it and fire the packet decoded event
-            if (_elementaryStreamPacket != null && _elementaryStreamPacket.HasAllBytes())
+        }
+
+        /// <summary>
+        /// Decodes teletext packets from the complete elementary stream packet.
+        /// </summary>
+        private void DecodeTeletextPackets()
+        {
+            // Check the PES is a private stream packet
+            if (_elementaryStreamPacket.StreamId != (byte)PesStreamTypes.PrivateStream1)
             {
-                _elementaryStreamPacket.Decode();
-                PacketDecoded?.Invoke(this, _elementaryStreamPacket);
-                _elementaryStreamPacket = null;
+                if (!_invalidPacketWarning)
+                {
+                    Logger.OutputWarning("Packets for the specified packet ID do not contain a teletext service and will be ignored");
+                    _invalidPacketWarning = true;
+                }
+                return;
+            }
+            // Set offset in bytes for teletext packet data
+            int teletextPacketOffset;
+            if (_elementaryStreamPacket.OptionalPesHeader.MarkerBits == 2) // If optional PES header is present
+            {
+                // If optional header is present, teletext data starts after 9 bytes plus header bytes
+                teletextPacketOffset = 9 + _elementaryStreamPacket.OptionalPesHeader.PesHeaderLength;
+            }
+            else
+            {
+                // If no optional header is present, teletext data starts after 6 bytes
+                teletextPacketOffset = 6;
+            }
+            // Check the data identifier is within the range for EBU teletext
+            if (_elementaryStreamPacket.Data[teletextPacketOffset] < 0x10 || _elementaryStreamPacket.Data[teletextPacketOffset] > 0x1F)
+            {
+                if (!_invalidPacketWarning)
+                {
+                    Logger.OutputWarning("Packets for the specified packet ID do not contain a teletext service and will be ignored");
+                    _invalidPacketWarning = true;
+                }
+                return;
+            }
+            // Increase offset by 1 to the start of the first teletext data unit
+            teletextPacketOffset++;
+            // Loop through each teletext data unit within the PES
+            while (teletextPacketOffset < _elementaryStreamPacket.PesPacketLength)
+            {
+                // Get length of data unit
+                int dataUnitLength = _elementaryStreamPacket.Data[teletextPacketOffset + 1];
+                // Check data unit contains non-subtitle teletext data, or contains subtitles teletext data if subtitles are enabled, otherwise ignore
+                if (_elementaryStreamPacket.Data[teletextPacketOffset] == 0x02 || (EnableSubtitles && _elementaryStreamPacket.Data[teletextPacketOffset] == 0x03))
+                {
+                    // Create array of bytes to contain teletext packet data
+                    byte[] teletextData = new byte[dataUnitLength];
+                    // Copy teletext packet data to the array
+                    Buffer.BlockCopy(_elementaryStreamPacket.Data, teletextPacketOffset + 2, teletextData, 0, dataUnitLength);
+                    // Create packet from bytes
+                    Packet packet = new Packet(teletextData);
+                    // Fire packet decoded event
+                    PacketDecoded?.Invoke(this, packet);
+                }
+                // Increase offset to the next data unit
+                teletextPacketOffset += (dataUnitLength + 2);
             }
         }
         #endregion
