@@ -190,6 +190,11 @@ namespace TtxFromTS
                     byte[] teletextData = new byte[dataUnitLength];
                     // Copy teletext packet data to the array
                     Buffer.BlockCopy(_elementaryStreamPacket.Data, teletextPacketOffset + 2, teletextData, 0, dataUnitLength);
+                    // Reverse the bits in the bytes, required as teletext is transmitted as little endian whereas computers are generally big endian
+                    for (int i = 0; i < teletextData.Length; i++)
+                    {
+                        teletextData[i] = Decode.Reverse(teletextData[i]);
+                    }
                     // Create packet from bytes
                     Packet packet = new Packet(teletextData);
                     // Fire packet decoded event

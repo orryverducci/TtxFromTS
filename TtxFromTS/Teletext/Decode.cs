@@ -144,7 +144,7 @@ namespace TtxFromTS.Teletext
         internal static byte Hamming84(byte encodedByte)
         {
             // Get decoded byte from the lookup table
-            return _hamming84Table[_reverseByte[encodedByte]];
+            return _hamming84Table[encodedByte];
         }
 
         /// <summary>
@@ -156,13 +156,13 @@ namespace TtxFromTS.Teletext
         {
             // Get the bytes without the protection bits (i.e. just data)
             int[] dataBytes = new int[3];
-            dataBytes[0] = _hamming2418Byte1Table[_reverseByte[encodedBytes[0]] >> 2];
-            dataBytes[1] = _reverseByte[encodedBytes[1]] & 0x7f;
-            dataBytes[2] = _reverseByte[encodedBytes[2]] & 0x7f;
+            dataBytes[0] = _hamming2418Byte1Table[encodedBytes[0] >> 2];
+            dataBytes[1] = encodedBytes[1] & 0x7f;
+            dataBytes[2] = encodedBytes[2] & 0x7f;
             // Combine the data bytes in to a single int
             int data = dataBytes[0] | (dataBytes[1] << 4) | (dataBytes[2] << 11);
             // Get parity check results for the encoded triplet
-            int parity = _hamming2418ParityTable[0, _reverseByte[encodedBytes[0]]] ^ _hamming2418ParityTable[1, _reverseByte[encodedBytes[1]]] ^ _hamming2418ParityTable[2, _reverseByte[encodedBytes[2]]];
+            int parity = _hamming2418ParityTable[0, encodedBytes[0]] ^ _hamming2418ParityTable[1, encodedBytes[1]] ^ _hamming2418ParityTable[2, encodedBytes[2]];
             // Combine the decoded data with parity results to correct single bit errors, or to return 0xXXXX when 2 or more errors occur
             uint correctedData = (uint)data ^ _hamming2418ErrorTable[parity];
             // If there is not unrecoverable errors, convert the corrected data back to a triplet of bytes and return it, otherwise return 0xffffff
@@ -204,12 +204,22 @@ namespace TtxFromTS.Teletext
             // If the number of 1 bits is odd, return the original value byte, otherwise return 0x00
             if (bitCount % 2 != 0)
             {
-                return (byte)(_reverseByte[encodedByte] & 0x7f);
+                return (byte)(encodedByte & 0x7f);
             }
             else
             {
                 return 0x20;
             }
+        }
+
+        /// <summary>
+        /// Reverses the bits in a byte.
+        /// </summary>
+        /// <returns>The reversed byte.</returns>
+        /// <param name="originalByte">The byte to be reversed.</param>
+        internal static byte Reverse(byte originalByte)
+        {
+            return _reverseByte[originalByte];
         }
     }
 }

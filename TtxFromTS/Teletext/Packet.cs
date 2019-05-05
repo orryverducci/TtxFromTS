@@ -74,7 +74,7 @@ namespace TtxFromTS.Teletext
             // Retrieve framing code
             FramingCode = packetData[1];
             // Check the framing code is valid, otherwise mark packet as containing errors
-            if (FramingCode != 0xe4)
+            if (FramingCode != 0x27)
             {
                 DecodingError = true;
             }
