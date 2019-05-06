@@ -11,7 +11,6 @@ namespace TtxFromTS
         /// <summary>
         /// Outputs an introductory header message to the console's standard error output.
         /// </summary>
-        /// <param name="errorMessage">The error message to be displayed.</param>
         internal static void OutputHeader()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
