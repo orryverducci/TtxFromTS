@@ -36,7 +36,13 @@ namespace TtxFromTS
                 return (int)ExitCodes.InvalidArgs;
             }
             // Setup output
-            IOutput output = new TTIOutput();
+            IOutput output;
+            switch (Options.OutputType)
+            {
+                default:
+                    output = new TTIOutput();
+                    break;
+            }
             // Setup TS decoder
             TSDecoder tsDecoder = new TSDecoder
             {
@@ -121,7 +127,8 @@ namespace TtxFromTS
                     case CommandLineArgumentOutOfRangeException rangeException: // Short argument used with two dashes
                         Logger.OutputError($"The value for {rangeException.Argument} is outside the valid range");
                         break;
-                    case TargetInvocationException invocationException: // Short argument used with two dashes
+                    case TargetInvocationException invocationException: // Invalid value parsed to argument
+                    case ArgumentException argException:
                         Logger.OutputError("The values for one or more arguments are invalid");
                         break;
                     default:

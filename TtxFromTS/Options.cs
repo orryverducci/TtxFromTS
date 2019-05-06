@@ -50,5 +50,12 @@ namespace TtxFromTS
         /// <value><c>true</c> if a config file should not be created, <c>false</c> if it should.</value>
         [SwitchArgument("no-config", false, Description = "Disabled the creation of a vbit2 config file")]
         public bool DisableConfig { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output type.
+        /// </summary>
+        /// <value>The output type.</value>
+        [ValueArgument(typeof(Output.Type), "type", Description = "Sets the output type")]
+        public Output.Type OutputType { get; set; }
     }
 }
