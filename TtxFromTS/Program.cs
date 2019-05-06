@@ -39,6 +39,9 @@ namespace TtxFromTS
             IOutput output;
             switch (Options.OutputType)
             {
+                case Output.Type.StdOut:
+                    output = new StdOutput();
+                    break;
                 default:
                     output = new TTIOutput();
                     break;

@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+2.0
+---
+
+* **NEW:** Support for outputting teletext packets directly to standard output
+
 1.2.1
 -----
 

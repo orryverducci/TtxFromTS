@@ -7,6 +7,7 @@ namespace TtxFromTS.Output
     /// </summary>
     public enum Type
     {
-        TTI
+        TTI,
+        StdOut
     }
 }
