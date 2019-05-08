@@ -18,6 +18,7 @@ These arguments are available to use:
 * `--cycle` The cycle time to be used between subpages in seconds. Must be greater than 1 second, defaults to 10 seconds.
 * `--include-subs` Enables decoding of teletext subtitle packets.
 * `--no-config` Disables creation of a vbit2 configuration file.
+* `--type` The type of output required. Valid options are `TTI` and `StdOut`. Defaults to TTI.
 * `--output` The directory to output the TTI files to. If no directory is given a directory is created in the current working directory with the same name as the input file.
 * `-i` **(required)** The input transport stream file.
 
