@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/TtxFromTS/bin/Debug/netcoreapp2.0/TtxFromTS.dll",
+            "program": "${workspaceFolder}/TtxFromTS/bin/Debug/netcoreapp2.2/TtxFromTS.dll",
             "args": [],
             "cwd": "${workspaceFolder}/TtxFromTS",
             "console": "internalConsole",
