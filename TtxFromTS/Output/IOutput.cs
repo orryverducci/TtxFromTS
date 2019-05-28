@@ -15,6 +15,12 @@ namespace TtxFromTS.Output
         (string, string)[] Statistics { get; }
 
         /// <summary>
+        /// Gets if output looping is supported for this output.
+        /// </summary>
+        /// <value><c>true</c> if output looping is supported, <c>false</c> if not.</value>
+        bool LoopSupported { get; }
+
+        /// <summary>
         /// Provides a teletext packet to the output.
         /// </summary>
         /// <param name="packet">The teletext packet.</param>

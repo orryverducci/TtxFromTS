@@ -57,5 +57,12 @@ namespace TtxFromTS
         /// <value>The output type.</value>
         [ValueArgument(typeof(Output.Type), "type", Description = "Sets the output type")]
         public Output.Type OutputType { get; set; }
+
+        /// <summary>
+        /// Gets or sets if the output should be continually looped.
+        /// </summary>
+        /// <value><c>true</c> if the output should be looped, <c>false</c> if not.</value>
+        [SwitchArgument("loop", false, Description = "Sets if the output should be continually looped")]
+        public bool Loop { get; set; }
     }
 }

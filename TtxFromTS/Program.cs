@@ -46,6 +46,15 @@ namespace TtxFromTS
                     output = new TTIOutput();
                     break;
             }
+            // Log if looping is enabled, or warn and disable looping if enabled but the output doesn't support it
+            if (Options.Loop && output.LoopSupported)
+            {
+                Logger.OutputInfo("Looping output is enabled");
+            }
+            else if (Options.Loop) {
+                Logger.OutputWarning("Looping has been enabled but it is not supported by the selected output type");
+                Options.Loop = false;
+            }
             // Setup TS decoder
             TSDecoder tsDecoder = new TSDecoder
             {
@@ -53,43 +62,60 @@ namespace TtxFromTS
                 EnableSubtitles = Options.IncludeSubtitles
             };
             tsDecoder.PacketDecoded += (sender, packet) => output.AddPacket(packet);
-            // Open the input file and read it in a loop until the end of the file
+            // Open the input file and read it until the end of the file, or in a loop if enabled
             using (FileStream fileStream = Options.InputFile.OpenRead())
             {
+                // Initialise data buffer and processing state
                 byte[] data = new byte[1316];
                 int loggedPercentage = 0;
-                while (fileStream.Read(data, 0, 1316) > 0)
+                bool finished = false;
+                // Keep processing until finished
+                while (!finished)
                 {
-                    tsDecoder.DecodeData(data);
-                    double currentPercentage = (double)fileStream.Position / (double)fileStream.Length * 100;
-                    if (currentPercentage > loggedPercentage + 10)
+                    // Decode data if there's more bytes available, otherwise finish or loop
+                    if (fileStream.Read(data, 0, 1316) > 0)
                     {
-                        loggedPercentage = (int)currentPercentage;
-                        Logger.OutputInfo($"Reading TS file: {loggedPercentage}%");
+                        tsDecoder.DecodeData(data);
+                        // If not set to loop, log the progress in increments of 10%
+                        if (!Options.Loop)
+                        {
+                            double currentPercentage = (double)fileStream.Position / (double)fileStream.Length * 100;
+                            if (currentPercentage >= loggedPercentage + 10)
+                            {
+                                loggedPercentage = (int)currentPercentage;
+                                Logger.OutputInfo($"Reading TS file: {loggedPercentage}%");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // If unable to decode any packets, exit with the appropriate error
+                        if (tsDecoder.PacketsReceived == 0)
+                        {
+                            Logger.OutputError("Unable to process transport stream - please check it is a valid TS file");
+                            return (int)ExitCodes.TSError;
+                        }
+                        if (tsDecoder.PacketsDecoded == 0)
+                        {
+                            Logger.OutputError("Invalid packet identifier provided");
+                            return (int)ExitCodes.InvalidPID;
+                        }
+                        // If looping reset the file back to the start, otherwise finish processing
+                        if (Options.Loop)
+                        {
+                            fileStream.Position = 0;
+                        }
+                        else
+                        {
+                            finished = true;
+                        }
                     }
                 }
-                if (loggedPercentage < 100)
-                {
-                    Logger.OutputInfo("Reading TS file: 100%");
-                }
-                // If packets are processed, finish the output and log stats, otherwise return an error
-                if (tsDecoder.PacketsDecoded > 0)
-                {
-                    output.FinishOutput();
-                    Logger.OutputStats(tsDecoder.PacketsReceived, tsDecoder.PacketsDecoded, output.Statistics);
-                    return (int)ExitCodes.Success;
-                }
-                else if (tsDecoder.PacketsReceived > 0)
-                {
-                    Logger.OutputError("Invalid packet identifier provided");
-                    return (int)ExitCodes.InvalidPID;
-                }
-                else
-                {
-                    Logger.OutputError("Unable to process transport stream - please check it is a valid TS file");
-                    return (int)ExitCodes.TSError;
-                }
             }
+            // Finish the output and log stats
+            output.FinishOutput();
+            Logger.OutputStats(tsDecoder.PacketsReceived, tsDecoder.PacketsDecoded, output.Statistics);
+            return (int)ExitCodes.Success;
         }
 
         /// <summary>

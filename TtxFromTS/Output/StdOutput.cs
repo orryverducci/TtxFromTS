@@ -22,6 +22,12 @@ namespace TtxFromTS.Output
         /// </summary>
         /// <value>A tuple containing the statistic title and its value.</value>
         public (string, string)[] Statistics => new (string, string)[0];
+
+        /// <summary>
+        /// Gets if output looping is supported for this output.
+        /// </summary>
+        /// <value><c>true</c> if output looping is supported, <c>false</c> if not.</value>
+        public bool LoopSupported { get; } = true;
         #endregion
 
         #region Constructor

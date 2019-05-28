@@ -62,6 +62,12 @@ namespace TtxFromTS.Output
                 };
             }
         }
+
+        /// <summary>
+        /// Gets if output looping is supported for this output.
+        /// </summary>
+        /// <value><c>true</c> if output looping is supported, <c>false</c> if not.</value>
+        public bool LoopSupported { get; } = false;
         #endregion
 
         #region Constructor

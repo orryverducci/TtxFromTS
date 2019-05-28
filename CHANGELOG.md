@@ -5,6 +5,7 @@ Release Notes
 ---
 
 * **NEW:** Support for outputting teletext packets directly to standard output
+* **NEW:** Support for looped output
 
 1.2.1
 -----
