@@ -11,6 +11,18 @@ namespace TtxFromTS
     /// </summary>
     internal class Program
     {
+        #region Private Fields
+        /// <summary>
+        /// The chosen application output.
+        /// </summary>
+        private static IOutput _output;
+
+        /// <summary>
+        /// The transport stream decoder.
+        /// </summary>
+        private static TSDecoder _tsDecoder;
+        #endregion
+
         #region Properties
         /// <summary>
         /// The application options.
@@ -36,32 +48,54 @@ namespace TtxFromTS
                 return (int)ExitCodes.InvalidArgs;
             }
             // Setup output
-            IOutput output;
-            switch (Options.OutputType)
-            {
-                case Output.Type.StdOut:
-                    output = new StdOutput();
-                    break;
-                default:
-                    output = new TTIOutput();
-                    break;
-            }
-            // Log if looping is enabled, or warn and disable looping if enabled but the output doesn't support it
-            if (Options.Loop && output.LoopSupported)
-            {
-                Logger.OutputInfo("Looping output is enabled");
-            }
-            else if (Options.Loop) {
-                Logger.OutputWarning("Looping has been enabled but it is not supported by the selected output type");
-                Options.Loop = false;
-            }
+            SetupOutput();
             // Setup TS decoder
-            TSDecoder tsDecoder = new TSDecoder
+            _tsDecoder = new TSDecoder
             {
                 PacketID = Options.PacketIdentifier,
                 EnableSubtitles = Options.IncludeSubtitles
             };
-            tsDecoder.PacketDecoded += (sender, packet) => output.AddPacket(packet);
+            _tsDecoder.PacketDecoded += (sender, packet) => _output.AddPacket(packet);
+            // Process the file
+            ProcessFile();
+            // Finish the output and log stats
+            _output.FinishOutput();
+            Logger.OutputStats(_tsDecoder.PacketsReceived, _tsDecoder.PacketsDecoded, _output.Statistics);
+            return (int)ExitCodes.Success;
+        }
+
+        /// <summary>
+        /// Sets up the chosen output type.
+        /// </summary>
+        private static void SetupOutput()
+        {
+            // Set output based on chosen type
+            switch (Options.OutputType)
+            {
+                case Output.Type.StdOut:
+                    _output = new StdOutput();
+                    break;
+                default:
+                    _output = new TTIOutput();
+                    break;
+            }
+            // Log if looping is enabled, or if looping is enabled but the output doesn't support it log a warning and disable it
+            if (Options.Loop && _output.LoopSupported)
+            {
+                Logger.OutputInfo("Looping output is enabled");
+            }
+            else if (Options.Loop)
+            {
+                Logger.OutputWarning("Looping has been enabled but it is not supported by the selected output type");
+                Options.Loop = false;
+            }
+        }
+
+        /// <summary>
+        /// Opens the provided input file and retrieves packets of data from it.
+        /// </summary>
+        private static void ProcessFile()
+        {
             // Open the input file and read it until the end of the file, or in a loop if enabled
             using (FileStream fileStream = Options.InputFile.OpenRead())
             {
@@ -75,7 +109,7 @@ namespace TtxFromTS
                     // Decode data if there's more bytes available, otherwise finish or loop
                     if (fileStream.Read(data, 0, 1316) > 0)
                     {
-                        tsDecoder.DecodeData(data);
+                        _tsDecoder.DecodeData(data);
                         // If not set to loop, log the progress in increments of 10%
                         if (!Options.Loop)
                         {
@@ -89,16 +123,16 @@ namespace TtxFromTS
                     }
                     else
                     {
-                        // If unable to decode any packets, exit with the appropriate error
-                        if (tsDecoder.PacketsReceived == 0)
+                        // If no packets were successfully decoded, exit with the appropriate error
+                        if (_tsDecoder.PacketsReceived == 0)
                         {
                             Logger.OutputError("Unable to process transport stream - please check it is a valid TS file");
-                            return (int)ExitCodes.TSError;
+                            Environment.Exit((int)ExitCodes.TSError);
                         }
-                        if (tsDecoder.PacketsDecoded == 0)
+                        if (_tsDecoder.PacketsDecoded == 0)
                         {
                             Logger.OutputError("Invalid packet identifier provided");
-                            return (int)ExitCodes.InvalidPID;
+                            Environment.Exit((int)ExitCodes.InvalidPID);
                         }
                         // If looping reset the file back to the start, otherwise finish processing
                         if (Options.Loop)
@@ -112,12 +146,10 @@ namespace TtxFromTS
                     }
                 }
             }
-            // Finish the output and log stats
-            output.FinishOutput();
-            Logger.OutputStats(tsDecoder.PacketsReceived, tsDecoder.PacketsDecoded, output.Statistics);
-            return (int)ExitCodes.Success;
         }
+        #endregion
 
+        #region Support Methods
         /// <summary>
         /// Parses and validates the command line arguments.
         /// </summary>
