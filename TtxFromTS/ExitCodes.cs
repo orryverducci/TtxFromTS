@@ -2,6 +2,9 @@
 
 namespace TtxFromTS
 {
+    /// <summary>
+    /// Exit codes used by the application.
+    /// </summary>
     internal enum ExitCodes
     {
         Success = 0,
