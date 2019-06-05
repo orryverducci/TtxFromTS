@@ -140,10 +140,10 @@ namespace TtxFromTS.Teletext
 
         #region Decode Methods
         /// <summary>
-        /// Decodes Hamming 8/4 byte back to original value byte.
+        /// Decodes a Hamming 8/4 encoded byte back to its original value.
         /// </summary>
-        /// <returns>Either the original encoded byte, or 0xff indicating an unrecoverable error.</returns>
-        /// <param name="encodedByte">The Hamming encoded byte.</param>
+        /// <returns>A byte representing either the original value, or 0xff indicating an unrecoverable error.</returns>
+        /// <param name="encodedByte">The Hamming 8/4 encoded byte.</param>
         internal static byte Hamming84(byte encodedByte)
         {
             // Get decoded byte from the lookup table
@@ -151,10 +151,10 @@ namespace TtxFromTS.Teletext
         }
 
         /// <summary>
-        /// Decodes Hamming 24/18 triplet back to original value triplet.
+        /// Decodes a Hamming 24/18 triplet back to its original value.
         /// </summary>
-        /// <returns>Either the original encoded triplet, or 0xffffff indicating an unrecoverable error.</returns>
-        /// <param name="encodedByte">The Hamming encoded bytes.</param>
+        /// <returns>A triplet representing either the original value, or 0xffffff indicating an unrecoverable error.</returns>
+        /// <param name="encodedBytes">The Hamming 24/18 encoded triplet in bytes.</param>
         internal static byte[] Hamming2418(byte[] encodedBytes)
         {
             // Get the bytes without the protection bits (i.e. just data)
@@ -162,11 +162,11 @@ namespace TtxFromTS.Teletext
             dataBytes[0] = _hamming2418Byte1Table[encodedBytes[0] >> 2];
             dataBytes[1] = encodedBytes[1] & 0x7f;
             dataBytes[2] = encodedBytes[2] & 0x7f;
-            // Combine the data bytes in to a single int
+            // Combine the data bytes in to a single integer
             int data = dataBytes[0] | (dataBytes[1] << 4) | (dataBytes[2] << 11);
             // Get parity check results for the encoded triplet
             int parity = _hamming2418ParityTable[0, encodedBytes[0]] ^ _hamming2418ParityTable[1, encodedBytes[1]] ^ _hamming2418ParityTable[2, encodedBytes[2]];
-            // Combine the decoded data with parity results to correct single bit errors, or to return 0xXXXX when 2 or more errors occur
+            // Combine the decoded data with parity results to correct single bit errors, or to return a value above 0x80000000 when 2 or more errors occur
             uint correctedData = (uint)data ^ _hamming2418ErrorTable[parity];
             // If there is not unrecoverable errors, convert the corrected data back to a triplet of bytes and return it, otherwise return 0xffffff
             if (correctedData < 0x80000000)
@@ -187,9 +187,9 @@ namespace TtxFromTS.Teletext
         }
 
         /// <summary>
-        /// Checks an odd parity encoded bit for errors, and returns the original value if there isn't any.
+        /// Decodes an odd parity encoded byte back to its original value.
         /// </summary>
-        /// <returns>The original value byte if there is no errors, or 0x20 (i.e. a space) if there is.</returns>
+        /// <returns>A byte representing either the original value, or 0x20 (a space in ASCII) if the parity check fails.</returns>
         /// <param name="encodedByte">The odd parity encoded byte.</param>
         internal static byte OddParity(byte encodedByte)
         {
@@ -204,7 +204,7 @@ namespace TtxFromTS.Teletext
                     bitCount++;
                 }
             }
-            // If the number of 1 bits is odd, return the original value byte, otherwise return 0x00
+            // If the number of 1 bits is odd, return the original value, otherwise return 0x20
             if (bitCount % 2 != 0)
             {
                 return (byte)(encodedByte & 0x7f);
