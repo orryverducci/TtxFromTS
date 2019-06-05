@@ -8,19 +8,6 @@ namespace TtxFromTS.Teletext
     /// </summary>
     internal class Page
     {
-        #region Enumerations
-        internal enum CharacterSubset
-        {
-            English = 0x00,
-            German = 0x01,
-            SwedishFinishHugarian = 0x02,
-            Italian = 0x03,
-            French = 0x04,
-            PortugeseSpanish = 0x05,
-            CzechSlovak = 0x06
-        }
-        #endregion
-
         #region Properties
         /// <summary>
         /// Gets the magazine number for the page.
