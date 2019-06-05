@@ -102,14 +102,14 @@ namespace TtxFromTS.Teletext
         internal void AddPacket(Packet packet)
         {
             // If packet is a header, save current page
-            if (packet.Type == Packet.PacketType.Header)
+            if (packet.Type == PacketType.Header)
             {
                 SavePage();
                 // Create new page
                 _currentPage = new Page { Magazine = Number };
             }
             // If the packet is not a magazine enhancements packet, add it to a page, otherwise process the enhancements
-            if (packet.Type != Packet.PacketType.MagazineEnhancements)
+            if (packet.Type != PacketType.MagazineEnhancements)
             {
                 // If a page is being decoded, add the packet to it
                 if (_currentPage != null)

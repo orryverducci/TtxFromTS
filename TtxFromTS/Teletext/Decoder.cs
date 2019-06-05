@@ -82,10 +82,10 @@ namespace TtxFromTS.Teletext
             // Check packet is free from errors, and if it is add it to its magazine, or decode broadcast services data
             if (!packet.DecodingError && packet.Magazine != null)
             {
-                if (packet.Type != Packet.PacketType.BroadcastServiceData)
+                if (packet.Type != PacketType.BroadcastServiceData)
                 {
                     // If packet is a header, check if it is in serial mode, and if it is signal to the other magazines that a serial header has been received
-                    if (packet.Type == Packet.PacketType.Header)
+                    if (packet.Type == PacketType.Header)
                     {
                         // Get serial flag
                         bool magazineSerial = false;

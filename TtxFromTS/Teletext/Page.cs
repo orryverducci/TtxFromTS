@@ -154,21 +154,21 @@ namespace TtxFromTS.Teletext
             // Choose how to decode the packet based on its type
             switch (packet.Type)
             {
-                case Packet.PacketType.Header:
+                case PacketType.Header:
                     DecodeHeader(packet);
                     break;
-                case Packet.PacketType.PageBody:
-                case Packet.PacketType.Fastext:
-                case Packet.PacketType.TOPCommentary:
+                case PacketType.PageBody:
+                case PacketType.Fastext:
+                case PacketType.TOPCommentary:
                     DecodeRow(packet);
                     break;
-                case Packet.PacketType.PageReplacements:
+                case PacketType.PageReplacements:
                     DecodePageReplacements(packet);
                     break;
-                case Packet.PacketType.LinkedPages:
+                case PacketType.LinkedPages:
                     DecodeLinkedPages(packet);
                     break;
-                case Packet.PacketType.PageEnhancements:
+                case PacketType.PageEnhancements:
                     DecodePageEnhancements(packet);
                     break;
             }

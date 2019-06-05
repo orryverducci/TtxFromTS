@@ -7,20 +7,6 @@ namespace TtxFromTS.Teletext
     /// </summary>
     public class Packet
     {
-        public enum PacketType
-        {
-            Header,
-            PageBody,
-            Fastext,
-            TOPCommentary,
-            PageReplacements,
-            LinkedPages,
-            PageEnhancements,
-            MagazineEnhancements,
-            BroadcastServiceData,
-            Unspecified
-        }
-
         /// <summary>
         /// Gets the framing code for the teletext packet.
         /// </summary>
