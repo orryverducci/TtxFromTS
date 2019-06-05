@@ -8,6 +8,7 @@ namespace TtxFromTS.Teletext
     /// </summary>
     internal static class Decode
     {
+        #region Lookup Tables
         /// <summary>
         /// Lookup table of decoded bytes for each Hamming 8/4 encoded byte value.
         /// </summary>
@@ -135,7 +136,9 @@ namespace TtxFromTS.Teletext
             0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7, 0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
             0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef, 0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
         };
+        #endregion
 
+        #region Decode Methods
         /// <summary>
         /// Decodes Hamming 8/4 byte back to original value byte.
         /// </summary>
@@ -221,5 +224,6 @@ namespace TtxFromTS.Teletext
         {
             return _reverseByte[originalByte];
         }
+        #endregion
     }
 }
