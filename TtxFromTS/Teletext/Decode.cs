@@ -144,11 +144,7 @@ namespace TtxFromTS.Teletext
         /// </summary>
         /// <returns>A byte representing either the original value, or 0xff indicating an unrecoverable error.</returns>
         /// <param name="encodedByte">The Hamming 8/4 encoded byte.</param>
-        internal static byte Hamming84(byte encodedByte)
-        {
-            // Get decoded byte from the lookup table
-            return _hamming84Table[encodedByte];
-        }
+        internal static byte Hamming84(byte encodedByte) => _hamming84Table[encodedByte];
 
         /// <summary>
         /// Decodes a Hamming 24/18 triplet back to its original value.
@@ -209,10 +205,7 @@ namespace TtxFromTS.Teletext
             {
                 return (byte)(encodedByte & 0x7f);
             }
-            else
-            {
-                return 0x20;
-            }
+            return 0x20;
         }
 
         /// <summary>
@@ -220,10 +213,7 @@ namespace TtxFromTS.Teletext
         /// </summary>
         /// <returns>The reversed byte.</returns>
         /// <param name="originalByte">The byte to be reversed.</param>
-        internal static byte Reverse(byte originalByte)
-        {
-            return _reverseByte[originalByte];
-        }
+        internal static byte Reverse(byte originalByte) => _reverseByte[originalByte];
         #endregion
     }
 }
