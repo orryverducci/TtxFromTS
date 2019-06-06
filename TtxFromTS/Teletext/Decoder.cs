@@ -6,49 +6,49 @@ namespace TtxFromTS.Teletext
     /// <summary>
     /// Provides a teletext decoder, to decode received packets in to full pages.
     /// </summary>
-    internal class Decoder
+    public class Decoder
     {
         /// <summary>
         /// Gets the teletext magazines.
         /// </summary>
         /// <value>The magazine.</value>
-        internal Magazine[] Magazine { get; private set; } = new Magazine[8];
+        public Magazine[] Magazine { get; private set; } = new Magazine[8];
 
         /// <summary>
         /// Gets if the teletext data is multiplexed with video.
         /// </summary>
         /// <value><c>true</c> if the data is multiplexed with video, <c>false</c> if full frame.</value>
-        internal bool Multiplexed { get; private set; } = true;
+        public bool Multiplexed { get; private set; } = true;
 
         /// <summary>
         /// Gets the status display (usually the channel name).
         /// </summary>
         /// <value>The status display.</value>
-        internal string StatusDisplay { get; private set; }
+        public string StatusDisplay { get; private set; }
 
         /// <summary>
         /// Gets the initial page to display.
         /// </summary>
         /// <value>The initial page number. Returns 8FF when no particular page is specified.</value>
-        internal string InitialPage { get; private set; } = "8FF";
+        public string InitialPage { get; private set; } = "8FF";
 
         /// <summary>
         /// Gets the initial subcode to display.
         /// </summary>
         /// <value>The initial subcode number. Returns 3F7F when no particular subcode is specified.</value>
-        internal string InitialSubcode { get; private set; } = "3F7F";
+        public string InitialSubcode { get; private set; } = "3F7F";
 
         /// <summary>
         /// Gets the network identification code.
         /// </summary>
         /// <value>The initial subcode number. Returns 3F7F when no particular subcode is specified.</value>
-        internal string NetworkID { get; private set; }
+        public string NetworkID { get; private set; }
 
         /// <summary>
         /// Gets the total pages, including subpages, within the teletext service.
         /// </summary>
         /// <value>The total number of pages.</value>
-        internal int TotalPages
+        public int TotalPages
         {
             get
             {
@@ -64,7 +64,7 @@ namespace TtxFromTS.Teletext
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextDecoder"/> class.
         /// </summary>
-        internal Decoder()
+        public Decoder()
         {
             // Create the magazines to decode packets in to
             for (int i = 0; i < 8; i++)
@@ -77,7 +77,7 @@ namespace TtxFromTS.Teletext
         /// Decodes a teletext packet.
         /// </summary>
         /// <param name="packet">The packet to be decoded.</param>
-        internal void DecodePacket(Packet packet)
+        public void DecodePacket(Packet packet)
         {
             // Check packet is free from errors, and if it is add it to its magazine, or decode broadcast services data
             if (!packet.DecodingError && packet.Magazine != null)

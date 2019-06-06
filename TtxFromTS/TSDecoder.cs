@@ -7,7 +7,7 @@ namespace TtxFromTS
     /// <summary>
     /// Decodes packets of data from a MPEG transport stream.
     /// </summary>
-    internal class TSDecoder
+    public class TSDecoder
     {
         #region Private Fields
         /// <summary>
@@ -41,32 +41,32 @@ namespace TtxFromTS
         /// Gets or sets the packet identifier to be decoded. If set to -1 (the default) all packets are decoded.
         /// </summary>
         /// <value>The packet identifier.</value>
-        internal int PacketID { set; get; } = -1;
+        public int PacketID { set; get; } = -1;
 
         /// <summary>
         /// Gets the number of TS packets that have been received from the data provided.
         /// </summary>
         /// <value>The packets received.</value>
-        internal int PacketsReceived { private set; get; }
+        public int PacketsReceived { private set; get; }
 
         /// <summary>
         /// Gets the number of TS packets from the specified Packet ID required that have been successfully decoded.
         /// </summary>
         /// <value>The packets decoded.</value>
-        internal int PacketsDecoded { private set; get; }
+        public int PacketsDecoded { private set; get; }
 
         /// <summary>
         /// Gets and sets if subtitle pages should be decoded.
         /// </summary>
         /// <value><c>true</c> if subtitles should be decoded, <c>false</c> if not.</value>
-        internal bool EnableSubtitles { get; set; } = false;
+        public bool EnableSubtitles { get; set; } = false;
         #endregion
 
         #region Events
         /// <summary>
         /// Occurs when a teletext packet has been successfully decoded from the specified Packet ID.
         /// </summary>
-        internal EventHandler<Packet> PacketDecoded;
+        public EventHandler<Packet> PacketDecoded;
         #endregion
 
         #region Methods
@@ -74,7 +74,7 @@ namespace TtxFromTS
         /// Decodes TS packets from the data provided.
         /// </summary>
         /// <param name="data">The data to be decoded.</param>
-        internal void DecodeData(byte[] data)
+        public void DecodeData(byte[] data)
         {
             // Get packets from the data
             TsPacket[] packets = _packetFactory.GetTsPacketsFromData(data);

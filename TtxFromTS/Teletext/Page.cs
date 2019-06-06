@@ -6,116 +6,116 @@ namespace TtxFromTS.Teletext
     /// <summary>
     /// Provides a teletext page.
     /// </summary>
-    internal class Page
+    public class Page
     {
         #region Properties
         /// <summary>
         /// Gets the magazine number for the page.
         /// </summary>
         /// <value>The magazine number.</value>
-        internal int Magazine { get; set; }
+        public int Magazine { get; set; }
 
         /// <summary>
         /// Gets the hex page number within the magazine.
         /// </summary>
         /// <value>The page number.</value>
-        internal string Number { get; private set; }
+        public string Number { get; private set; }
 
         /// <summary>
         /// Gets the page subcode.
         /// </summary>
         /// <value>The page subcode.</value>
-        internal string Subcode { get; private set; }
+        public string Subcode { get; private set; }
 
         /// <summary>
         /// Gets if any previous displays of this page should be erased.
         /// </summary>
         /// <value>True if the page should be erased.</value>
-        internal bool ErasePage { get; private set; } = false;
+        public bool ErasePage { get; private set; } = false;
 
         /// <summary>
         /// Gets if this is a newsflash page.
         /// </summary>
         /// <value>True if the page is a newsflash page.</value>
-        internal bool Newsflash { get; private set; }
+        public bool Newsflash { get; private set; }
 
         /// <summary>
         /// Gets if this is a subtitles page.
         /// </summary>
         /// <value>True if the page is a subtitles page.</value>
-        internal bool Subtitles { get; private set; } = false;
+        public bool Subtitles { get; private set; } = false;
 
         /// <summary>
         /// Gets if the page headers should not be displayed.
         /// </summary>
         /// <value>True if the page header should be hidden.</value>
-        internal bool SuppressHeader { get; private set; } = false;
+        public bool SuppressHeader { get; private set; } = false;
 
         /// <summary>
         /// Gets if the page has changed since the previous transmission.
         /// </summary>
         /// <value>True if the page is an updated page.</value>
-        internal bool Update { get; private set; } = false;
+        public bool Update { get; private set; } = false;
 
         /// <summary>
         /// Gets if the page has been transmitted out of numerical order.
         /// </summary>
         /// <value>True if the page is has been transmitted out of order.</value>
-        internal bool InterruptedSequence { get; private set; } = false;
+        public bool InterruptedSequence { get; private set; } = false;
 
         /// <summary>
         /// Gets if the page should not be displayed.
         /// </summary>
         /// <value>True if the page should not be displayed.</value>
-        internal bool InhibitDisplay { get; private set; } = false;
+        public bool InhibitDisplay { get; private set; } = false;
 
         /// <summary>
         /// Gets if magazines are being transmitted serially.
         /// </summary>
         /// <value>True if transmitted serially, false if transmitted in parrallel.</value>
-        internal bool MagazineSerial { get; private set; } = false;
+        public bool MagazineSerial { get; private set; } = false;
 
         /// <summary>
         /// Gets the national option character set to be used for the page.
         /// </summary>
         /// <value>The character set to be used.</value>
-        internal CharacterSubset NationalOptionCharacterSubset { get; private set; } = CharacterSubset.English;
+        public CharacterSubset NationalOptionCharacterSubset { get; private set; } = CharacterSubset.English;
 
         /// <summary>
         /// Gets the rows of the page.
         /// </summary>
         /// <value>The rows of the page.</value>
-        internal byte[][] Rows { get; private set; } = new byte[26][];
+        public byte[][] Rows { get; private set; } = new byte[26][];
 
         /// <summary>
         /// Gets the linked pages
         /// </summary>
         /// <value>The linked page numbers and shortcodes.</value>
-        internal (string Number, string Subcode)[] Links { get; private set; }
+        public (string Number, string Subcode)[] Links { get; private set; }
 
         /// <summary>
         /// Gets if row 24 should be displayed.
         /// </summary>
         /// <value>True if row 24 should be displayed, false if not.</value>
-        internal bool DisplayRow24 { get; private set; } = false;
+        public bool DisplayRow24 { get; private set; } = false;
 
         /// <summary>
         /// Gets character replacement and object data (i.e. packet 26) for the page.
         /// </summary>
         /// <value>The enhancement data packets.</value>
-        internal byte[][] ReplacementData { get; private set; } = new byte[16][];
+        public byte[][] ReplacementData { get; private set; } = new byte[16][];
 
         /// <summary>
         /// Gets enhancement data (i.e. packet 28) for the page.
         /// </summary>
         /// <value>The enhancement data packets.</value>
-        internal byte[][] EnhancementData { get; private set; } = new byte[4][];
+        public byte[][] EnhancementData { get; private set; } = new byte[4][];
 
         /// <summary>
         /// Gets the number of rows that contain data.
         /// </summary>
         /// <value>The number of rows with data.</value>
-        internal int UsedRows {
+        public int UsedRows {
             get
             {
                 int usedRows = 0;
@@ -136,7 +136,7 @@ namespace TtxFromTS.Teletext
         /// Adds a teletext packet to the page.
         /// </summary>
         /// <param name="packet">The teletext packet to be added.</param>
-        internal void AddPacket(Packet packet)
+        public void AddPacket(Packet packet)
         {
             // Choose how to decode the packet based on its type
             switch (packet.Type)
@@ -165,7 +165,7 @@ namespace TtxFromTS.Teletext
         /// Merges and updated subpage with this page.
         /// </summary>
         /// <param name="packet">The teletext page to be merged.</param>
-        internal void MergeUpdate(Page page)
+        public void MergeUpdate(Page page)
         {
             // Update properties with new ones
             Newsflash = page.Newsflash;

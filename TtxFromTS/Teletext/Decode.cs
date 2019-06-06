@@ -6,7 +6,7 @@ namespace TtxFromTS.Teletext
     /// <summary>
     /// Provides methods to decode data.
     /// </summary>
-    internal static class Decode
+    public static class Decode
     {
         #region Lookup Tables
         /// <summary>
@@ -144,14 +144,14 @@ namespace TtxFromTS.Teletext
         /// </summary>
         /// <returns>A byte representing either the original value, or 0xff indicating an unrecoverable error.</returns>
         /// <param name="encodedByte">The Hamming 8/4 encoded byte.</param>
-        internal static byte Hamming84(byte encodedByte) => _hamming84Table[encodedByte];
+        public static byte Hamming84(byte encodedByte) => _hamming84Table[encodedByte];
 
         /// <summary>
         /// Decodes a Hamming 24/18 triplet back to its original value.
         /// </summary>
         /// <returns>A triplet representing either the original value, or 0xffffff indicating an unrecoverable error.</returns>
         /// <param name="encodedBytes">The Hamming 24/18 encoded triplet in bytes.</param>
-        internal static byte[] Hamming2418(byte[] encodedBytes)
+        public static byte[] Hamming2418(byte[] encodedBytes)
         {
             // Get the bytes without the protection bits (i.e. just data)
             int[] dataBytes = new int[3];
@@ -187,7 +187,7 @@ namespace TtxFromTS.Teletext
         /// </summary>
         /// <returns>A byte representing either the original value, or 0x20 (a space in ASCII) if the parity check fails.</returns>
         /// <param name="encodedByte">The odd parity encoded byte.</param>
-        internal static byte OddParity(byte encodedByte)
+        public static byte OddParity(byte encodedByte)
         {
             // Convert byte to an array of bits
             BitArray bits = new BitArray(new byte[] { encodedByte });
@@ -213,7 +213,7 @@ namespace TtxFromTS.Teletext
         /// </summary>
         /// <returns>The reversed byte.</returns>
         /// <param name="originalByte">The byte to be reversed.</param>
-        internal static byte Reverse(byte originalByte) => _reverseByte[originalByte];
+        public static byte Reverse(byte originalByte) => _reverseByte[originalByte];
         #endregion
     }
 }

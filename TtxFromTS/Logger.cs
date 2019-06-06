@@ -6,12 +6,12 @@ namespace TtxFromTS
     /// <summary>
     /// Provides console logging functionality.
     /// </summary>
-    internal static class Logger
+    public static class Logger
     {
         /// <summary>
         /// Outputs an introductory header message to the console's standard error output.
         /// </summary>
-        internal static void OutputHeader()
+        public static void OutputHeader()
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.BackgroundColor = ConsoleColor.Blue;
@@ -25,7 +25,7 @@ namespace TtxFromTS
         /// Outputs an info message to the console's standard error output.
         /// </summary>
         /// <param name="infoMessage">The info message to be displayed.</param>
-        internal static void OutputInfo(string infoMessage)
+        public static void OutputInfo(string infoMessage)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Error.Write("[INFO] ");
@@ -37,7 +37,7 @@ namespace TtxFromTS
         /// Outputs an error message to the console's standard error output.
         /// </summary>
         /// <param name="errorMessage">The error message to be displayed.</param>
-        internal static void OutputError(string errorMessage)
+        public static void OutputError(string errorMessage)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.Write("[ERROR] ");
@@ -49,7 +49,7 @@ namespace TtxFromTS
         /// Outputs a warning message to the console's standard error output.
         /// </summary>
         /// <param name="warningMessage">The warning message to be displayed.</param>
-        internal static void OutputWarning(string warningMessage)
+        public static void OutputWarning(string warningMessage)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.Error.Write("[WARNING] ");
@@ -63,7 +63,7 @@ namespace TtxFromTS
         /// <param name="packetsReceived">The number of packets received.</param>
         /// <param name="packetsProcessed">The number of packets processed.</param>
         /// <param name="outputStats">Statistics provided by the output.</param>
-        internal static void OutputStats(int packetsReceived, int packetsProcessed, (string, string)[] outputStats)
+        public static void OutputStats(int packetsReceived, int packetsProcessed, (string, string)[] outputStats)
         {
             Console.Error.WriteLine();
             Console.ForegroundColor = ConsoleColor.Green;

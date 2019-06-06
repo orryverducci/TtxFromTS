@@ -6,7 +6,7 @@ namespace TtxFromTS.Output
     /// <summary>
     /// Provides an interface to teletext data outputs.
     /// </summary>
-    internal interface IOutput
+    public interface IOutput
     {
         /// <summary>
         /// Gets the output specific statistics.

@@ -6,25 +6,25 @@ namespace TtxFromTS.Teletext
     /// <summary>
     /// Provides a carousel of teletext pages.
     /// </summary>
-    internal class Carousel
+    public class Carousel
     {
         /// <summary>
         /// Gets or sets the hex page number within the magazine.
         /// </summary>
         /// <value>The page number.</value>
-        internal string Number { get; set; }
+        public string Number { get; set; }
 
         /// <summary>
         /// Gets the list of teletext pages within the carousel.
         /// </summary>
         /// <value>The list of teletext pages.</value>
-        internal List<Page> Pages { get; private set; } = new List<Page>();
+        public List<Page> Pages { get; private set; } = new List<Page>();
 
         /// <summary>
         /// Adds a teletext page to the carousel.
         /// </summary>
         /// <param name="page">The teletext page to add to the carousel.</param>
-        internal void AddPage(Page page)
+        public void AddPage(Page page)
         {
             // Check if a page with the same subcode is already in the list
             Page existingPage = Pages.Find(x => x.Subcode == page.Subcode);

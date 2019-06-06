@@ -9,7 +9,7 @@ namespace TtxFromTS
     /// <summary>
     /// Provides the main functionality for the application
     /// </summary>
-    internal class Program
+    public class Program
     {
         #region Private Fields
         /// <summary>
@@ -28,7 +28,7 @@ namespace TtxFromTS
         /// The application options.
         /// </summary>
         /// <value>The options.</value>
-        internal static Options Options { get; private set; } = new Options();
+        public static Options Options { get; private set; } = new Options();
         #endregion
 
         #region Main Application Methods
@@ -36,7 +36,7 @@ namespace TtxFromTS
         /// The entry point of the application.
         /// </summary>
         /// <param name="args">The command line arguments.</param>
-        internal static int Main(string[] args)
+        public static int Main(string[] args)
         {
             // Output application header
             Logger.OutputHeader();

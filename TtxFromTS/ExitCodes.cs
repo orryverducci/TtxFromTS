@@ -5,7 +5,7 @@ namespace TtxFromTS
     /// <summary>
     /// Exit codes used by the application.
     /// </summary>
-    internal enum ExitCodes
+    public enum ExitCodes
     {
         Success = 0,
         InvalidArgs = 1,

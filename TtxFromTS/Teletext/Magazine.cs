@@ -6,7 +6,7 @@ namespace TtxFromTS.Teletext
     /// <summary>
     /// Provides a teletext magazine
     /// </summary>
-    internal class Magazine
+    public class Magazine
     {
         /// <summary>
         /// The teletext page currently being decoded.
@@ -17,19 +17,19 @@ namespace TtxFromTS.Teletext
         /// Gets the magazine number.
         /// </summary>
         /// <value>The magazine number.</value>
-        internal int Number { get; private set; }
+        public int Number { get; private set; }
 
         /// <summary>
         /// Gets the list of teletext pages.
         /// </summary>
         /// <value>The list of teletext pages.</value>
-        internal List<Carousel> Pages { get; private set; } = new List<Carousel>();
+        public List<Carousel> Pages { get; private set; } = new List<Carousel>();
 
         /// <summary>
         /// Gets the total number of pages within the magazine.
         /// </summary>
         /// <value>The total number of pages.</value>
-        internal int TotalPages
+        public int TotalPages
         {
             get
             {
@@ -41,55 +41,55 @@ namespace TtxFromTS.Teletext
         /// Gets enhancement data (i.e. packet 29) for the magazine.
         /// </summary>
         /// <value>The enhancement data packets.</value>
-        internal byte[][] EnhancementData { get; private set; } = new byte[4][];
+        public byte[][] EnhancementData { get; private set; } = new byte[4][];
 
         /// <summary>
         /// Gets the page number of the Global Public Object Page for the magazine.
         /// </summary>
         /// <value>The GPOP page number, or 8FF if not defined.</value>
-        internal string GlobalObjectPage { get; private set; } = "8FF";
+        public string GlobalObjectPage { get; private set; } = "8FF";
 
         /// <summary>
         /// Gets a list of page numbers for Public Object Pages for the magazine.
         /// </summary>
         /// <value>The list of POP page numbers.</value>
-        internal List<string> ObjectPages { get; private set; } = new List<string>();
+        public List<string> ObjectPages { get; private set; } = new List<string>();
 
         /// <summary>
         /// Gets a list of page numbers for the Global Dynamically Redefinable Character Set pages for the magazine.
         /// </summary>
         /// <value>The list of GDRCS page numbers.</value>
-        internal List<string> GDRCSPages { get; private set; } = new List<string>();
+        public List<string> GDRCSPages { get; private set; } = new List<string>();
 
         /// <summary>
         /// Gets a list of page numbers for the Dynamically Redefinable Character Set pages for the magazine.
         /// </summary>
         /// <value>The list of DRCS page numbers.</value>
-        internal List<string> DRCSPages { get; private set; } = new List<string>();
+        public List<string> DRCSPages { get; private set; } = new List<string>();
 
         /// <summary>
         /// Gets a list of page numbers for the TOP Multipage Table pages for the magazine.
         /// </summary>
         /// <value>The list of MPT page numbers.</value>
-        internal List<string> MultipageTablePages { get; private set; } = new List<string>();
+        public List<string> MultipageTablePages { get; private set; } = new List<string>();
 
         /// <summary>
         /// Gets a list of page numbers for the TOP Multipage Table Extension pages for the magazine.
         /// </summary>
         /// <value>The list of MPT-EX page numbers.</value>
-        internal List<string> MultipageExtensionPages { get; private set; } = new List<string>();
+        public List<string> MultipageExtensionPages { get; private set; } = new List<string>();
 
         /// <summary>
         /// Gets a list of page numbers for the TOP Additional Information Table pages for the magazine.
         /// </summary>
         /// <value>The list of AIT page numbers.</value>
-        internal List<string> AdditionalInformationTablePages { get; private set; } = new List<string>();
+        public List<string> AdditionalInformationTablePages { get; private set; } = new List<string>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
         /// <param name="number">The magazine number.</param>
-        internal Magazine(int number)
+        public Magazine(int number)
         {
             // Set the magazine number
             Number = number;
@@ -99,7 +99,7 @@ namespace TtxFromTS.Teletext
         /// Adds a teletext packet to the magazine.
         /// </summary>
         /// <param name="packet">The teletext packet to be added.</param>
-        internal void AddPacket(Packet packet)
+        public void AddPacket(Packet packet)
         {
             // If packet is a header, save current page
             if (packet.Type == PacketType.Header)
@@ -126,7 +126,7 @@ namespace TtxFromTS.Teletext
         /// <summary>
         /// Called when a serial header is received from any magazine. Saves the page currently being decoded.
         /// </summary>
-        internal void SerialHeaderReceived()
+        public void SerialHeaderReceived()
         {
             SavePage();
         }

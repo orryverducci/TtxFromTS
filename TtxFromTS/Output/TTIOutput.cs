@@ -12,7 +12,7 @@ namespace TtxFromTS.Output
     /// <summary>
     /// Provides output to TTI files.
     /// </summary>
-    internal class TTIOutput : IOutput
+    public class TTIOutput : IOutput
     {
         #region Enumerations
         enum PageType
@@ -71,7 +71,7 @@ namespace TtxFromTS.Output
         #endregion
 
         #region Constructor
-        internal TTIOutput()
+        public TTIOutput()
         {
             _teletextDecoder = new Decoder();
         }
