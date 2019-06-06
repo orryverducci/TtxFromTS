@@ -7,10 +7,11 @@ namespace TtxFromTS.Teletext
     /// </summary>
     public class Packet
     {
+        #region Properties
         /// <summary>
         /// Gets the framing code for the teletext packet.
         /// </summary>
-        /// <value>The packet data.</value>
+        /// <value>The framing code.</value>
         public byte FramingCode { get; private set; }
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace TtxFromTS.Teletext
         public bool DecodingError { get; private set; } = false;
 
         /// <summary>
-        /// Gets the type of packet
+        /// Gets the type of packet.
         /// </summary>
         /// <value>The packet type.</value>
         public PacketType Type { get; private set; } = PacketType.Unspecified;
@@ -47,8 +48,10 @@ namespace TtxFromTS.Teletext
         /// Gets the full packet data with framing code, magazine and row.
         /// </summary>
         /// <value>The full packet data.</value>
-        public byte[] FullPacketData { get; private set; } 
+        public byte[] FullPacketData { get; private set; }
+        #endregion
 
+        #region Constructor
         /// <summary>
         /// Initialises a new instance of the <see cref="T:TtxFromTS.TeletextPacket"/> class.
         /// </summary>
@@ -57,17 +60,14 @@ namespace TtxFromTS.Teletext
         {
             // Store the original full packet data
             FullPacketData = packetData;
-            // Retrieve framing code
+            // Retrieve the framing code
             FramingCode = packetData[1];
-            // Check the framing code is valid, otherwise mark packet as containing errors
-            if (FramingCode != 0x27)
-            {
-                DecodingError = true;
-            }
-            // Retrieve and decode magazine number
+            // Check the framing code is valid, otherwise mark the packet as containing errors
+            DecodingError = FramingCode != 0x27;
+            // Retrieve and decode the magazine number
             byte address1 = Decode.Hamming84(packetData[2]);
             Magazine = address1 & 0x07;
-            // Check magazine number is valid, otherwise mark packet as containing errors, and change 0 to 8
+            // Check the magazine number is valid, otherwise mark the packet as containing errors, and change 0 to 8
             if (Magazine > 7)
             {
                 Magazine = null;
@@ -77,54 +77,48 @@ namespace TtxFromTS.Teletext
             {
                 Magazine = 8;
             }
-            // Retrieve and decode packet number
+            // Retrieve and decode the packet number
             byte address2 = Decode.Hamming84(packetData[3]);
             Number = (address1 >> 3) | (address2 << 1);
-            // Check the packet number is valid, otherwise mark packet as containing errors, and set the packet type
-            if (Number == 0)
+            // Set the packet type from the packet number, or if it is not a valid number mark the packet as containing errors
+            switch (Number)
             {
-                Type = PacketType.Header;
-            }
-            else if (Number <= 23)
-            {
-                Type = PacketType.PageBody;
-            }
-            else if (Number == 24)
-            {
-                Type = PacketType.Fastext;
-            }
-            else if (Number == 25)
-            {
-                Type = PacketType.TOPCommentary;
-            }
-            else if (Number == 26)
-            {
-                Type = PacketType.PageReplacements;
-            }
-            else if (Number == 27)
-            {
-                Type = PacketType.LinkedPages;
-            }
-            else if (Number == 28)
-            {
-                Type = PacketType.PageEnhancements;
-            }
-            else if (Number == 29)
-            {
-                Type = PacketType.MagazineEnhancements;
-            }
-            else if (Number == 30 && Magazine == 8)
-            {
-                Type = PacketType.BroadcastServiceData;
-            }
-            if (Number > 31)
-            {
-                Number = null;
-                DecodingError = true;
+                case 0:
+                    Type = PacketType.Header;
+                    break;
+                case int packetNumber when packetNumber <= 23:
+                    Type = PacketType.PageBody;
+                    break;
+                case 24:
+                    Type = PacketType.Fastext;
+                    break;
+                case 25:
+                    Type = PacketType.TOPCommentary;
+                    break;
+                case 26:
+                    Type = PacketType.PageReplacements;
+                    break;
+                case 27:
+                    Type = PacketType.LinkedPages;
+                    break;
+                case 28:
+                    Type = PacketType.PageEnhancements;
+                    break;
+                case 29:
+                    Type = PacketType.MagazineEnhancements;
+                    break;
+                case int packetNumber when packetNumber == 30 && Magazine == 8:
+                    Type = PacketType.BroadcastServiceData;
+                    break;
+                default:
+                    Number = null;
+                    DecodingError = true;
+                    break;
             }
             // Retrieve packet data
             Data = new byte[packetData.Length - 4];
             Buffer.BlockCopy(packetData, 4, Data, 0, packetData.Length - 4);
         }
+        #endregion
     }
 }
