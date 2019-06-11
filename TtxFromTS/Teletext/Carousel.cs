@@ -10,9 +10,9 @@ namespace TtxFromTS.Teletext
     {
         #region Properties
         /// <summary>
-        /// Gets or sets the hex page number within the magazine.
+        /// Gets the page number within the magazine.
         /// </summary>
-        /// <value>The page number.</value>
+        /// <value>The page number as a hexidecimal string.</value>
         public string Number { get; set; }
 
         /// <summary>
