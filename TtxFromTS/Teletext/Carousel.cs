@@ -8,6 +8,7 @@ namespace TtxFromTS.Teletext
     /// </summary>
     public class Carousel
     {
+        #region Properties
         /// <summary>
         /// Gets or sets the hex page number within the magazine.
         /// </summary>
@@ -19,7 +20,9 @@ namespace TtxFromTS.Teletext
         /// </summary>
         /// <value>The list of teletext pages.</value>
         public List<Page> Pages { get; private set; } = new List<Page>();
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Adds a teletext page to the carousel.
         /// </summary>
@@ -48,5 +51,6 @@ namespace TtxFromTS.Teletext
                 Pages.Add(page);
             }
         }
+        #endregion
     }
 }
