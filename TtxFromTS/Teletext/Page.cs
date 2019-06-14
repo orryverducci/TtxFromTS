@@ -179,18 +179,27 @@ namespace TtxFromTS.Teletext
             // Update rows with new ones
             for (int i = 0; i < Rows.Length; i++)
             {
-                Rows[i] = page.Rows[i];
+                if (page.Rows[i] != null)
+                {
+                    Rows[i] = page.Rows[i];
+                }
             }
             // Update links with new ones
             Links = page.Links;
             // Update enhancements with new ones
             for (int i = 0; i < EnhancementData.Length; i++)
             {
-                EnhancementData[i] = page.EnhancementData[i];
+                if (page.EnhancementData[i] != null)
+                {
+                    EnhancementData[i] = page.EnhancementData[i];
+                }
             }
             for (int i = 0; i < ReplacementData.Length; i++)
             {
-                ReplacementData[i] = page.ReplacementData[i];
+                if (page.ReplacementData[i] != null)
+                {
+                    ReplacementData[i] = page.ReplacementData[i];
+                }
             }
         }
         #endregion
