@@ -371,6 +371,11 @@ namespace TtxFromTS.Teletext
             EnhancementData[designation] = enhancementTriplets;
         }
 
+        /// <summary>
+        /// Decodes a page number from a header or page link.
+        /// </summary>
+        /// <param name="pageNumberData">The bytes containing the link.</param>
+        /// <returns>A tuple containing the page number and the subcode as strings.</returns>
         private (string Number, string Subcode) DecodePageNumber(byte[] pageNumberData)
         {
             // Create default (i.e. erroneous and to be ignored) values for number and subcode
