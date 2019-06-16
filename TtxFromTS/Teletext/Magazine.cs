@@ -8,11 +8,14 @@ namespace TtxFromTS.Teletext
     /// </summary>
     public class Magazine
     {
+        #region Private Fields
         /// <summary>
         /// The teletext page currently being decoded.
         /// </summary>
         private Page _currentPage;
+        #endregion
 
+        #region Properties
         /// <summary>
         /// Gets the magazine number.
         /// </summary>
@@ -20,9 +23,9 @@ namespace TtxFromTS.Teletext
         public int Number { get; private set; }
 
         /// <summary>
-        /// Gets the list of teletext pages.
+        /// Gets the list of teletext page carousels.
         /// </summary>
-        /// <value>The list of teletext pages.</value>
+        /// <value>The list of teletext page carousels.</value>
         public List<Carousel> Pages { get; private set; } = new List<Carousel>();
 
         /// <summary>
@@ -31,16 +34,13 @@ namespace TtxFromTS.Teletext
         /// <value>The total number of pages.</value>
         public int TotalPages
         {
-            get
-            {
-                return Pages.Count;
-            }
+            get => Pages.Count;
         }
 
         /// <summary>
-        /// Gets enhancement data (i.e. packet 29) for the magazine.
+        /// Gets the enhancement data (i.e. packet 29) for the magazine.
         /// </summary>
-        /// <value>The enhancement data packets.</value>
+        /// <value>The rows of enhancement data packets.</value>
         public byte[][] EnhancementData { get; private set; } = new byte[4][];
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace TtxFromTS.Teletext
         public string GlobalObjectPage { get; private set; } = "8FF";
 
         /// <summary>
-        /// Gets a list of page numbers for Public Object Pages for the magazine.
+        /// Gets a list of page numbers for the Public Object Pages for the magazine.
         /// </summary>
         /// <value>The list of POP page numbers.</value>
         public List<string> ObjectPages { get; private set; } = new List<string>();
@@ -84,7 +84,9 @@ namespace TtxFromTS.Teletext
         /// </summary>
         /// <value>The list of AIT page numbers.</value>
         public List<string> AdditionalInformationTablePages { get; private set; } = new List<string>();
+        #endregion
 
+        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
         /// </summary>
@@ -94,21 +96,25 @@ namespace TtxFromTS.Teletext
             // Set the magazine number
             Number = number;
         }
+        #endregion
 
+        #region Decoding Methods
         /// <summary>
         /// Adds a teletext packet to the magazine.
         /// </summary>
         /// <param name="packet">The teletext packet to be added.</param>
         public void AddPacket(Packet packet)
         {
-            // If packet is a header, save current page
+            // If the packet is a header, save the page currently being decoded and create a new one
             if (packet.Type == PacketType.Header)
             {
                 SavePage();
-                // Create new page
-                _currentPage = new Page { Magazine = Number };
+                _currentPage = new Page
+                {
+                    Magazine = Number
+                };
             }
-            // If the packet is not a magazine enhancements packet, add it to a page, otherwise process the enhancements
+            // If the packet is not a magazine enhancements packet, add it to the page currently being decoded, otherwise process the enhancements
             if (packet.Type != PacketType.MagazineEnhancements)
             {
                 // If a page is being decoded, add the packet to it
@@ -126,61 +132,54 @@ namespace TtxFromTS.Teletext
         /// <summary>
         /// Called when a serial header is received from any magazine. Saves the page currently being decoded.
         /// </summary>
-        public void SerialHeaderReceived()
-        {
-            SavePage();
-        }
+        public void SerialHeaderReceived() => SavePage();
 
         /// <summary>
         /// Saves the page currently being decoded.
         /// </summary>
         private void SavePage()
         {
-            // Check there is a current page
-            if (_currentPage == null)
+            // Check there is a current page and that the page number is valid (i.e. not a time filler)
+            if (_currentPage == null && _currentPage.Number == "FF")
             {
                 return;
             }
-            // Check the page number is valid (i.e. not a time filler)
-            if (_currentPage.Number != "FF")
+            // If the page is a Magazine Organisation Table, decode the page numbers of object and DRCS pages
+            if (_currentPage.Number == "FE")
             {
-                // If the page is a Magazine Organisation Table, decode the page numbers of object and DRCS pages
-                if (_currentPage.Number == "FE")
-                {
-                    DecodeMOT();
-                }
-                // If the page is a Basic TOP Table, decode the page numbers of additional TOP pages
-                if (_currentPage.Number == "F0")
-                {
-                    DecodeTOP();
-                }
-                // Check if a carousel with the page number exists
-                Carousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
-                // If the carousel exists, add the page to it, otherwise create a carousel and add the page
-                if (existingCarousel == null)
-                {
-                    Carousel carousel = new Carousel { Number = _currentPage.Number };
-                    carousel.AddPage(_currentPage);
-                    Pages.Add(carousel);
-                }
-                else
-                {
-                    existingCarousel.AddPage(_currentPage);
-                }
+                DecodeMOT();
+            }
+            // If the page is a Basic TOP Table, decode the page numbers of additional TOP pages
+            if (_currentPage.Number == "F0")
+            {
+                DecodeTOP();
+            }
+            // Check if a carousel with the page number exists
+            Carousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
+            // If the carousel exists, add the page to it, otherwise create a carousel and add the page
+            if (existingCarousel == null)
+            {
+                Carousel carousel = new Carousel { Number = _currentPage.Number };
+                carousel.AddPage(_currentPage);
+                Pages.Add(carousel);
+            }
+            else
+            {
+                existingCarousel.AddPage(_currentPage);
             }
             // Clear the page
             _currentPage = null;
         }
 
         /// <summary>
-        /// Decodes magazine enhancement data.
+        /// Decodes enhancement data for the magazine.
         /// </summary>
-        /// <param name="packet">The packet containing enhancement triplets.</param>
+        /// <param name="packet">The enhancement packet to be decoded.</param>
         private void DecodeEnhancements(Packet packet)
         {
             // Get designation code
             int designation = Decode.Hamming84(packet.Data[0]);
-            // Check designation code is valid and below 4, otherwise treat as an invalid packet and ignore it
+            // Check the designation code is valid and below 5, otherwise treat as an invalid packet and ignore it
             if (designation == 0xff || designation > 4)
             {
                 return;
@@ -188,7 +187,7 @@ namespace TtxFromTS.Teletext
             // Get the triplets from the packet
             byte[] enhancementTriplets = new byte[packet.Data.Length - 1];
             Buffer.BlockCopy(packet.Data, 1, enhancementTriplets, 0, enhancementTriplets.Length);
-            // Store decoded packet
+            // Store the decoded packet
             EnhancementData[designation] = enhancementTriplets;
         }
 
@@ -197,69 +196,77 @@ namespace TtxFromTS.Teletext
         /// </summary>
         private void DecodeMOT()
         {
-            // Decode object page links
+            // Loop through and decode each packet containing object page links
             for (int i = 0; i < 4; i++)
             {
-                // Set packet number
+                // Set the packet number to decode
                 int packetNum = 19 + i;
                 if (i > 1)
                 {
                     packetNum++;
                 }
-                // If packet is set, decode links from it
-                if (_currentPage.Rows[packetNum] != null)
+                // Check the packet has been set, otherwise jump to the next one
+                if (_currentPage.Rows[packetNum] == null)
                 {
-                    for (int x = 0; x < 4; x++)
+                    continue;
+                }
+                // Loop through and decode each page link within the packet
+                for (int x = 0; x < 4; x++)
+                {
+                    // Set link offset
+                    int linkOffset = 10 * x;
+                    // Decode the link page number
+                    byte[] linkBytes = new byte[3];
+                    Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
+                    string link = DecodePageLink(linkBytes);
+                    // Check a valid link has been decoded and set to a value, otherwise jump to the next link
+                    if (link == null)
                     {
-                        // Set link offset
-                        int linkOffset = 10 * x;
-                        // Decode link page number
-                        byte[] linkBytes = new byte[3];
-                        Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
-                        string link = DecodePageLink(linkBytes);
-                        // If a valid link is decoded and set to a value, add it to the global object link or list of object pages
-                        if (link != null)
-                        {
-                            if (link.Substring(1) != "FF" && linkOffset == 0)
-                            {
-                                GlobalObjectPage = link;
-                            }
-                            else if (link.Substring(1) != "FF")
-                            {
-                                ObjectPages.Add(link);
-                            }
-                        }
+                        continue;
+                    }
+                    // Add the link to the global object link or list of object pages
+                    if (link.Substring(1) != "FF" && linkOffset == 0)
+                    {
+                        GlobalObjectPage = link;
+                    }
+                    else if (link.Substring(1) != "FF")
+                    {
+                        ObjectPages.Add(link);
                     }
                 }
             }
-            // Decode DRCS page links
+            // Loop through and decode each packet containing DRCS page links
             for (int i = 0; i < 2; i++)
             {
-                // Set packet number
+                // Set the packet number to decode
                 int packetNum = 21 + (3 * i);
-                // If packet is set, decode links from it
-                if (_currentPage.Rows[packetNum] != null)
+                // Check the packet has been set, otherwise jump to the next one
+                if (_currentPage.Rows[packetNum] == null)
                 {
-                    for (int x = 0; x < 8; x++)
+                    continue;
+                }
+                // Loop through and decode each page link within the packet
+                for (int x = 0; x < 8; x++)
+                {
+                    // Set link offset
+                    int linkOffset = 4 * x;
+                    // Decode the link page number
+                    byte[] linkBytes = new byte[3];
+                    Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
+                    string link = DecodePageLink(linkBytes);
+                    // Check a valid link has been decoded and set to a value, otherwise jump to the next link
+                    if (link == null)
                     {
-                        // Set link offset
-                        int linkOffset = 4 * x;
-                        // Decode link page number
-                        byte[] linkBytes = new byte[3];
-                        Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
-                        string link = DecodePageLink(linkBytes);
-                        // If a valid link is decoded and set to a value, add it to the list of DRCS pages
-                        if (link != null)
-                        {
-                            if (link.Substring(1) != "FF" && linkOffset == 0)
-                            {
-                                GDRCSPages.Add(link);
-                            }
-                            else if (link.Substring(1) != "FF")
-                            {
-                                DRCSPages.Add(link);
-                            }
-                        }
+                        continue;
+                    }
+                    // Add the link to the list of DRCS pages
+                    if (link.Substring(1) != "FF" && linkOffset == 0)
+                    {
+                        GDRCSPages.Add(link);
+                    }
+                    else if (link.Substring(1) != "FF")
+                    {
+                        DRCSPages.Add(link);
                     }
                 }
             }
@@ -270,56 +277,59 @@ namespace TtxFromTS.Teletext
         /// </summary>
         private void DecodeTOP()
         {
-            // Decode page linking table
+            // Loop through and decode each packet containing a page linking table
             for (int i = 0; i < 2; i++)
             {
                 // Set packet number
                 int packetNum = 21 + i;
-                // If packet is set, decode links from it
-                if (_currentPage.Rows[packetNum] != null)
+                // Check the packet has been set, otherwise jump to the next one
+                if (_currentPage.Rows[packetNum] == null)
                 {
-                    for (int x = 0; x < 5; x++)
+                    continue;
+                }
+                // Loop through and decode each page link within the packet
+                for (int x = 0; x < 5; x++)
+                {
+                    // Set link offset
+                    int linkOffset = 8 * x;
+                    // Decode link page number
+                    byte[] linkBytes = new byte[3];
+                    Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
+                    string link = DecodePageLink(linkBytes);
+                    // Check a valid link has been decoded and set to a value, otherwise jump to the next link
+                    if (link == null)
                     {
-                        // Set link offset
-                        int linkOffset = 8 * x;
-                        // Decode link page number
-                        byte[] linkBytes = new byte[3];
-                        Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
-                        string link = DecodePageLink(linkBytes);
-                        // If a valid link is decoded, add it to the appropriate list
-                        if (link != null)
-                        {
-                            // Decode page type
-                            int type = Decode.Hamming84(_currentPage.Rows[packetNum][linkOffset + 7]);
-                            switch (type)
-                            {
-                                case 1:
-                                    MultipageTablePages.Add(link);
-                                    break;
-                                case 2:
-                                    AdditionalInformationTablePages.Add(link);
-                                    break;
-                                case 3:
-                                    MultipageExtensionPages.Add(link);
-                                    break;
-                            }
-                        }
+                        continue;
+                    }
+                    // Decode page type and add it to the appropriate list
+                    int type = Decode.Hamming84(_currentPage.Rows[packetNum][linkOffset + 7]);
+                    switch (type)
+                    {
+                        case 1:
+                            MultipageTablePages.Add(link);
+                            break;
+                        case 2:
+                            AdditionalInformationTablePages.Add(link);
+                            break;
+                        case 3:
+                            MultipageExtensionPages.Add(link);
+                            break;
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Decodes a page link from a MOT.
+        /// Decodes a page number from a MOT page link.
         /// </summary>
         /// <param name="link">The bytes containing the link.</param>
         private string DecodePageLink(byte[] link)
         {
-            // Get linked page number
+            // Decode magazine and page number bytes
             byte magazine = Decode.Hamming84(link[0]);
             byte pageTens = Decode.Hamming84(link[1]);
             byte pageUnits = Decode.Hamming84(link[2]);
-            // If link doesn't have unrecoverable errors, decode it, otherwise return null
+            // If the page number bytes don't contain errors, set the page number and return it
             if (magazine != 0xff && pageTens != 0xff & pageUnits != 0xff)
             {
                 // Mask X/27/4 flag from magazine number
@@ -327,10 +337,9 @@ namespace TtxFromTS.Teletext
                 // Decode and return full page number
                 return magazine.ToString() + ((pageTens << 4) | pageUnits).ToString("X2");
             }
-            else
-            {
-                return null;
-            }
+            // If the page number bytes do contain errors, return null
+            return null;
         }
+        #endregion
     }
 }
