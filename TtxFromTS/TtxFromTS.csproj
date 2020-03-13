@@ -7,6 +7,7 @@
     <ReleaseVersion>1.2</ReleaseVersion>
     <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <FileVersion>1.2.0.0</FileVersion>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -16,7 +17,6 @@
   <ItemGroup>
     <PackageReference Include="CommandLineArgumentsParser" Version="3.0.19" />
     <PackageReference Include="Cinegy.TsDecoder" Version="2.1.0" />
-    <PackageReference Include="ILLink.Tasks" Version="0.1.5-preview-1841731" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Output\" />
