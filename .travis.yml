@@ -5,6 +5,6 @@ mono: none
 dist: bionic
 
 git:
-  depth: false
+  depth: 1
 
 script: dotnet build --configuration Release
