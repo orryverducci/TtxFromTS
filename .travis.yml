@@ -1,15 +1,10 @@
 language: csharp
 solution: TtxFromTS.sln
-
+dotnet: 3.1.102
+mono: none
 dist: bionic
 
 git:
   depth: false
 
-jobs:
-  include:
-    - dotnet: 3.1.102
-      mono: none
-      script:
-        - dotnet build --configuration Release 
-    - mono: latest
+script: dotnet build --configuration Release
