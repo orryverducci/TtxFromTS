@@ -15,7 +15,7 @@
     <RuntimeIdentifiers>win-x86;win-x64;osx-x64;ubuntu-x64;debian-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CommandLineArgumentsParser" Version="3.0.19" />
+    <PackageReference Include="CommandLineArgumentsParser" Version="3.0.20" />
     <PackageReference Include="Cinegy.TsDecoder" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
