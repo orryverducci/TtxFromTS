@@ -2,11 +2,11 @@ name: TtxFromTS Continuous Integration
 
 on:
   push:
-    branches: [ master ]
+    branches: [ next ]
     paths:
     - 'TtxFromTS/**'
   pull_request:
-    branches: [ master ]
+    branches: [ next ]
 
 jobs:
   build:
