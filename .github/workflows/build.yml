@@ -1,0 +1,52 @@
+name: TtxFromTS Continuous Integration
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - 'TtxFromTS/**'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Windows x64 build
+      run: dotnet build --runtime win-x64 --configuration Release
+    - name: Upload Windows x64 artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x64
+        path: TtxFromTS/bin/Release/win-x64
+    - name: Windows x86 build
+      run: dotnet build --runtime win-x86 --configuration Release
+    - name: Upload Windows x86 artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x86
+        path: TtxFromTS/bin/Release/win-x86
+    - name: macOS build
+      run: dotnet build --runtime osx-x64 --configuration Release
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos-x64
+        path: TtxFromTS/bin/Release/osx-x64
+    - name: Ubuntu build
+      run: dotnet build --runtime ubuntu-x64 --configuration Release
+    - name: Upload Ubuntu artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ubuntu-x64
+        path: TtxFromTS/bin/Release/ubuntu-x64/
+    - name: Debian build
+      run: dotnet build --runtime debian-x64 --configuration Release
+    - name: Upload Debian artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: debian-x64
+        path: TtxFromTS/bin/Release/debian-x64/
