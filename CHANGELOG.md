@@ -6,6 +6,7 @@ Release Notes
 
 * **NEW:** Support for outputting teletext packets directly to standard output
 * **NEW:** Support for looped output
+* **FIXED:** Out of bounds crash that occurred while decoding enhancement packets
 
 1.2.1
 -----

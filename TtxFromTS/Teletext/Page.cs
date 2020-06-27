@@ -108,7 +108,7 @@ namespace TtxFromTS.Teletext
         /// Gets enhancement data (i.e. packet 28) for the page.
         /// </summary>
         /// <value>The rows of enhancement data packets.</value>
-        public byte[][] EnhancementData { get; private set; } = new byte[4][];
+        public byte[][] EnhancementData { get; private set; } = new byte[5][];
 
         /// <summary>
         /// Gets the number of rows that contain data.
