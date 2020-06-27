@@ -140,7 +140,7 @@ namespace TtxFromTS.Teletext
         private void SavePage()
         {
             // Check there is a current page and that the page number is valid (i.e. not a time filler)
-            if (_currentPage == null && _currentPage.Number == "FF")
+            if (_currentPage == null || _currentPage.Number == "FF")
             {
                 return;
             }
