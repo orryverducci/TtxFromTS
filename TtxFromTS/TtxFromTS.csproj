@@ -16,7 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineArgumentsParser" Version="3.0.20" />
-    <PackageReference Include="Cinegy.TsDecoder" Version="2.1.0" />
+    <PackageReference Include="Cinegy.TsDecoder" Version="3.0.126" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Output\" />
