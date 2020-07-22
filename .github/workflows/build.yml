@@ -29,6 +29,13 @@ jobs:
       with:
         name: win-x86
         path: TtxFromTS/bin/Release/netcoreapp3.1/win-x86/publish
+    - name: Windows ARM build
+      run: dotnet publish --runtime win-arm64 --configuration Release
+    - name: Upload Windows ARM artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-arm64
+        path: TtxFromTS/bin/Release/netcoreapp3.1/win-arm64/publish
     - name: macOS build
       run: dotnet publish --runtime osx-x64 --configuration Release
     - name: Upload macOS artifact
@@ -36,17 +43,17 @@ jobs:
       with:
         name: macos-x64
         path: TtxFromTS/bin/Release/netcoreapp3.1/osx-x64/publish
-    - name: Ubuntu build
-      run: dotnet publish --runtime ubuntu-x64 --configuration Release
-    - name: Upload Ubuntu artifact
+    - name: Linux x64 build
+      run: dotnet publish --runtime linux-x64 --configuration Release
+    - name: Upload Linux x64 artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ubuntu-x64
-        path: TtxFromTS/bin/Release/netcoreapp3.1/ubuntu-x64/publish
-    - name: Debian build
-      run: dotnet publish --runtime debian-x64 --configuration Release
-    - name: Upload Debian artifact
+        name: linux-x64
+        path: TtxFromTS/bin/Release/netcoreapp3.1/linux-x64/publish
+    - name: Linux ARM build
+      run: dotnet publish --runtime linux-arm --configuration Release
+    - name: Upload Linux ARM artifact
       uses: actions/upload-artifact@v2
       with:
-        name: debian-x64
-        path: TtxFromTS/bin/Release/netcoreapp3.1/debian-x64/publish
+        name: linux-arm
+        path: TtxFromTS/bin/Release/netcoreapp3.1/linux-arm/publish
