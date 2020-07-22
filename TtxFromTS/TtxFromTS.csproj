@@ -10,7 +10,7 @@
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <RuntimeIdentifiers>win-x86;win-x64;osx-x64;ubuntu-x64;debian-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
