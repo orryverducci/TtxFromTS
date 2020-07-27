@@ -9,6 +9,18 @@ namespace TtxFromTS.Teletext
     {
         #region Properties
         /// <summary>
+        /// Gets the field the teletext packet belongs to.
+        /// </summary>
+        /// <value>false for the odd (first) field, true for the even (second) field.</value>
+        public bool Field { get; private set; }
+
+        /// <summary>
+        /// Gets the line number the teletext packet belongs to.
+        /// </summary>
+        /// <value>The line number.</value>
+        public byte LineNumber { get; private set; }
+
+        /// <summary>
         /// Gets the framing code for the teletext packet.
         /// </summary>
         /// <value>The framing code.</value>
@@ -60,6 +72,10 @@ namespace TtxFromTS.Teletext
         {
             // Store the original full packet data
             FullPacketData = packetData;
+            // Retrieve the field
+            Field = !Convert.ToBoolean((packetData[0] >> 2) & 0x1);
+            // Retrieve the line number
+            LineNumber = (byte)(Decode.Reverse(packetData[0]) & 0xF);
             // Retrieve the framing code
             FramingCode = packetData[1];
             // Check the framing code is valid, otherwise mark the packet as containing errors

@@ -7,7 +7,7 @@ namespace TtxFromTS.Output
     /// <summary>
     /// Provides output to standard output.
     /// </summary>
-    public class StdOutput : IOutput
+    public class StdOutput : PacketStreamOutput, IOutput
     {
         #region Private Fields
         /// <summary>
@@ -36,14 +36,10 @@ namespace TtxFromTS.Output
 
         #region Generic Output Methods
         /// <summary>
-        /// Provides a teletext packet to the output.
+        /// Sends teletext packet data from the stream to the output.
         /// </summary>
-        /// <param name="packet">The teletext packet.</param>
-        public void AddPacket(Packet packet)
-        {
-            // Write the teletext packet to standard out
-            _stdOutStream.Write(packet.FullPacketData, 2, packet.FullPacketData.Length - 2);
-        }
+        /// <param name="packetData">The bytes of data to be output as a span.</param>
+        protected override void OutputPacket(Span<byte> packetData) => _stdOutStream.Write(packetData);
 
         /// <summary>
         /// Finalise the output, closing the standard out stream.
