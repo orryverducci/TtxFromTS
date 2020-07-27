@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using TtxFromTS.Teletext;
 
 namespace TtxFromTS.Output
 {
