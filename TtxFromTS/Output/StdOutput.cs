@@ -31,6 +31,9 @@ namespace TtxFromTS.Output
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initialises a new instance of the <see cref="T:TtxFromTS.Output.StdOutput"/> class.
+        /// </summary>
         public StdOutput() => _stdOutStream = Console.OpenStandardOutput();
         #endregion
 

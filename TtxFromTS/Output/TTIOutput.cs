@@ -74,6 +74,9 @@ namespace TtxFromTS.Output
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initialises a new instance of the <see cref="T:TtxFromTS.Output.TTIOutput"/> class.
+        /// </summary>
         public TTIOutput() => _teletextDecoder = new Decoder();
         #endregion
 
