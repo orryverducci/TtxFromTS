@@ -65,7 +65,7 @@ namespace TtxFromTS.Teletext
 
         #region Constructor
         /// <summary>
-        /// Initialises a new instance of the <see cref="T:TtxFromTS.TeletextPacket"/> class.
+        /// Initialises a new instance of the <see cref="T:TtxFromTS.Teletext.Packet"/> class.
         /// </summary>
         /// <param name="packetData">The teletext packet data to be decoded.</param>
         public Packet(byte[] packetData)

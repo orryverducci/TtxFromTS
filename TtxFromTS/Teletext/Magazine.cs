@@ -88,7 +88,7 @@ namespace TtxFromTS.Teletext
 
         #region Constructor
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:TtxFromTS.TeletextMagazine"/> class.
+        /// Initializes a new instance of the <see cref="T:TtxFromTS.Teletext.Magazine"/> class.
         /// </summary>
         /// <param name="number">The magazine number.</param>
         public Magazine(int number)
