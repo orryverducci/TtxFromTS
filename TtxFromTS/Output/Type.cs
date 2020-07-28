@@ -8,6 +8,7 @@ namespace TtxFromTS.Output
     public enum Type
     {
         TTI,
-        StdOut
+        StdOut,
+        WebSocket
     }
 }

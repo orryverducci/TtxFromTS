@@ -75,6 +75,9 @@ namespace TtxFromTS
                 case Output.Type.StdOut:
                     _output = new StdOutput();
                     break;
+                case Output.Type.WebSocket:
+                    _output = new WebSocketOutput();
+                    break;
                 default:
                     _output = new TTIOutput();
                     break;

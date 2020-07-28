@@ -64,5 +64,12 @@ namespace TtxFromTS
         /// <value><c>true</c> if the output should be looped, <c>false</c> if not.</value>
         [SwitchArgument("loop", false, Description = "Sets if the output should be continually looped")]
         public bool Loop { get; set; }
+
+        /// <summary>
+        /// Gets or sets the web socket port.
+        /// </summary>
+        /// <value>The port number.</value>
+        [ValueArgument(typeof(int), "port", DefaultValue = 80, Description = "The port to be used by the web socket server")]
+        public int Port { get; set; }
     }
 }
