@@ -85,7 +85,7 @@ namespace TtxFromTS.Teletext
         public void DecodePacket(Packet packet)
         {
             // Check packet is free from errors, otherwise ignore it
-            if (packet.DecodingError || packet.Magazine == null)
+            if (packet.DecodingError || packet.Magazine == null || packet.Number == null)
             {
                 return;
             }
