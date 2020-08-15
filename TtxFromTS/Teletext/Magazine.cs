@@ -12,7 +12,7 @@ namespace TtxFromTS.Teletext
         /// <summary>
         /// The teletext page currently being decoded.
         /// </summary>
-        private Page _currentPage;
+        private Page? _currentPage;
         #endregion
 
         #region Properties
@@ -155,7 +155,7 @@ namespace TtxFromTS.Teletext
                 DecodeTOP();
             }
             // Check if a carousel with the page number exists
-            Carousel existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
+            Carousel? existingCarousel = Pages.Find(x => x.Number == _currentPage.Number);
             // If the carousel exists, add the page to it, otherwise create a carousel and add the page
             if (existingCarousel == null)
             {
@@ -206,7 +206,7 @@ namespace TtxFromTS.Teletext
                     packetNum++;
                 }
                 // Check the packet has been set, otherwise jump to the next one
-                if (_currentPage.Rows[packetNum] == null)
+                if (_currentPage!.Rows[packetNum] == null)
                 {
                     continue;
                 }
@@ -218,7 +218,7 @@ namespace TtxFromTS.Teletext
                     // Decode the link page number
                     byte[] linkBytes = new byte[3];
                     Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
-                    string link = DecodePageLink(linkBytes);
+                    string? link = DecodePageLink(linkBytes);
                     // Check a valid link has been decoded and set to a value, otherwise jump to the next link
                     if (link == null)
                     {
@@ -241,7 +241,7 @@ namespace TtxFromTS.Teletext
                 // Set the packet number to decode
                 int packetNum = 21 + (3 * i);
                 // Check the packet has been set, otherwise jump to the next one
-                if (_currentPage.Rows[packetNum] == null)
+                if (_currentPage!.Rows[packetNum] == null)
                 {
                     continue;
                 }
@@ -253,7 +253,7 @@ namespace TtxFromTS.Teletext
                     // Decode the link page number
                     byte[] linkBytes = new byte[3];
                     Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
-                    string link = DecodePageLink(linkBytes);
+                    string? link = DecodePageLink(linkBytes);
                     // Check a valid link has been decoded and set to a value, otherwise jump to the next link
                     if (link == null)
                     {
@@ -283,7 +283,7 @@ namespace TtxFromTS.Teletext
                 // Set packet number
                 int packetNum = 21 + i;
                 // Check the packet has been set, otherwise jump to the next one
-                if (_currentPage.Rows[packetNum] == null)
+                if (_currentPage!.Rows[packetNum] == null)
                 {
                     continue;
                 }
@@ -295,7 +295,7 @@ namespace TtxFromTS.Teletext
                     // Decode link page number
                     byte[] linkBytes = new byte[3];
                     Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
-                    string link = DecodePageLink(linkBytes);
+                    string? link = DecodePageLink(linkBytes);
                     // Check a valid link has been decoded and set to a value, otherwise jump to the next link
                     if (link == null)
                     {
@@ -323,7 +323,7 @@ namespace TtxFromTS.Teletext
         /// Decodes a page number from a MOT page link.
         /// </summary>
         /// <param name="link">The bytes containing the link.</param>
-        private string DecodePageLink(byte[] link)
+        private string? DecodePageLink(byte[] link)
         {
             // Decode magazine and page number bytes
             byte magazine = Decode.Hamming84(link[0]);

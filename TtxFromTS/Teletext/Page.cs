@@ -18,13 +18,13 @@ namespace TtxFromTS.Teletext
         /// Gets the page number within the magazine.
         /// </summary>
         /// <value>The page number as a hexidecimal string.</value>
-        public string Number { get; private set; }
+        public string Number { get; private set; } = "8FF";
 
         /// <summary>
         /// Gets the page subcode.
         /// </summary>
         /// <value>The page subcode as a hexidecimal string.</value>
-        public string Subcode { get; private set; }
+        public string Subcode { get; private set; } = "F7F3";
 
         /// <summary>
         /// Gets if any previous displays of this page should be erased.
@@ -90,7 +90,7 @@ namespace TtxFromTS.Teletext
         /// Gets the fasttext linked pages.
         /// </summary>
         /// <value>The linked page numbers and shortcodes.</value>
-        public (string Number, string Subcode)[] Links { get; private set; }
+        public (string Number, string Subcode)[]? Links { get; private set; }
 
         /// <summary>
         /// Gets if row 24 should be displayed.
@@ -274,7 +274,7 @@ namespace TtxFromTS.Teletext
         /// <param name="packet">The row packet to be decoded.</param>
         private void DecodeRow(Packet packet)
         {
-            Rows[(int)packet.Number] = packet.Data;
+            Rows[(int)packet.Number!] = packet.Data;
         }
 
         /// <summary>

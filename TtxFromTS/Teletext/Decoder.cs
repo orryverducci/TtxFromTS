@@ -25,7 +25,7 @@ namespace TtxFromTS.Teletext
         /// Gets the status display (usually the channel name).
         /// </summary>
         /// <value>The status display.</value>
-        public string StatusDisplay { get; private set; }
+        public string StatusDisplay { get; private set; } = string.Empty;
 
         /// <summary>
         /// Gets the initial page to display.
@@ -43,7 +43,7 @@ namespace TtxFromTS.Teletext
         /// Gets the network identification code.
         /// </summary>
         /// <value>The network identification code as a hexidecimal string.</value>
-        public string NetworkID { get; private set; }
+        public string NetworkID { get; private set; } = "0000";
 
         /// <summary>
         /// Gets the total number of pages, including subpages, within the teletext service.

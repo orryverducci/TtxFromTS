@@ -15,12 +15,12 @@ namespace TtxFromTS
         /// <summary>
         /// The chosen application output.
         /// </summary>
-        private static IOutput _output;
+        private static IOutput? _output;
 
         /// <summary>
         /// The transport stream decoder.
         /// </summary>
-        private static TSDecoder _tsDecoder;
+        private static TSDecoder? _tsDecoder;
         #endregion
 
         #region Properties
@@ -55,11 +55,11 @@ namespace TtxFromTS
                 PacketID = Options.PacketIdentifier,
                 EnableSubtitles = Options.IncludeSubtitles
             };
-            _tsDecoder.PacketDecoded += (sender, packet) => _output.AddPacket(packet);
+            _tsDecoder.PacketDecoded += (sender, packet) => _output!.AddPacket(packet);
             // Process the file
             ProcessFile();
             // Finish the output and log stats
-            _output.FinishOutput();
+            _output!.FinishOutput();
             Logger.OutputStats(_tsDecoder.PacketsReceived, _tsDecoder.PacketsDecoded, _output.Statistics);
             return (int)ExitCodes.Success;
         }
@@ -100,7 +100,7 @@ namespace TtxFromTS
         private static void ProcessFile()
         {
             // Open the input file and read it until the end of the file, or in a loop if enabled
-            using (FileStream fileStream = Options.InputFile.OpenRead())
+            using (FileStream fileStream = Options.InputFile!.OpenRead())
             {
                 // Initialise data buffer and processing state
                 byte[] data = new byte[1316];
@@ -112,7 +112,7 @@ namespace TtxFromTS
                     // Decode data if there's more bytes available, otherwise finish or loop
                     if (fileStream.Read(data, 0, 1316) > 0)
                     {
-                        _tsDecoder.DecodeData(data);
+                        _tsDecoder!.DecodeData(data);
                         // If not set to loop, log the progress in increments of 10%
                         if (!Options.Loop)
                         {
@@ -127,7 +127,7 @@ namespace TtxFromTS
                     else
                     {
                         // If no packets were successfully decoded, exit with the appropriate error
-                        if (_tsDecoder.PacketsReceived == 0)
+                        if (_tsDecoder!.PacketsReceived == 0)
                         {
                             Logger.OutputError("Unable to process transport stream - please check it is a valid TS file");
                             Environment.Exit((int)ExitCodes.TSError);

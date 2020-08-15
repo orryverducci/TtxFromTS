@@ -18,7 +18,7 @@ namespace TtxFromTS
         /// <summary>
         /// Buffer for an elementary stream packet.
         /// </summary>
-        private Pes _elementaryStreamPacket;
+        private Pes? _elementaryStreamPacket;
 
         /// <summary>
         /// Indicates if a PES error warning has been output.
@@ -66,7 +66,7 @@ namespace TtxFromTS
         /// <summary>
         /// Occurs when a teletext packet has been successfully decoded from the specified Packet ID.
         /// </summary>
-        public EventHandler<Packet> PacketDecoded;
+        public EventHandler<Packet>? PacketDecoded;
         #endregion
 
         #region Methods
@@ -145,7 +145,7 @@ namespace TtxFromTS
         private void DecodeTeletextPackets()
         {
             // Check the PES is a private stream packet
-            if (_elementaryStreamPacket.StreamId != (byte)PesStreamTypes.PrivateStream1)
+            if (_elementaryStreamPacket!.StreamId != (byte)PesStreamTypes.PrivateStream1)
             {
                 if (!_invalidPacketWarning)
                 {

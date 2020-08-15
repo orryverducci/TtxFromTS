@@ -98,7 +98,7 @@ namespace TtxFromTS.Output
                 return;
             }
             // Use provided output directory, or get the output directory name from the input filename if not provided
-            string directoryName = String.IsNullOrEmpty(Program.Options.OutputPath) ? Program.Options.InputFile.Name.Substring(0, Program.Options.InputFile.Name.LastIndexOf('.')) : Program.Options.OutputPath;
+            string directoryName = String.IsNullOrEmpty(Program.Options.OutputPath) ? Program.Options.InputFile!.Name.Substring(0, Program.Options.InputFile.Name.LastIndexOf('.')) : Program.Options.OutputPath;
             // Create the directory to store the pages in
             DirectoryInfo outputDirectory = Directory.CreateDirectory(directoryName);
             // Loop through each magazine to retrieve pages
@@ -176,12 +176,12 @@ namespace TtxFromTS.Output
         private void OutputVbitConfig(DirectoryInfo outputDirectory)
         {
             // Retrieve the initial page, if set, otherwise use the first page of the first magazine (usually P100)
-            Page initialPage = null;
+            Page? initialPage = null;
             if (_teletextDecoder.InitialPage != "8FF")
             {
                 int magazineNumber = int.Parse(_teletextDecoder.InitialPage.Substring(0, 1));
                 Magazine magazine = _teletextDecoder.Magazine[magazineNumber - 1];
-                Carousel carousel = magazine.Pages.Find(x => x.Number == _teletextDecoder.InitialPage);
+                Carousel? carousel = magazine.Pages.Find(x => x.Number == _teletextDecoder.InitialPage);
                 if (carousel != null)
                 {
                     initialPage = carousel.Pages.First();

@@ -14,7 +14,7 @@ namespace TtxFromTS
         /// </summary>
         /// <value>The input file.</value>
         [FileArgument('i', "input", Description = "Input TS file to read", Optional = false, FileMustExist = true)]
-        public FileInfo InputFile { get; set; }
+        public FileInfo? InputFile { get; set; }
 
         /// <summary>
         /// Gets or sets the packet identifier.
@@ -35,7 +35,7 @@ namespace TtxFromTS
         /// </summary>
         /// <value>The output path.</value>
         [ValueArgument(typeof(string), 'o', "output", Description = "Sets the output directory")]
-        public string OutputPath { get; set; }
+        public string? OutputPath { get; set; }
 
         /// <summary>
         /// Gets or sets if outputting subtitle pages should be enabled.

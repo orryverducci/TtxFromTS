@@ -13,7 +13,7 @@ namespace TtxFromTS.Teletext
         /// Gets the page number within the magazine.
         /// </summary>
         /// <value>The page number as a hexidecimal string.</value>
-        public string Number { get; set; }
+        public string Number { get; set; } = "8FF";
 
         /// <summary>
         /// Gets the list of teletext pages within the carousel.
@@ -30,7 +30,7 @@ namespace TtxFromTS.Teletext
         public void AddPage(Page page)
         {
             // Check if a page with the same subcode is already in the list
-            Page existingPage = Pages.Find(x => x.Subcode == page.Subcode);
+            Page? existingPage = Pages.Find(x => x.Subcode == page.Subcode);
             // If the subpage already exists, merge new subpage with existing one, otherwise add to the list of subpages
             if (existingPage != null)
             {

@@ -15,7 +15,7 @@ namespace TtxFromTS
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.BackgroundColor = ConsoleColor.Blue;
-            Console.Error.Write($" TtxFromTS {Assembly.GetEntryAssembly().GetName().Version.ToString(2)} ");
+            Console.Error.Write($" TtxFromTS {Assembly.GetEntryAssembly()?.GetName().Version?.ToString(2)} ");
             Console.ResetColor();
             Console.Error.WriteLine();
             Console.Error.WriteLine();
