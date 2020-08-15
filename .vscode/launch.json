@@ -7,14 +7,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/TtxFromTS/bin/Debug/netcoreapp3.1/TtxFromTS.dll",
-            "args": [
-                "-i",
-                "/Users/Orry/Downloads/20200531_1730_TMBZ_Gera___labor14.TS",
-                "--pid",
-                "7314",
-                "-o",
-                "/Users/Orry/Desktop/Test"
-            ],
+            "args": [],
             "cwd": "${workspaceFolder}/TtxFromTS",
             "console": "internalConsole",
             "stopAtEntry": false,
