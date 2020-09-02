@@ -22,7 +22,7 @@ namespace TtxFromTS.Output
 
         #region Properties
         /// <summary>
-        /// Gets the standard output statistics.
+        /// Gets the web socket output statistics.
         /// </summary>
         /// <value>A tuple containing the statistic title and its value.</value>
         public (string, string)[] Statistics => new (string, string)[0];
