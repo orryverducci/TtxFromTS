@@ -78,6 +78,9 @@ namespace TtxFromTS
                 case Output.Type.WebSocket:
                     _output = new WebSocketOutput();
                     break;
+                case Output.Type.T42:
+                    _output = new T42Output();
+                    break;
                 default:
                     _output = new TTIOutput();
                     break;
@@ -201,8 +204,8 @@ namespace TtxFromTS
                 // Return failure
                 return false;
             }
-            // If an output directory has been given, check it is valid, logging an error if it isn't
-            if (!string.IsNullOrEmpty(Options.OutputPath))
+            // If an output directory has been given and TTI output is being used check it is valid, logging an error if it isn't
+            if (Options.OutputType == Output.Type.TTI && !string.IsNullOrEmpty(Options.OutputPath))
             {
                 try
                 {

@@ -18,9 +18,9 @@ These arguments are available to use:
 * `--cycle` The cycle time to be used between subpages in seconds. Must be greater than 1 second, defaults to 10 seconds.
 * `--include-subs` Enables decoding of teletext subtitle packets.
 * `--no-config` Disables creation of a vbit2 configuration file.
-* `--type` The type of output required. Valid options are `TTI`, `StdOut` and `WebSocket`. Defaults to TTI.
+* `--type` The type of output required. Valid options are `TTI`, `T42`, `StdOut` and `WebSocket`. Defaults to TTI.
 * `--port` The port number to be used by the WebSocket server. Defaults to port 80.
-* `--output` The directory to output the TTI files to. If no directory is given a directory is created in the current working directory with the same name as the input file.
+* `--output` The path of the directory to output the TTI files to, or the path of the T42 file to be created. When outputting TTI files, if no directory is given a directory is created in the current working directory with the same name as the input file.
 * `-i` **(required)** The input transport stream file.
 
 ### Example Command Line

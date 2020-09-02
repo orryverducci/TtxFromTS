@@ -9,6 +9,7 @@ namespace TtxFromTS.Output
     {
         TTI,
         StdOut,
-        WebSocket
+        WebSocket,
+        T42
     }
 }
