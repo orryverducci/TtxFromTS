@@ -10,6 +10,7 @@
 *.json text
 .gitattributes text
 .gitignore text
+.editorconfig text
 
 # Don't export git and GitHub files
 .gitattributes export-ignore
