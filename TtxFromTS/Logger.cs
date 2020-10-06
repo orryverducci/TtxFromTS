@@ -71,7 +71,7 @@ namespace TtxFromTS
             Console.ResetColor();
             Console.Error.WriteLine($"Total number of packets: {packetsReceived}");
             Console.Error.WriteLine($"Packets processed: {packetsProcessed}");
-            foreach (var statistic in outputStats)
+            foreach ((string, string) statistic in outputStats)
             {
                 Console.Error.WriteLine($"{statistic.Item1}: {statistic.Item2}");
             }
