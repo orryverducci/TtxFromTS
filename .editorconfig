@@ -170,3 +170,47 @@ csharp_space_between_square_brackets = false
 # Wrapping options
 csharp_preserve_single_line_statements = false
 csharp_preserve_single_line_blocks = true
+
+##########################################
+# Naming rules
+# https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/naming-rules
+##########################################
+
+# Private and internal fields should be _camelCase
+dotnet_naming_rule.camel_case_for_private_internal_fields.severity = suggestion
+dotnet_naming_rule.camel_case_for_private_internal_fields.symbols = private_internal_fields
+dotnet_naming_rule.camel_case_for_private_internal_fields.style = camel_case_underscore_style
+dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
+dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
+dotnet_naming_style.camel_case_underscore_style.required_prefix = _
+dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
+
+# Constant fields should be PascalCase
+dotnet_naming_rule.pascal_case_for_constant_fields.severity = suggestion
+dotnet_naming_rule.pascal_case_for_constant_fields.symbols = constant_fields
+dotnet_naming_rule.pascal_case_for_constant_fields.style = const_style
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+dotnet_naming_style.const_style.capitalization = pascal_case
+
+# Locals and parameters should be camelCase
+dotnet_naming_rule.camel_case_for_locals.severity = suggestion
+dotnet_naming_rule.camel_case_for_locals.symbols = locals_and_parameters
+dotnet_naming_rule.camel_case_for_locals.style = camel_case_style
+dotnet_naming_symbols.locals_and_parameters.applicable_kinds = parameter, local
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+
+# Interfaces must be IPascalCase
+dotnet_naming_rule.interface_rule.severity = warning
+dotnet_naming_rule.interface_rule.symbols = interfaces
+dotnet_naming_rule.interface_rule.style = pascal_case_i_style
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_style.pascal_case_i_style.required_prefix = I
+dotnet_naming_style.pascal_case_i_style.capitalization = pascal_case
+
+# By default name items with PascalCase
+dotnet_naming_rule.members_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.members_should_be_pascal_case.symbols = all_members
+dotnet_naming_rule.members_should_be_pascal_case.style = pascal_case_style
+dotnet_naming_symbols.all_members.applicable_kinds = *
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
