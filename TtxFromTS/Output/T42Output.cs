@@ -48,7 +48,7 @@ namespace TtxFromTS.Output
         public T42Output()
         {
             // Set output file path
-            string filePath = String.IsNullOrEmpty(Program.Options.OutputPath) ? Path.ChangeExtension(Program.Options.InputFile!.FullName, "t42") : Program.Options.OutputPath;
+            string filePath = string.IsNullOrEmpty(Program.Options.OutputPath) ? Path.ChangeExtension(Program.Options.InputFile!.FullName, "t42") : Program.Options.OutputPath;
             // If the file already exists throw an exception
             if (File.Exists(filePath))
             {

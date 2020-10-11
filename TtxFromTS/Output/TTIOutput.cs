@@ -98,7 +98,7 @@ namespace TtxFromTS.Output
                 return;
             }
             // Use provided output directory, or get the output directory name from the input filename if not provided
-            string directoryName = String.IsNullOrEmpty(Program.Options.OutputPath) ? Program.Options.InputFile!.Name.Substring(0, Program.Options.InputFile.Name.LastIndexOf('.')) : Program.Options.OutputPath;
+            string directoryName = string.IsNullOrEmpty(Program.Options.OutputPath) ? Program.Options.InputFile!.Name.Substring(0, Program.Options.InputFile.Name.LastIndexOf('.')) : Program.Options.OutputPath;
             // Create the directory to store the pages in
             DirectoryInfo outputDirectory = Directory.CreateDirectory(directoryName);
             // Loop through each magazine to retrieve pages
