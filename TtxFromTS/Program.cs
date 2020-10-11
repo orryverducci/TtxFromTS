@@ -23,7 +23,7 @@ namespace TtxFromTS
         /// <summary>
         /// The transport stream decoder.
         /// </summary>
-        private static TSDecoder _tsDecoder = new TSDecoder();
+        private readonly static TSDecoder _tsDecoder = new TSDecoder();
 
         /// <summary>
         /// Indicates if a warning for non-teletext packets has been output.

@@ -10,7 +10,7 @@ namespace TtxFromTS.Output
         /// <summary>
         /// The binary file writer.
         /// </summary>
-        private BinaryWriter _binaryWriter;
+        private readonly BinaryWriter _binaryWriter;
 
         /// <summary>
         /// Count of teletext packets decoded.

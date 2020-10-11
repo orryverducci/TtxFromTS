@@ -47,7 +47,7 @@ namespace TtxFromTS.Output
         /// <summary>
         /// The teletext decoder.
         /// </summary>
-        private Decoder _teletextDecoder;
+        private readonly Decoder _teletextDecoder;
         #endregion
 
         #region Properties
