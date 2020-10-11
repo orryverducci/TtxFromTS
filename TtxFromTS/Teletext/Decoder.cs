@@ -54,7 +54,7 @@ namespace TtxFromTS.Teletext
             get
             {
                 int count = 0;
-                foreach (var magazine in Magazine)
+                foreach (Magazine magazine in Magazine)
                 {
                     count += magazine.TotalPages;
                 }
