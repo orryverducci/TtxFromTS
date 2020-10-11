@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Cinegy.TsDecoder.TransportStream;
 using CommandLineParser.Exceptions;
 using TtxFromTS.Output;
+using TtxFromTS.Teletext;
 
 namespace TtxFromTS
 {
@@ -20,7 +23,12 @@ namespace TtxFromTS
         /// <summary>
         /// The transport stream decoder.
         /// </summary>
-        private static TSDecoder? _tsDecoder;
+        private static TSDecoder _tsDecoder = new TSDecoder();
+
+        /// <summary>
+        /// Indicates if a warning for non-teletext packets has been output.
+        /// </summary>
+        private static bool _invalidPacketWarning = false;
         #endregion
 
         #region Properties
@@ -49,15 +57,11 @@ namespace TtxFromTS
             }
             // Setup output
             SetupOutput();
-            // Setup TS decoder
-            _tsDecoder = new TSDecoder
+            // Open the file and process it
+            using (FileStream fileStream = Options.InputFile!.OpenRead())
             {
-                PacketID = Options.PacketIdentifier,
-                EnableSubtitles = Options.IncludeSubtitles
-            };
-            _tsDecoder.PacketDecoded += (sender, packet) => _output!.AddPacket(packet);
-            // Process the file
-            ProcessFile();
+                DecodeTeletext(fileStream);
+            }
             // Finish the output and log stats
             _output!.FinishOutput();
             Logger.OutputStats(_tsDecoder.PacketsReceived, _tsDecoder.PacketsDecoded, _output.Statistics);
@@ -96,59 +100,77 @@ namespace TtxFromTS
                 Options.Loop = false;
             }
         }
+        #endregion
 
+        #region Decoding Methods
         /// <summary>
         /// Opens the provided input file and retrieves packets of data from it.
         /// </summary>
-        private static void ProcessFile()
+        private static void DecodeTeletext(FileStream fileStream)
         {
-            // Open the input file and read it until the end of the file, or in a loop if enabled
-            using (FileStream fileStream = Options.InputFile!.OpenRead())
+            // Set the packet ID to be decoded
+            _tsDecoder.PacketID = Options.PacketIdentifier;
+            // Initialise data buffer and processing state
+            byte[] data = new byte[1316];
+            int loggedPercentage = 0;
+            bool finished = false;
+            // Keep processing until finished
+            while (!finished)
             {
-                // Initialise data buffer and processing state
-                byte[] data = new byte[1316];
-                int loggedPercentage = 0;
-                bool finished = false;
-                // Keep processing until finished
-                while (!finished)
+                // Decode data if there's more bytes available, otherwise finish or loop
+                if (fileStream.Read(data, 0, 1316) > 0)
                 {
-                    // Decode data if there's more bytes available, otherwise finish or loop
-                    if (fileStream.Read(data, 0, 1316) > 0)
+                    // Decode TS packets from the data
+                    List<Pes> tsPackets = _tsDecoder!.DecodePackets(data);
+                    // If TS packets have been returned, process teletext packets from them and output them
+                    foreach (Pes tsPacket in tsPackets)
                     {
-                        _tsDecoder!.DecodeData(data);
-                        // If not set to loop, log the progress in increments of 10%
-                        if (!Options.Loop)
+                        List<Packet> teletextPackets = TSDecoder.DecodeTeletextPacket(tsPacket, Options.IncludeSubtitles);
+                        if (teletextPackets.Count > 0)
                         {
-                            double currentPercentage = (double)fileStream.Position / (double)fileStream.Length * 100;
-                            if (currentPercentage >= loggedPercentage + 10)
+                            foreach (Packet teletextPacket in teletextPackets)
                             {
-                                loggedPercentage = (int)currentPercentage;
-                                Logger.OutputInfo($"Reading TS file: {loggedPercentage}%");
+                                _output!.AddPacket(teletextPacket);
                             }
                         }
+                        else if (!_invalidPacketWarning)
+                        {
+                            Logger.OutputWarning("The specified packet ID contains packets without a teletext service which will be ignored");
+                            _invalidPacketWarning = true;
+                        }
+                    }
+                    // If not set to loop, log the progress in increments of 10%
+                    if (!Options.Loop)
+                    {
+                        double currentPercentage = (double)fileStream.Position / (double)fileStream.Length * 100;
+                        if (currentPercentage >= loggedPercentage + 10)
+                        {
+                            loggedPercentage = (int)currentPercentage;
+                            Logger.OutputInfo($"Reading TS file: {loggedPercentage}%");
+                        }
+                    }
+                }
+                else
+                {
+                    // If no packets were successfully decoded, exit with the appropriate error
+                    if (_tsDecoder!.PacketsReceived == 0)
+                    {
+                        Logger.OutputError("Unable to process transport stream - please check it is a valid TS file");
+                        Environment.Exit((int)ExitCodes.TSError);
+                    }
+                    if (_tsDecoder.PacketsDecoded == 0)
+                    {
+                        Logger.OutputError("Invalid packet identifier provided");
+                        Environment.Exit((int)ExitCodes.InvalidPID);
+                    }
+                    // If looping is enabled reset the file back to the start, otherwise finish processing
+                    if (Options.Loop)
+                    {
+                        fileStream.Position = 0;
                     }
                     else
                     {
-                        // If no packets were successfully decoded, exit with the appropriate error
-                        if (_tsDecoder!.PacketsReceived == 0)
-                        {
-                            Logger.OutputError("Unable to process transport stream - please check it is a valid TS file");
-                            Environment.Exit((int)ExitCodes.TSError);
-                        }
-                        if (_tsDecoder.PacketsDecoded == 0)
-                        {
-                            Logger.OutputError("Invalid packet identifier provided");
-                            Environment.Exit((int)ExitCodes.InvalidPID);
-                        }
-                        // If looping reset the file back to the start, otherwise finish processing
-                        if (Options.Loop)
-                        {
-                            fileStream.Position = 0;
-                        }
-                        else
-                        {
-                            finished = true;
-                        }
+                        finished = true;
                     }
                 }
             }
