@@ -10,7 +10,7 @@ on:
 
 jobs:
   windows-x64-build:
-  name: Windows x64 build
+    name: Windows x64 build
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
