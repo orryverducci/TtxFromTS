@@ -9,7 +9,72 @@ on:
     branches: [ next ]
 
 jobs:
-  build:
+  windows-x64-build:
+  name: Windows x64 build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Build
+      run: dotnet publish --runtime win-x64 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x64
+        path: TtxFromTS/bin/Release/netcoreapp3.1/win-x64/publish
+  windows-x86-build:
+    name: Windows x86 build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Build
+      run: dotnet publish --runtime win-x86 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x86
+        path: TtxFromTS/bin/Release/netcoreapp3.1/win-x86/publish
+  windows-arm-build:
+    name: Windows ARM build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Build
+      run: dotnet publish --runtime win-arm64 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-arm64
+        path: TtxFromTS/bin/Release/netcoreapp3.1/win-arm64/publish
+  macos-build:
+    name: macOS build
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Build
+      run: dotnet publish --runtime osx-x64 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos-x64
+        path: TtxFromTS/bin/Release/netcoreapp3.1/osx-x64/publish
+  linux-x64-build:
+    name: Linux x64 build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -17,46 +82,25 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.x'
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Windows x64 build
-      run: dotnet publish --runtime win-x64 --configuration Release
-    - name: Upload Windows x64 artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: win-x64
-        path: TtxFromTS/bin/Release/netcoreapp3.1/win-x64/publish
-    - name: Windows x86 build
-      run: dotnet publish --runtime win-x86 --configuration Release
-    - name: Upload Windows x86 artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: win-x86
-        path: TtxFromTS/bin/Release/netcoreapp3.1/win-x86/publish
-    - name: Windows ARM build
-      run: dotnet publish --runtime win-arm64 --configuration Release
-    - name: Upload Windows ARM artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: win-arm64
-        path: TtxFromTS/bin/Release/netcoreapp3.1/win-arm64/publish
-    - name: macOS build
-      run: dotnet publish --runtime osx-x64 --configuration Release
-    - name: Upload macOS artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: macos-x64
-        path: TtxFromTS/bin/Release/netcoreapp3.1/osx-x64/publish
-    - name: Linux x64 build
+    - name: Build
       run: dotnet publish --runtime linux-x64 --configuration Release
-    - name: Upload Linux x64 artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: linux-x64
         path: TtxFromTS/bin/Release/netcoreapp3.1/linux-x64/publish
-    - name: Linux ARM build
+  linux-arm-build:
+    name: Linux ARM build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Build
       run: dotnet publish --runtime linux-arm --configuration Release
-    - name: Upload Linux ARM artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: linux-arm
