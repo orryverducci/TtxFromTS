@@ -113,6 +113,7 @@ namespace TtxFromTS
             _tsDecoder.PacketID = Options.PacketIdentifier;
             // Initialise data buffer and processing state
             byte[] data = new byte[1316];
+            PESFactory pesFactory = new PESFactory();
             int loggedPercentage = 0;
             bool finished = false;
             // Keep processing until finished
@@ -122,22 +123,26 @@ namespace TtxFromTS
                 if (fileStream.Read(data, 0, 1316) > 0)
                 {
                     // Decode TS packets from the data
-                    List<Pes> tsPackets = _tsDecoder!.DecodePackets(data);
+                    List<TsPacket> tsPackets = _tsDecoder!.DecodePackets(data);
                     // If TS packets have been returned, process teletext packets from them and output them
-                    foreach (Pes tsPacket in tsPackets)
+                    foreach (TsPacket tsPacket in tsPackets)
                     {
-                        List<Packet> teletextPackets = TSDecoder.DecodeTeletextPacket(tsPacket, Options.IncludeSubtitles);
-                        if (teletextPackets.Count > 0)
+                        Pes? pesPacket = pesFactory.DecodePesFromTsPacket(tsPacket);
+                        if (pesPacket != null)
                         {
-                            foreach (Packet teletextPacket in teletextPackets)
+                            List<Packet> teletextPackets = ElementaryDecode.DecodeTeletextPacket(pesPacket, Options.IncludeSubtitles);
+                            if (teletextPackets.Count > 0)
                             {
-                                _output!.AddPacket(teletextPacket);
+                                foreach (Packet teletextPacket in teletextPackets)
+                                {
+                                    _output!.AddPacket(teletextPacket);
+                                }
                             }
-                        }
-                        else if (!_invalidPacketWarning)
-                        {
-                            Logger.OutputWarning("The specified packet ID contains packets without a teletext service which will be ignored");
-                            _invalidPacketWarning = true;
+                            else if (!_invalidPacketWarning)
+                            {
+                                Logger.OutputWarning("The specified packet ID contains packets without a teletext service which will be ignored");
+                                _invalidPacketWarning = true;
+                            }
                         }
                     }
                     // If not set to loop, log the progress in increments of 10%
