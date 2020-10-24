@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using Cinegy.TsDecoder.TransportStream;
 using CommandLineParser.Exceptions;
+using TtxFromTS.DVB;
 using TtxFromTS.Output;
 using TtxFromTS.Teletext;
 

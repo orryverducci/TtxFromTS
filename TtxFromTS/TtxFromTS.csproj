@@ -21,6 +21,7 @@
     <PackageReference Include="EmbedIO" Version="3.4.3" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="DVB\" />
     <Folder Include="Output\" />
     <Folder Include="Teletext\" />
   </ItemGroup>

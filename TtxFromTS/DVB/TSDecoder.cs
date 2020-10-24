@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cinegy.TsDecoder.TransportStream;
 using TtxFromTS.Teletext;
 
-namespace TtxFromTS
+namespace TtxFromTS.DVB
 {
     /// <summary>
     /// Decodes packets of data from a MPEG transport stream.
