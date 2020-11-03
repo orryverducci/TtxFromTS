@@ -16,6 +16,11 @@ namespace TtxFromTS.DVB
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Decodes a PES packet from TS packets.
+        /// </summary>
+        /// <param name="packet">The TS packet to decode a PES packet from.</param>
+        /// <returns>A PES packet if one is decoded, otherwise null.</returns>
         public Pes? DecodePesFromTsPacket(TsPacket packet)
         {
             // If the TS packet is the start of a PES, create a new elementary stream packet
