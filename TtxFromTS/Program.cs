@@ -107,6 +107,7 @@ namespace TtxFromTS
         /// <summary>
         /// Opens the provided input file and retrieves packets of data from it.
         /// </summary>
+        /// <param name="fileStream">The file stream to read from.</param>
         private static void DecodeTeletext(FileStream fileStream)
         {
             // Set the packet ID to be decoded
