@@ -174,6 +174,7 @@ namespace TtxFromTS
                     if (Options.Loop)
                     {
                         fileStream.Position = 0;
+                        pesFactory.Reset();
                     }
                     else
                     {

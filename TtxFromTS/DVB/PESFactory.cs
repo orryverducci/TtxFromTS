@@ -41,6 +41,11 @@ namespace TtxFromTS.DVB
             // Return null if no other response has been returned
             return null;
         }
+
+        /// <summary>
+        /// Resets the decoder.
+        /// </summary>
+        public void Reset() => _elementaryStreamPacket = null;
         #endregion
     }
 }
