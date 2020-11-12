@@ -229,7 +229,7 @@ namespace TtxFromTS
                         Logger.OutputError("The values for one or more arguments are invalid");
                         break;
                     default:
-                        throw exception;
+                        throw;
                 }
                 // Return failure
                 return false;
@@ -252,7 +252,7 @@ namespace TtxFromTS
                             Logger.OutputError("The output directory path is too long");
                             break;
                         default:
-                            throw exception;
+                            throw;
                     }
                     // Return failure
                     return false;
