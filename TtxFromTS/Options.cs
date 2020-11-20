@@ -20,8 +20,15 @@ namespace TtxFromTS
         /// Gets or sets the packet identifier.
         /// </summary>
         /// <value>The packet identifier.</value>
-        [ValueArgument(typeof(int), "pid", Description = "Packet identifier of the Teletext service to decode", Optional = false)]
+        [ValueArgument(typeof(int), "pid", Description = "Packet identifier of the Teletext service to decode")]
         public int PacketIdentifier { get; set; }
+
+        /// <summary>
+        /// Gets or sets the service identifier.
+        /// </summary>
+        /// <value>The service identifier.</value>
+        [ValueArgument(typeof(int), "sid", Description = "Service identifier of the TV service containing a Teletext to decode")]
+        public int ServiceIdentifier { get; set; }
 
         /// <summary>
         /// Gets or sets the cycle time.

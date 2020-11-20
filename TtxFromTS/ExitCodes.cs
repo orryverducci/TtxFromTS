@@ -12,6 +12,8 @@ namespace TtxFromTS
         InvalidService = 2,
         InvalidPID = 3,
         TSError = 4,
-        Unspecified = 5
+        Unspecified = 5,
+        InvalidServiceID = 6,
+        TeletextPIDNotFound = 7
     }
 }

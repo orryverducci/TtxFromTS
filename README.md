@@ -14,7 +14,8 @@ The output files will be placed in a directory with the same name as input file 
 
 These arguments are available to use:
 
-* `--pid` **(required)** The packet identifier of the teletext elementary stream to be decoded.
+* `--pid` **(required if service ID not specified)** The packet identifier of the teletext elementary stream to be decoded.
+* `--sid` **(required if packet ID not specified)** The identifier of the television service containing the teletext service.
 * `--cycle` The cycle time to be used between subpages in seconds. Must be greater than 1 second, defaults to 10 seconds.
 * `--include-subs` Enables decoding of teletext subtitle packets.
 * `--no-config` Disables creation of a vbit2 configuration file.

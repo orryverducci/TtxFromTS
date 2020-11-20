@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Cinegy.TsDecoder.Tables;
 using Cinegy.TsDecoder.TransportStream;
 using CommandLineParser.Exceptions;
 using TtxFromTS.DVB;
@@ -61,7 +62,29 @@ namespace TtxFromTS
             // Open the file and process it
             using (FileStream fileStream = Options.InputFile!.OpenRead())
             {
-                DecodeTeletext(fileStream);
+                // Get the packet ID to be decoded
+                int packetID;
+                if (Options.PacketIdentifier != 0)
+                {
+                    packetID = Options.PacketIdentifier;
+                }
+                else
+                {
+                    int pmtPID = GetProgramMappingTablePIDFromServiceID(fileStream, Options.ServiceIdentifier!);
+                    if (pmtPID == -1)
+                    {
+                        Logger.OutputError($"Unable to find service with ID {Options.ServiceIdentifier!}");
+                        return (int)ExitCodes.InvalidService;
+                    }
+                    packetID = GetTeletextPIDFromServiceID(fileStream, pmtPID);
+                    if (packetID == -1)
+                    {
+                        Logger.OutputError($"Unable to teltext service associated with service ID {Options.ServiceIdentifier!}");
+                        return (int)ExitCodes.TeletextPIDNotFound;
+                    }
+                }
+                // Decode teletext
+                DecodeTeletext(fileStream, packetID);
             }
             // Finish the output and log stats
             _output!.FinishOutput();
@@ -105,13 +128,106 @@ namespace TtxFromTS
 
         #region Decoding Methods
         /// <summary>
+        /// Gets the packet ID for a service's program map table.
+        /// </summary>
+        /// <param name="fileStream">The file stream to read from.</param>
+        /// <param name="serviceID">The service ID of the TV service.</param>
+        /// <returns>A packet ID.</returns>
+        private static int GetProgramMappingTablePIDFromServiceID(FileStream fileStream, int serviceID)
+        {
+            // Reset the file stream
+            fileStream.Position = 0;
+            // Set the packet ID to be decoded
+            _tsDecoder.PacketID = 0;
+            // Initialise data buffer and processing state
+            byte[] data = new byte[1316];
+            PATFactory patFactory = new PATFactory();
+            // Keep processing until the end of the file has been reached
+            while (fileStream.Read(data, 0, 1316) > 0)
+            {
+                // Decode TS packets from the data
+                List<TsPacket> tsPackets = _tsDecoder!.DecodePackets(data);
+                // If TS packets have been returned, add them to the PAT factory and find the PMT ID if a table is returned
+                foreach (TsPacket tsPacket in tsPackets)
+                {
+                    ProgramAssociationTable? patTable = patFactory.AddPacket(tsPacket);
+                    if (patTable == null)
+                    {
+                        continue;
+                    }
+                    int serviceIndex = Array.FindIndex(patTable.ProgramNumbers, x => x == serviceID);
+                    if (serviceIndex != -1)
+                    {
+                        Logger.OutputInfo($"Found PMT PID for the service: {patTable.Pids[serviceIndex]}");
+                        return patTable.Pids[serviceIndex];
+                    }
+                }
+            }
+            // Service not found, return -1
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the packet ID for a teletext service associated from a program map table.
+        /// </summary>
+        /// <param name="fileStream">The file stream to read from.</param>
+        /// <param name="pmtPID">The PID of the program mapping table.</param>
+        /// <returns>A packet ID.</returns>
+        private static int GetTeletextPIDFromServiceID(FileStream fileStream, int pmtPID)
+        {
+            // Reset the file stream
+            fileStream.Position = 0;
+            // Set the packet ID to be decoded
+            _tsDecoder.PacketID = pmtPID;
+            // Initialise data buffer and processing state
+            byte[] data = new byte[1316];
+            PMTFactory pmtFactory = new PMTFactory();
+            // Keep processing until the end of the file has been reached
+            while (fileStream.Read(data, 0, 1316) > 0)
+            {
+                // Decode TS packets from the data
+                List<TsPacket> tsPackets = _tsDecoder!.DecodePackets(data);
+                // If TS packets have been returned, add them to the PMT factory and find the teletext PID if a table is returned
+                foreach (TsPacket tsPacket in tsPackets)
+                {
+                    ProgramMapTable? pmtTable = pmtFactory.AddPacket(tsPacket);
+                    if (pmtTable == null)
+                    {
+                        continue;
+                    }
+                    List<EsInfo> privateStreams = pmtTable.EsStreams.FindAll(x => x.StreamType == 0x6);
+                    if (privateStreams.Count == 0)
+                    {
+                        continue;
+                    }
+                    foreach (EsInfo privateStream in privateStreams)
+                    {
+                        foreach (Descriptor descriptor in privateStream.Descriptors)
+                        {
+                            if (descriptor.DescriptorTag == 0x56)
+                            {
+                                Logger.OutputInfo($"Found teletext elementary stream PID: {privateStream.ElementaryPid}");
+                                return privateStream.ElementaryPid;
+                            }
+                        }
+                    }
+                }
+            }
+            // Teletext PID not found, return -1
+            return -1;
+        }
+
+        /// <summary>
         /// Opens the provided input file and retrieves packets of data from it.
         /// </summary>
         /// <param name="fileStream">The file stream to read from.</param>
-        private static void DecodeTeletext(FileStream fileStream)
+        /// <param name="packetID">The packet ID to decode.</param>
+        private static void DecodeTeletext(FileStream fileStream, int packetID)
         {
+            // Reset the file stream
+            fileStream.Position = 0;
             // Set the packet ID to be decoded
-            _tsDecoder.PacketID = Options.PacketIdentifier;
+            _tsDecoder.PacketID = packetID;
             // Initialise data buffer and processing state
             byte[] data = new byte[1316];
             PESFactory pesFactory = new PESFactory();
@@ -233,6 +349,17 @@ namespace TtxFromTS
                 }
                 // Return failure
                 return false;
+            }
+            // Check either a packet ID or service ID has been provided
+            if (Options.PacketIdentifier == 0 && Options.ServiceIdentifier == 0)
+            {
+                Logger.OutputError("A packet ID or service ID must be provided");
+                return false;
+            }
+            // Output a warning if both a packet ID and service ID has been provided
+            if (Options.PacketIdentifier != 0 && Options.ServiceIdentifier != 0)
+            {
+                Logger.OutputWarning("Both a packet ID and service ID has been provided - the service ID will be ignored");
             }
             // If an output directory has been given and TTI output is being used check it is valid, logging an error if it isn't
             if (Options.OutputType == Output.Type.TTI && !string.IsNullOrEmpty(Options.OutputPath))
