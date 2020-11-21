@@ -14,7 +14,7 @@ namespace TtxFromTS.DVB
 
         public PMTFactory() => TableChangeDetected += PMTChanged;
 
-        private void PMTChanged(object sender, TransportStreamEventArgs args) => _changed = true;
+        private void PMTChanged(object sender, TransportStreamEventArgs args) => _changed = ProgramMapTable.CurrentNextIndicator;
 
         public new ProgramMapTable? AddPacket(TsPacket packet)
         {

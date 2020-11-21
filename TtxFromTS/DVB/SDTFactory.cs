@@ -17,7 +17,7 @@ namespace TtxFromTS.DVB
 
         private void SDTChanged(object sender, TransportStreamEventArgs args)
         {
-            if (!ServiceDescriptionTable.ItemsIncomplete)
+            if (ServiceDescriptionTable.CurrentNextIndicator && !ServiceDescriptionTable.ItemsIncomplete)
             {
                 _changed = true;
             }

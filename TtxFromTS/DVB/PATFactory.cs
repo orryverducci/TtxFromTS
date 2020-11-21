@@ -14,7 +14,7 @@ namespace TtxFromTS.DVB
 
         public PATFactory() => TableChangeDetected += PATChanged;
 
-        private void PATChanged(object sender, TransportStreamEventArgs args) => _changed = true;
+        private void PATChanged(object sender, TransportStreamEventArgs args) => _changed = ProgramAssociationTable.CurrentNextIndicator;
 
         public new ProgramAssociationTable? AddPacket(TsPacket packet)
         {
