@@ -6,7 +6,7 @@ namespace TtxFromTS.DVB
 {
     /// <summary>
     /// Wraps the <see cref="T:Cinegy.TsDecoder.Tables.ProgramMapTableFactory"/> class,
-    /// changing the return of PAT tables from an event to a method return.
+    /// changing the return of PMT tables from an event to a method return.
     /// </summary>
     public class PMTFactory : ProgramMapTableFactory
     {
