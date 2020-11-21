@@ -62,6 +62,12 @@ namespace TtxFromTS
             // Open the file and process it
             using (FileStream fileStream = Options.InputFile!.OpenRead())
             {
+                // Output a list of services if enabled
+                if (Options.ListServices)
+                {
+                    OutputServiceList(fileStream);
+                    return (int)ExitCodes.Success;
+                }
                 // Get the packet ID to be decoded
                 int packetID;
                 if (Options.PacketIdentifier != 0)
@@ -218,6 +224,44 @@ namespace TtxFromTS
         }
 
         /// <summary>
+        /// Outputs a list of services in the transport stream.
+        /// </summary>
+        /// <param name="fileStream">The file stream to read from.</param>
+        /// <returns>A list of services.</returns>
+        private static void OutputServiceList(FileStream fileStream)
+        {
+            // Reset the file stream
+            fileStream.Position = 0;
+            // Set the packet ID to be decoded
+            _tsDecoder.PacketID = 0x11;
+            // Initialise data buffer and processing state
+            byte[] data = new byte[1316];
+            SDTFactory sdtFactory = new SDTFactory();
+            // Keep processing until the end of the file has been reached
+            while (fileStream.Read(data, 0, 1316) > 0)
+            {
+                // Decode TS packets from the data
+                List<TsPacket> tsPackets = _tsDecoder!.DecodePackets(data);
+                // If TS packets have been returned, add them to the SDT factory and output the list of services if one is returned
+                foreach (TsPacket tsPacket in tsPackets)
+                {
+                    List<Service>? services = sdtFactory.AddPacket(tsPacket);
+                    if (services == null)
+                    {
+                        continue;
+                    }
+                    foreach (Service service in services)
+                    {
+                        Logger.OutputInfo($"Service {service.PID} - {service.Name}");
+                    }
+                    return;
+                }
+            }
+            // Service not found, return -1
+            Logger.OutputError($"Unable to find a service description table");
+        }
+
+        /// <summary>
         /// Opens the provided input file and retrieves packets of data from it.
         /// </summary>
         /// <param name="fileStream">The file stream to read from.</param>
@@ -349,6 +393,11 @@ namespace TtxFromTS
                 }
                 // Return failure
                 return false;
+            }
+            // If a service list is requested, ignore all the other options, they're not required
+            if (Options.ListServices)
+            {
+                return true;
             }
             // Check either a packet ID or service ID has been provided
             if (Options.PacketIdentifier == 0 && Options.ServiceIdentifier == 0)

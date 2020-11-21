@@ -31,6 +31,13 @@ namespace TtxFromTS
         public int ServiceIdentifier { get; set; }
 
         /// <summary>
+        /// Gets or sets if a list of services should be output.
+        /// </summary>
+        /// <value>The service identifier.</value>
+        [SwitchArgument("list-services", false, Description = "Outputs a list of services contained within the transport stream")]
+        public bool ListServices { get; set; }
+
+        /// <summary>
         /// Gets or sets the cycle time.
         /// </summary>
         /// <value>The cycle time in seconds.</value>
