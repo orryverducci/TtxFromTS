@@ -89,7 +89,7 @@ namespace TtxFromTS.Teletext
         /// <summary>
         /// Gets the fasttext linked pages.
         /// </summary>
-        /// <value>The linked page numbers and shortcodes.</value>
+        /// <value>The linked page numbers and subcodes.</value>
         public (string Number, string Subcode)[]? Links { get; private set; }
 
         /// <summary>
