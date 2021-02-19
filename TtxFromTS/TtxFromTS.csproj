@@ -17,7 +17,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="CommandLineArgumentsParser" Version="3.0.20" />
+    <PackageReference Include="CommandLineArgumentsParser" Version="3.0.22" />
     <PackageReference Include="Cinegy.TsDecoder" Version="3.0.126" />
     <PackageReference Include="EmbedIO" Version="3.4.3" />
   </ItemGroup>
