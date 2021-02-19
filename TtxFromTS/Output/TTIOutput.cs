@@ -433,8 +433,8 @@ namespace TtxFromTS.Output
                         }
                     }
                 }
-                // Add fastext links to the payload if page has them and the service does not have TOP pages
-                if (page.Links != null && !magazine.Pages.Any(x => x.Number == "F0" ))
+                // Add fastext links to the payload if page has them
+                if (page.Links != null)
                 {
                     payload.Add($"FL,{page.Links[0].Number},{page.Links[1].Number},{page.Links[2].Number},{page.Links[3].Number},{page.Links[4].Number},{page.Links[5].Number}");
                 }
