@@ -415,7 +415,7 @@ namespace TtxFromTS.Output
                 bool linksSpecifySubcode = page.Links != null ? page.Links.Any(x => x.Subcode != "3F7F") : false;
                 if (linksSpecifySubcode)
                 {
-                    payload.Add($"OL,27,{EncodeFastextLinks(page.Links!, page.Magazine)}");
+                    payload.Add($"OL,27,{EncodeFastextLinks(page.Links!, page.Magazine, page.DisplayRow24)}");
                 }
                 // Loop through each row in the page and add the row to the payload if it contains data using the correct encoding for the page
                 for (int i = 1; i < page.Rows.Length; i++)
@@ -609,7 +609,8 @@ namespace TtxFromTS.Output
         /// <returns>The encoded string.</returns>
         /// <param name="links">The linked page numbers and subcodes.</param>
         /// <param name="magazine">The current page magazine number.</param>
-        private string EncodeFastextLinks((string Number, string Subcode)[] links, int magazine)
+        /// <param name="displayRow24"><c>true</c> row 24 should be displayed, <c>false</c> otherwise.</param>
+        private string EncodeFastextLinks((string Number, string Subcode)[] links, int magazine, bool displayRow42)
         {
             // Create the string to be returned
             StringBuilder outputString = new StringBuilder();
@@ -627,7 +628,7 @@ namespace TtxFromTS.Output
                 outputString.Append((char)((byte)(Convert.ToByte(links[i].Subcode[0].ToString(), 16) | ((magazineByte & 0x03) << 2) | 0x40)));
             }
             // Output the link control byte
-            outputString.Append((char)0x48);
+            outputString.Append((char)(displayRow42 ? 0x48 : 0x40));
             // Output a blank CRC (this should be replaced by the transmitting application)
             outputString.Append(Encoding.ASCII.GetString(new byte[] { 0x40, 0x40 }));
             // Return the encoded string
