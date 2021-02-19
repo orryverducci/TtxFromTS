@@ -417,6 +417,14 @@ namespace TtxFromTS.Output
                 {
                     payload.Add($"OL,27,{EncodeFastextLinks(page.Links!, page.Magazine, page.DisplayRow24)}");
                 }
+                // Add enhancement links to the payload if the page has them
+                for (int i = 0; i < 2; i++)
+                {
+                    if (page.EnhancementLinks[i] != null)
+                    {
+                        payload.Add($"OL,27,{EncodeEnhancement(4 + i, page.EnhancementLinks[i])}");
+                    }
+                }
                 // Loop through each row in the page and add the row to the payload if it contains data using the correct encoding for the page
                 for (int i = 1; i < page.Rows.Length; i++)
                 {

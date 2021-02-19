@@ -111,6 +111,12 @@ namespace TtxFromTS.Teletext
         public byte[][] EnhancementData { get; private set; } = new byte[5][];
 
         /// <summary>
+        /// Gets enhancement link data (i.e. packet 27/4 and 27/5) for the page.
+        /// </summary>
+        /// <value>The rows of enhancement data packets.</value>
+        public byte[][] EnhancementLinks { get; private set; } = new byte[2][];
+
+        /// <summary>
         /// Gets the number of rows that contain data.
         /// </summary>
         /// <value>The number of rows with data.</value>
@@ -283,51 +289,62 @@ namespace TtxFromTS.Teletext
         /// <param name="packet">The linked pages packet to be decoded.</param>
         private void DecodeLinkedPages(Packet packet)
         {
-            // Check the designation code is 0, otherwise ignore packet
-            if (Decode.Hamming84(packet.Data[0]) != 0)
+            // Check the designation code is 0, 4 or 5, otherwise ignore packet
+            byte designationCode = Decode.Hamming84(packet.Data[0]);
+            // Process as fastext page links if designation code 0, or enhancement links if designation 4 or 5
+            switch (designationCode)
             {
-                return;
-            }
-            // Initialise links property
-            Links = new (string Number, string Subcode)[6];
-            // Set the offset for the link bytes, starting at byte 1
-            int linkOffset = 1;
-            // Retrieve the 6 links
-            for (int i = 0; i < 6; i++)
-            {
-                // Extract link data from the packet
-                byte[] linkData = new byte[6];
-                Buffer.BlockCopy(packet.Data, linkOffset, linkData, 0, 6);
-                // Decode page number and subcode
-                (string Number, string Subcode) pageNumber = DecodePageNumber(linkData);
-                // Get the bytes containing the magazine number bits
-                byte magazineByte1 = Decode.Hamming84(packet.Data[linkOffset + 3]);
-                byte magazineByte2 = Decode.Hamming84(packet.Data[linkOffset + 5]);
-                // If the magazine bytes don't contain errors, decode the magazine number and add it to the link page number, otherwise add the current magazine
-                if (magazineByte1 != 0xff && magazineByte2 != 0xff)
-                {
-                    int rawMagNumber = Magazine < 8 ? Magazine : 0;
-                    int magazineNumber = ((magazineByte1 >> 3) | ((magazineByte2 & 0x0C) >> 1)) ^ rawMagNumber;
-                    if (magazineNumber == 0)
+                case 0:
+                    // Initialise links property
+                    Links = new (string Number, string Subcode)[6];
+                    // Set the offset for the link bytes, starting at byte 1
+                    int linkOffset = 1;
+                    // Retrieve the 6 links
+                    for (int i = 0; i < 6; i++)
                     {
-                        magazineNumber = 8;
+                        // Extract link data from the packet
+                        byte[] linkData = new byte[6];
+                        Buffer.BlockCopy(packet.Data, linkOffset, linkData, 0, 6);
+                        // Decode page number and subcode
+                        (string Number, string Subcode) pageNumber = DecodePageNumber(linkData);
+                        // Get the bytes containing the magazine number bits
+                        byte magazineByte1 = Decode.Hamming84(packet.Data[linkOffset + 3]);
+                        byte magazineByte2 = Decode.Hamming84(packet.Data[linkOffset + 5]);
+                        // If the magazine bytes don't contain errors, decode the magazine number and add it to the link page number, otherwise add the current magazine
+                        if (magazineByte1 != 0xff && magazineByte2 != 0xff)
+                        {
+                            int rawMagNumber = Magazine < 8 ? Magazine : 0;
+                            int magazineNumber = ((magazineByte1 >> 3) | ((magazineByte2 & 0x0C) >> 1)) ^ rawMagNumber;
+                            if (magazineNumber == 0)
+                            {
+                                magazineNumber = 8;
+                            }
+                            pageNumber.Number = magazineNumber.ToString("X1") + pageNumber.Number;
+                        }
+                        else
+                        {
+                            pageNumber.Number = Magazine + pageNumber.Number;
+                        }
+                        // Add link to array of links
+                        Links[i] = pageNumber;
+                        // Increase the link offset to the next link data block
+                        linkOffset += 6;
                     }
-                    pageNumber.Number = magazineNumber.ToString("X1") + pageNumber.Number;
-                }
-                else
-                {
-                    pageNumber.Number = Magazine + pageNumber.Number;
-                }
-                // Add link to array of links
-                Links[i] = pageNumber;
-                // Increase the link offset to the next link data block
-                linkOffset += 6;
-            }
-            // Set if row 24 should be hidden if the link control byte doesn't have errors
-            byte linkControl = Decode.Hamming84(packet.Data[linkOffset]);
-            if (linkControl != 0xff)
-            {
-                DisplayRow24 = Convert.ToBoolean(linkControl >> 3);
+                    // Set if row 24 should be hidden if the link control byte doesn't have errors
+                    byte linkControl = Decode.Hamming84(packet.Data[linkOffset]);
+                    if (linkControl != 0xff)
+                    {
+                        DisplayRow24 = Convert.ToBoolean(linkControl >> 3);
+                    }
+                    break;
+                case 4:
+                    EnhancementLinks[0] = new byte[packet.Data.Length - 1];
+                    Buffer.BlockCopy(packet.Data, 1, EnhancementLinks[0], 0, EnhancementLinks[0].Length);
+                    break;
+                case 5:
+                    EnhancementLinks[1] = new byte[packet.Data.Length - 1];
+                    Buffer.BlockCopy(packet.Data, 1, EnhancementLinks[1], 0, EnhancementLinks[1].Length);
+                    break;
             }
         }
 
