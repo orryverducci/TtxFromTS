@@ -9,6 +9,7 @@ Release Notes
 * **NEW:** Support for outputting teletext packets as a T42 file
 * **NEW:** Support for looped output
 * **NEW:** A teletext service can now be selected using the teletext service ID
+* **NEW:** Support for fastext page links that point to specific subcodes
 * **IMPROVED:** The code has been significantly refactored for improved readability
 * **FIXED:** Out of bounds crash that occurred while decoding enhancement packets
 * **FIXED:** Incorrect processing of header clock if it contained text

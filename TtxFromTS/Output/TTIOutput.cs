@@ -411,6 +411,12 @@ namespace TtxFromTS.Output
                         }
                     }
                 }
+                // Add page links to the payload using an OL row if the page has them and any of them specify a subcode
+                bool linksSpecifySubcode = page.Links != null ? page.Links.Any(x => x.Subcode != "3F7F") : false;
+                if (linksSpecifySubcode)
+                {
+                    payload.Add($"OL,27,{EncodeFastextLinks(page.Links!, page.Magazine)}");
+                }
                 // Loop through each row in the page and add the row to the payload if it contains data using the correct encoding for the page
                 for (int i = 1; i < page.Rows.Length; i++)
                 {
@@ -433,8 +439,8 @@ namespace TtxFromTS.Output
                         }
                     }
                 }
-                // Add fastext links to the payload if page has them
-                if (page.Links != null)
+                // Add fastext page links to the payload using an FL if page has them and they haven't already been added
+                if (page.Links != null && !linksSpecifySubcode)
                 {
                     payload.Add($"FL,{page.Links[0].Number},{page.Links[1].Number},{page.Links[2].Number},{page.Links[3].Number},{page.Links[4].Number},{page.Links[5].Number}");
                 }
@@ -593,6 +599,36 @@ namespace TtxFromTS.Output
                     }
                 }
             }
+            // Return the encoded string
+            return outputString.ToString();
+        }
+
+        /// <summary>
+        /// Encodes fasttext page links as hamming encoded packets.
+        /// </summary>
+        /// <returns>The encoded string.</returns>
+        /// <param name="dataPacket">The linked page numbers and subcodes.</param>
+        private string EncodeFastextLinks((string Number, string Subcode)[] links, int magazine)
+        {
+            // Create the string to be returned
+            StringBuilder outputString = new StringBuilder();
+            // Output the designation code
+            outputString.Append((char)0x40);
+            // Loop through each link and output its bytes
+            for (int i = 0; i < 6; i++)
+            {
+                byte magazineByte = (byte)((magazine < 8 ? magazine : 0) ^ Convert.ToByte(links[i].Number[0].ToString(), 16));
+                outputString.Append((char)(Convert.ToByte(links[i].Number[2].ToString(), 16) | 0x40));
+                outputString.Append((char)(Convert.ToByte(links[i].Number[1].ToString(), 16) | 0x40));
+                outputString.Append((char)(Convert.ToByte(links[i].Subcode[3].ToString(), 16) | 0x40));
+                outputString.Append((char)((byte)(Convert.ToByte(links[i].Subcode[2].ToString(), 16) | ((magazineByte & 0x04) << 1) | 0x40)));
+                outputString.Append((char)(Convert.ToByte(links[i].Subcode[1].ToString(), 16) | 0x40));
+                outputString.Append((char)((byte)(Convert.ToByte(links[i].Subcode[0].ToString(), 16) | ((magazineByte & 0x03) << 2) | 0x40)));
+            }
+            // Output the link control byte
+            outputString.Append((char)0x48);
+            // Output a blank CRC (this should be replaced by the transmitting application)
+            outputString.Append(Encoding.ASCII.GetString(new byte[] { 0x40, 0x40 }));
             // Return the encoded string
             return outputString.ToString();
         }
