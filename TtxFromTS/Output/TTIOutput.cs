@@ -604,10 +604,11 @@ namespace TtxFromTS.Output
         }
 
         /// <summary>
-        /// Encodes fasttext page links as hamming encoded packets.
+        /// Encodes fastext page links as hamming encoded packets.
         /// </summary>
         /// <returns>The encoded string.</returns>
-        /// <param name="dataPacket">The linked page numbers and subcodes.</param>
+        /// <param name="links">The linked page numbers and subcodes.</param>
+        /// <param name="magazine">The current page magazine number.</param>
         private string EncodeFastextLinks((string Number, string Subcode)[] links, int magazine)
         {
             // Create the string to be returned
