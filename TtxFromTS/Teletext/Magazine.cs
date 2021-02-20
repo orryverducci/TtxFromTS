@@ -296,8 +296,8 @@ namespace TtxFromTS.Teletext
                     byte[] linkBytes = new byte[3];
                     Buffer.BlockCopy(_currentPage.Rows[packetNum], linkOffset, linkBytes, 0, 3);
                     string? link = DecodePageLink(linkBytes);
-                    // Check a valid link has been decoded and set to a value, otherwise jump to the next link
-                    if (link == null)
+                    // Check a valid link has been decoded and set to a value, and isn't set to "don't care", otherwise jump to the next link
+                    if (link == null || link[0] == 'E')
                     {
                         continue;
                     }
