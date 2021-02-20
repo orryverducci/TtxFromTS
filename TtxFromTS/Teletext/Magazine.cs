@@ -301,6 +301,11 @@ namespace TtxFromTS.Teletext
                     {
                         continue;
                     }
+                    // Check if the link isn't an end symbol, and stop decoding links if it is
+                    if (link[0] == 'F' && x == 4)
+                    {
+                        return;
+                    }
                     // Decode page type and add it to the appropriate list
                     int type = Decode.Hamming84(_currentPage.Rows[packetNum][linkOffset + 7]);
                     switch (type)
