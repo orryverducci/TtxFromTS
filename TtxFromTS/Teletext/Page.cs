@@ -192,6 +192,7 @@ namespace TtxFromTS.Teletext
             }
             // Update links with new ones
             Links = page.Links;
+            EnhancementLinks = page.EnhancementLinks;
             // Update enhancements with new ones
             for (int i = 0; i < EnhancementData.Length; i++)
             {
