@@ -196,20 +196,30 @@ namespace TtxFromTS.Output
                 }
             }
             // Set the page header template from the header in the initial page, or if there isn't one use the default
+            StringBuilder headerTemplateBuilder = new StringBuilder();
             string headerTemplate;
             if (initialPage != null)
             {
                 // Decode the header from the initial page
-                byte[] decodedHeader = new byte[initialPage.Rows[0].Length - 8];
                 for (int i = 8; i < initialPage.Rows[0].Length; i++)
                 {
-                    decodedHeader[i - 8] = Decode.OddParity(initialPage.Rows[0][i]);
+                    // Decode the character, and if the hex code for the character is 0x20 or greater output it as is, otherwise add 0x40 and prefix it with an escape (0x1b)
+                    byte decodedChar = Decode.OddParity(initialPage.Rows[0][i]);
+                    if (decodedChar >= 0x20)
+                    {
+                        headerTemplateBuilder.Append(Encoding.ASCII.GetString(new byte[] { decodedChar }));
+                    }
+                    else
+                    {
+                        headerTemplateBuilder.Append(Encoding.ASCII.GetString(new byte[] { 0x1b }));
+                        headerTemplateBuilder.Append(Encoding.ASCII.GetString(new byte[] { (byte)(decodedChar + 0x40) }));
+                    }
                 }
-                headerTemplate = Encoding.ASCII.GetString(decodedHeader);
+                headerTemplate = headerTemplateBuilder.ToString();
                 // Replace the page number in header with the number placeholder
                 headerTemplate = headerTemplate.Replace(initialPage.Magazine.ToString() + initialPage.Number, "%%#");
                 // Get the header clock
-                string headerClock = headerTemplate.Substring(24);
+                string headerClock = headerTemplate.Substring(headerTemplate.Length - 8);
                 // Check the header clock is actually a clock (i.e. it doesn't contain text), and process it if it is
                 if (headerClock.All(x => !char.IsLetter(x)))
                 {
@@ -257,7 +267,7 @@ namespace TtxFromTS.Output
                         }
                     }
                     // Replace the clock in the header with the placeholder
-                    headerTemplate = headerTemplate.Substring(0, 24) + clockPlaceholder;
+                    headerTemplate = headerTemplate.Substring(0, headerTemplate.Length - 8) + clockPlaceholder;
                 }
             }
             else
