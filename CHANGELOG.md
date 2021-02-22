@@ -14,6 +14,7 @@ Release Notes
 * **IMPROVED:** The code has been significantly refactored for improved readability
 * **FIXED:** Out of bounds crash that occurred while decoding enhancement packets
 * **FIXED:** Incorrect processing of header clock if it contained text
+* **FIXED:** Selection of the initial page when setting the header template
 
 1.2.1
 -----

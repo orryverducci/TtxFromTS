@@ -181,18 +181,18 @@ namespace TtxFromTS.Output
             {
                 int magazineNumber = int.Parse(_teletextDecoder.InitialPage.Substring(0, 1));
                 Magazine magazine = _teletextDecoder.Magazine[magazineNumber - 1];
-                Carousel? carousel = magazine.Pages.Find(x => x.Number == _teletextDecoder.InitialPage);
+                Carousel? carousel = magazine.Pages.Find(x => x.Number == _teletextDecoder.InitialPage.Substring(1));
                 if (carousel != null)
                 {
-                    initialPage = carousel.Pages.First();
+                    initialPage = carousel.Pages.OrderBy(x => int.Parse(x.Subcode, System.Globalization.NumberStyles.HexNumber)).First();
                 }
             }
             if (initialPage == null)
             {
-                Carousel carousel = _teletextDecoder.Magazine[0].Pages.First();
+                Carousel carousel = _teletextDecoder.Magazine[0].Pages.OrderBy(x => int.Parse(x.Number, System.Globalization.NumberStyles.HexNumber)).First();
                 if (carousel != null)
                 {
-                    initialPage = carousel.Pages.First();
+                    initialPage = carousel.Pages.OrderBy(x => int.Parse(x.Subcode, System.Globalization.NumberStyles.HexNumber)).First();
                 }
             }
             // Set the page header template from the header in the initial page, or if there isn't one use the default
