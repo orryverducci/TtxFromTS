@@ -85,7 +85,7 @@ namespace TtxFromTS
                     packetID = GetTeletextPIDFromServiceID(fileStream, pmtPID);
                     if (packetID == -1)
                     {
-                        Logger.OutputError($"Unable to teltext service associated with service ID {Options.ServiceIdentifier!}");
+                        Logger.OutputError($"Unable to find teletext service associated with service ID {Options.ServiceIdentifier!}");
                         return (int)ExitCodes.TeletextPIDNotFound;
                     }
                 }
