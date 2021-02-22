@@ -36,10 +36,19 @@ namespace TtxFromTS.DVB
                         continue;
                     }
                     ServiceDescriptor? serviceDescriptor = (ServiceDescriptor?)serviceInfo.Descriptors.Find(x => x.DescriptorTag == 0x48);
+                    string serviceName = string.Empty;
+                    try
+                    {
+                        if (serviceDescriptor != null)
+                        {
+                            serviceName = serviceDescriptor.ServiceName.ToString();
+                        }
+                    }
+                    catch {}
                     Service service = new Service
                     {
                         PID = serviceInfo.ServiceId,
-                        Name = serviceDescriptor != null ? serviceDescriptor.ServiceName.ToString() : string.Empty
+                        Name = serviceName
                     };
                     services.Add(service);
                 }
