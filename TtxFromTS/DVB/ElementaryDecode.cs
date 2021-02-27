@@ -45,12 +45,12 @@ namespace TtxFromTS.DVB
             // Increase offset by 1 to the start of the first teletext data unit
             teletextPacketOffset++;
             // Loop through each teletext data unit within the PES
-            while (teletextPacketOffset < elementaryStreamPacket.PesPacketLength)
+            while (teletextPacketOffset < elementaryStreamPacket.Data.Length)
             {
                 // Get length of data unit
                 int dataUnitLength = elementaryStreamPacket.Data[teletextPacketOffset + 1];
                 // Check the data unit length doesn't exceed the PES length, and exit the loop if it does (assumed it is corrupted)
-                if (dataUnitLength > elementaryStreamPacket.PesPacketLength - teletextPacketOffset)
+                if (dataUnitLength > elementaryStreamPacket.Data.Length - teletextPacketOffset + 2)
                 {
                     Logger.OutputWarning("Skipping data unit with invalid length");
                     break;
