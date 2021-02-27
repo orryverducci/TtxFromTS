@@ -49,6 +49,12 @@ namespace TtxFromTS.DVB
             {
                 // Get length of data unit
                 int dataUnitLength = elementaryStreamPacket.Data[teletextPacketOffset + 1];
+                // Check the data unit length doesn't exceed the PES length, and exit the loop if it does (assumed it is corrupted)
+                if (dataUnitLength > elementaryStreamPacket.PesPacketLength - teletextPacketOffset)
+                {
+                    Logger.OutputWarning("Skipping data unit with invalid length");
+                    break;
+                }
                 // Check data unit contains non-subtitle teletext data, or contains subtitles teletext data if subtitles are enabled, otherwise ignore
                 if (elementaryStreamPacket.Data[teletextPacketOffset] == 0x02 || (decodeSubtitles && elementaryStreamPacket.Data[teletextPacketOffset] == 0x03))
                 {

@@ -15,6 +15,7 @@ Release Notes
 * **FIXED:** Out of bounds crash that occurred while decoding enhancement packets
 * **FIXED:** Incorrect processing of header clock if it contained text
 * **FIXED:** Selection of the initial page when setting the header template
+* **FIXED:** Error when an invalid data unit length is encountered
 
 1.2.1
 -----
