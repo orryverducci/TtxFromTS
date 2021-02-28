@@ -8,6 +8,11 @@ namespace TtxFromTS.Output
     {
         #region Private Fields
         /// <summary>
+        /// The T42 file path.
+        /// </summary>
+        private string _filePath;
+        
+        /// <summary>
         /// The binary file writer.
         /// </summary>
         private readonly BinaryWriter _binaryWriter;
@@ -48,14 +53,14 @@ namespace TtxFromTS.Output
         public T42Output()
         {
             // Set output file path
-            string filePath = string.IsNullOrEmpty(Program.Options.OutputPath) ? Path.ChangeExtension(Program.Options.InputFile!.FullName, "t42") : Program.Options.OutputPath;
+            _filePath = string.IsNullOrEmpty(Program.Options.OutputPath) ? Path.ChangeExtension(Program.Options.InputFile!.FullName, "t42") : Program.Options.OutputPath;
             // If the file already exists throw an exception
-            if (File.Exists(filePath))
+            if (File.Exists(_filePath))
             {
-                throw new Exception($"{filePath} already exists");
+                throw new Exception($"{_filePath} already exists");
             }
             // Setup the T42 file stream writer
-            _binaryWriter = new BinaryWriter(File.Open(filePath, FileMode.Create));
+            _binaryWriter = new BinaryWriter(File.Open(_filePath, FileMode.Create));
         }
         #endregion
 
@@ -75,7 +80,16 @@ namespace TtxFromTS.Output
         /// <summary>
         /// Finalise the output, closing the file writer.
         /// </summary>
-        public void FinishOutput() => _binaryWriter.Dispose();
+        public void FinishOutput()
+        {
+            // Finish writing the file
+            _binaryWriter.Dispose();
+            // If no packets were output, delete the file
+            if (_packetCount == 0)
+            {
+                File.Delete(_filePath);
+            }
+        }
         #endregion
     }
 }
