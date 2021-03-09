@@ -57,12 +57,18 @@ namespace TtxFromTS.DVB
             // Create a list of TS packets to return
             List<TsPacket> tsPackets = new List<TsPacket>();
             // Get packets from the data
-            TsPacket[] decodedTsPackets = _packetFactory.GetTsPacketsFromData(data);
+            TsPacket[]? decodedTsPackets = _packetFactory.GetTsPacketsFromData(data);
+            // Return empty list if no packets were decoded
+            if (decodedTsPackets == null)
+            {
+                return tsPackets;
+            }
             // For each TS packet decoded increase the packet counters and add it to the list of packets to be returned if the packet is from the specified packet ID
             foreach (TsPacket packet in decodedTsPackets)
             {
+                // Increase the received packet counter
                 PacketsReceived++;
-                // If the packet is free from errors, not encrypted and from the right packet ID, add it to the list of packets to be returned
+                // If the packet is free from errors and from the right packet ID, add it to the list of packets to be returned
                 if (packet.TransportErrorIndicator)
                 {
                     if (!_errorWarning)
@@ -71,18 +77,19 @@ namespace TtxFromTS.DVB
                         _errorWarning = true;
                     }
                 }
-                else if (packet.ScramblingControl != 0)
+                else if (PacketID == -1 || packet.Pid == PacketID)
                 {
-                    if (!_encryptedWarning)
+                    // Add the packet if it is not encrypted, otherwise output warning
+                    if (packet.ScramblingControl == 0)
+                    {
+                        PacketsDecoded++;
+                        tsPackets.Add(packet);
+                    }
+                    else if (!_encryptedWarning)
                     {
                         Logger.OutputWarning("The specified packet ID contains encrypted packets which will be ignored");
                         _encryptedWarning = true;
                     }
-                }
-                else if (PacketID == -1 || packet.Pid == PacketID)
-                {
-                    PacketsDecoded++;
-                    tsPackets.Add(packet);
                 }
             }
             // Return the decoded elementary stream packets

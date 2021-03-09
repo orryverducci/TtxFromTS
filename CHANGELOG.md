@@ -17,6 +17,8 @@ Release Notes
 * **FIXED:** Selection of the initial page when setting the header template
 * **FIXED:** Error when an invalid data unit length is encountered
 * **FIXED:** Invalid packet warnings when teletext subtitle packets are encountered while subtitles are disabled
+* **FIXED:** Null reference error triggered by some transport streams
+* **FIXED:** Encrypted packet warnings on unencrypted services
 
 1.2.1
 -----
