@@ -291,8 +291,8 @@ namespace TtxFromTS
                         Pes? pesPacket = pesFactory.DecodePesFromTsPacket(tsPacket);
                         if (pesPacket != null)
                         {
-                            List<Packet> teletextPackets = ElementaryDecode.DecodeTeletextPacket(pesPacket, Options.IncludeSubtitles);
-                            if (teletextPackets.Count > 0)
+                            List<Packet>? teletextPackets = ElementaryDecode.DecodeTeletextPacket(pesPacket, Options.IncludeSubtitles);
+                            if (teletextPackets != null)
                             {
                                 foreach (Packet teletextPacket in teletextPackets)
                                 {

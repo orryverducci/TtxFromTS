@@ -16,6 +16,7 @@ Release Notes
 * **FIXED:** Incorrect processing of header clock if it contained text
 * **FIXED:** Selection of the initial page when setting the header template
 * **FIXED:** Error when an invalid data unit length is encountered
+* **FIXED:** Invalid packet warnings when teletext subtitle packets are encountered while subtitles are disabled
 
 1.2.1
 -----

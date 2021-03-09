@@ -15,15 +15,13 @@ namespace TtxFromTS.DVB
         /// </summary>
         /// <param name="elementaryStreamPacket">The elementary stream packet to decode teletext packets from.</param>
         /// <param name="decodeSubtitles">True if teletext subtitles packets should be decoded, false if not.</param>
-        /// <returns>A list of teletext packets.</returns>
-        public static List<Packet> DecodeTeletextPacket(Pes elementaryStreamPacket, bool decodeSubtitles)
+        /// <returns>A list of teletext packets, or null if the elementary stream packet is not for a teletext service.</returns>
+        public static List<Packet>? DecodeTeletextPacket(Pes elementaryStreamPacket, bool decodeSubtitles)
         {
-            // Create a list of teletext packets to return
-            List<Packet> packets = new List<Packet>();
             // Check the PES is a private stream packet
             if (elementaryStreamPacket.StreamId != (byte)PesStreamTypes.PrivateStream1)
             {
-                return packets;
+                return null;
             }
             // Set offset in bytes for teletext packet data
             int teletextPacketOffset;
@@ -40,10 +38,12 @@ namespace TtxFromTS.DVB
             // Check the data identifier is within the range for EBU teletext
             if (elementaryStreamPacket.Data[teletextPacketOffset] < 0x10 || elementaryStreamPacket.Data[teletextPacketOffset] > 0x1F)
             {
-                return packets;
+                return null;
             }
             // Increase offset by 1 to the start of the first teletext data unit
             teletextPacketOffset++;
+            // Create a list of teletext packets to return
+            List<Packet> packets = new List<Packet>();
             // Loop through each teletext data unit within the PES
             while (teletextPacketOffset < elementaryStreamPacket.Data.Length)
             {
