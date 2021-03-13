@@ -26,7 +26,14 @@ namespace TtxFromTS.DVB
             // If the TS packet is the start of a PES, create a new elementary stream packet
             if (packet.PayloadUnitStartIndicator)
             {
-                _elementaryStreamPacket = new Pes(packet);
+                try
+                {
+                    _elementaryStreamPacket = new Pes(packet);
+                }
+                catch
+                {
+                    _elementaryStreamPacket = null;
+                }
             }
             // If we have an elementary stream packet, add the packet and decode the PES if it is complete
             if (_elementaryStreamPacket != null)
