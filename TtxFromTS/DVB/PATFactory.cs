@@ -1,6 +1,6 @@
 using System;
-using Cinegy.TsDecoder.TransportStream;
 using Cinegy.TsDecoder.Tables;
+using Cinegy.TsDecoder.TransportStream;
 
 namespace TtxFromTS.DVB
 {
