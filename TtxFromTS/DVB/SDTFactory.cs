@@ -44,7 +44,7 @@ namespace TtxFromTS.DVB
                             serviceName = serviceDescriptor.ServiceName.ToString();
                         }
                     }
-                    catch {}
+                    catch { }
                     Service service = new Service
                     {
                         PID = serviceInfo.ServiceId,

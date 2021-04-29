@@ -176,7 +176,7 @@ namespace TtxFromTS.DVB
                         SourceBufferIndex = start
                     };
 
-                    if(preserveSourceData)
+                    if (preserveSourceData)
                     {
                         tsPacket.SourceData = new byte[TsPacketFixedSize];
                         Buffer.BlockCopy(data, start, tsPacket.SourceData, 0, TsPacketFixedSize);
@@ -210,7 +210,7 @@ namespace TtxFromTS.DVB
                                 start += TsPacketFixedSize;
                                 continue;
                             }
-                            
+
                             if (tsPacket.AdaptationField.PcrFlag && tsPacket.AdaptationField.FieldSize > 0)
                             {
                                 //Packet has PCR
@@ -229,7 +229,7 @@ namespace TtxFromTS.DVB
                                 uint iLow = (uint)((data[start + 10] & 1) << 8) + data[start + 11];
                                 tsPacket.AdaptationField.Pcr += iLow;
 
-                                if (_lastPcr == 0) 
+                                if (_lastPcr == 0)
                                 {
                                     _lastPcr = tsPacket.AdaptationField.Pcr;
                                 }
@@ -305,7 +305,7 @@ namespace TtxFromTS.DVB
                 {
                     //we have 'residual' data to carry over to next call
                     _residualData = new byte[dataSize - start];
-                    Buffer.BlockCopy(data,start,_residualData,0, dataSize - start);
+                    Buffer.BlockCopy(data, start, _residualData, 0, dataSize - start);
                 }
 
                 return tsPackets;

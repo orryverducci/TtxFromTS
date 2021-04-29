@@ -11,7 +11,7 @@ namespace TtxFromTS.Output
         /// The T42 file path.
         /// </summary>
         private string _filePath;
-        
+
         /// <summary>
         /// The binary file writer.
         /// </summary>

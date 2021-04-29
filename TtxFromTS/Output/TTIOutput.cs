@@ -232,7 +232,7 @@ namespace TtxFromTS.Output
                     for (int i = 0; i < clockSegments.Length; i++)
                     {
                         // If segments is digits, set the placeholder, otherwise use segment text
-                        if(clockSegments[i].All(x => char.IsDigit(x)))
+                        if (clockSegments[i].All(x => char.IsDigit(x)))
                         {
                             // If segment is a valid format set the placeholder, otherwise use segment text
                             if (clockSegments[i].Length == 2 && clockPosition < 3)

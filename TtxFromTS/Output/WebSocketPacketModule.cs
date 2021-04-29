@@ -12,7 +12,7 @@ namespace TtxFromTS.Output
         /// <summary>
         /// Initialises a new instance of the <see cref="T:TtxFromTS.Output.WebSocketPacketModule"/> class.
         /// </summary>
-        public WebSocketPacketModule(string urlPath) : base(urlPath, true) {}
+        public WebSocketPacketModule(string urlPath) : base(urlPath, true) { }
 
         /// <summary>
         /// Handles messages received from a client.
