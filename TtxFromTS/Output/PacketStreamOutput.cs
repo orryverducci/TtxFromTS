@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TtxFromTS.Teletext;
 
 namespace TtxFromTS.Output
