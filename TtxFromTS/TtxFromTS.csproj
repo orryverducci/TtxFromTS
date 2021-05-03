@@ -14,6 +14,8 @@
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64;osx-x64;linux-x64;linux-arm</RuntimeIdentifiers>
     <PublishSingleFile>true</PublishSingleFile>
     <PublishTrimmed>true</PublishTrimmed>
+    <DebugType>None</DebugType>
+    <DebugSymbols>False</DebugSymbols>
   </PropertyGroup>
   
   <ItemGroup>
