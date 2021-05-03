@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Install dotnet-format
         run: dotnet tool install -g dotnet-format
-      - name: name: Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v2
       - name: Add dotnet-format problem matcher
         uses: xt0rted/dotnet-format-problem-matcher@v1
