@@ -1,80 +1,16 @@
-name: TtxFromTS Continuous Integration
+name: Continuous Integration
 
 on:
   push:
-    branches: [ next ]
+    branches: [ main ]
     paths:
     - 'TtxFromTS/**'
   pull_request:
-    branches: [ next ]
+    branches: [ main ]
 
 jobs:
-  windows-x64-build:
-    name: Windows x64 build
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-    - name: Build
-      run: dotnet publish --runtime win-x64 --configuration Release
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: win-x64
-        path: TtxFromTS/bin/Release/net5.0/win-x64/publish
-  windows-x86-build:
-    name: Windows x86 build
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-    - name: Build
-      run: dotnet publish --runtime win-x86 --configuration Release
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: win-x86
-        path: TtxFromTS/bin/Release/net5.0/win-x86/publish
-  windows-arm-build:
-    name: Windows ARM build
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-    - name: Build
-      run: dotnet publish --runtime win-arm64 --configuration Release
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: win-arm64
-        path: TtxFromTS/bin/Release/net5.0/win-arm64/publish
-  macos-build:
-    name: macOS build
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-    - name: Build
-      run: dotnet publish --runtime osx-x64 --configuration Release
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: macos-x64
-        path: TtxFromTS/bin/Release/net5.0/osx-x64/publish
-  linux-x64-build:
-    name: Linux x64 build
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -83,25 +19,4 @@ jobs:
       with:
         dotnet-version: '5.0.x'
     - name: Build
-      run: dotnet publish --runtime linux-x64 --configuration Release
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: linux-x64
-        path: TtxFromTS/bin/Release/net5.0/linux-x64/publish
-  linux-arm-build:
-    name: Linux ARM build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-    - name: Build
-      run: dotnet publish --runtime linux-arm --configuration Release
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: linux-arm
-        path: TtxFromTS/bin/Release/net5.0/linux-arm/publish
+      run: dotnet build
