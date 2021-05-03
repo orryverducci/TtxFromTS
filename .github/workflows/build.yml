@@ -20,3 +20,15 @@ jobs:
         dotnet-version: '5.0.x'
     - name: Build
       run: dotnet build
+  dotnet-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+      - uses: actions/checkout@v2
+      - name: Add dotnet-format problem matcher
+        uses: xt0rted/dotnet-format-problem-matcher@v1
+      - name: Run dotnet format
+        uses: xt0rted/dotnet-format@v1
+        with:
+          only-changed-files: "true"
