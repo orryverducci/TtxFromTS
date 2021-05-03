@@ -1,6 +1,4 @@
-<h1 align="center">TtxFromTS</h1>
-
-<p align="center"></p>
+<h1 align="center"><img alt="TtxFromTS" style="width: 100%; max-width: 500px;" src="https://raw.githubusercontent.com/orryverducci/TtxFromTS/main/logo.png"/></h1>
 
 TtxFromTS is a command line utility which decodes teletext services from a recorded DVB MPEG transport stream file. It can output decoded services as TTI or T42 files, or as a stream of Teletext packets to standard out or a web socket. TTI files are compatible with [vbit2](https://github.com/peterkvt80/vbit2).
 
