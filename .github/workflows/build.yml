@@ -13,7 +13,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -21,11 +22,13 @@ jobs:
     - name: Build
       run: dotnet build
   dotnet-format:
+    name: Formatting Check
     runs-on: ubuntu-latest
     steps:
       - name: Install dotnet-format
         run: dotnet tool install -g dotnet-format
-      - uses: actions/checkout@v2
+      - name: name: Checkout repository
+        uses: actions/checkout@v2
       - name: Add dotnet-format problem matcher
         uses: xt0rted/dotnet-format-problem-matcher@v1
       - name: Run dotnet format

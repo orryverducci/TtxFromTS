@@ -25,7 +25,8 @@ jobs:
     needs: commit-check
     if: ${{ needs.commit-check.outputs.should-run != 'false' }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -43,7 +44,8 @@ jobs:
     needs: commit-check
     if: ${{ needs.commit-check.outputs.should-run != 'false' }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -61,7 +63,8 @@ jobs:
     needs: commit-check
     if: ${{ needs.commit-check.outputs.should-run != 'false' }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -79,7 +82,8 @@ jobs:
     needs: commit-check
     if: ${{ needs.commit-check.outputs.should-run != 'false' }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -97,7 +101,8 @@ jobs:
     needs: commit-check
     if: ${{ needs.commit-check.outputs.should-run != 'false' }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -115,7 +120,8 @@ jobs:
     needs: commit-check
     if: ${{ needs.commit-check.outputs.should-run != 'false' }}
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
