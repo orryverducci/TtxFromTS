@@ -44,6 +44,6 @@ Global
 		$3.scope = text/x-csharp
 		$0.StandardHeader = $4
 		$0.VersionControlPolicy = $5
-		version = 1.2
+		version = 2.0
 	EndGlobalSection
 EndGlobal
