@@ -1,0 +1,123 @@
+name: Automatic Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  windows-x64-build:
+    name: Windows x64 build
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - name: Build
+      run: dotnet publish --runtime win-x64 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x64
+        path: TtxFromTS/bin/Release/net5.0/win-x64/publish
+  windows-x86-build:
+    name: Windows x86 build
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - name: Build
+      run: dotnet publish --runtime win-x86 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x86
+        path: TtxFromTS/bin/Release/net5.0/win-x86/publish
+  windows-arm-build:
+    name: Windows ARM build
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - name: Build
+      run: dotnet publish --runtime win-arm64 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-arm64
+        path: TtxFromTS/bin/Release/net5.0/win-arm64/publish
+  macos-build:
+    name: macOS build
+    runs-on: macos-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - name: Build
+      run: dotnet publish --runtime osx-x64 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos-x64
+        path: TtxFromTS/bin/Release/net5.0/osx-x64/publish
+  linux-x64-build:
+    name: Linux x64 build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - name: Build
+      run: dotnet publish --runtime linux-x64 --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-x64
+        path: TtxFromTS/bin/Release/net5.0/linux-x64/publish
+  linux-arm-build:
+    name: Linux ARM build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - name: Build
+      run: dotnet publish --runtime linux-arm --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-arm
+        path: TtxFromTS/bin/Release/net5.0/linux-arm/publish
+  create-release:
+    name: Release Application
+    runs-on: ubuntu-latest
+    needs: [windows-x64-build, windows-x86-build, windows-arm-build, macos-build, linux-x64-build, linux-arm-build]
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+    - name: Create Release
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        prerelease: false
+        files: */*.zip
