@@ -38,6 +38,7 @@ jobs:
       with:
         name: win-x64
         path: TtxFromTS/bin/Release/net5.0/win-x64/publish
+        retention-days: 7
   windows-x86-build:
     name: Windows x86 build
     runs-on: windows-latest
@@ -57,6 +58,7 @@ jobs:
       with:
         name: win-x86
         path: TtxFromTS/bin/Release/net5.0/win-x86/publish
+        retention-days: 7
   windows-arm-build:
     name: Windows ARM build
     runs-on: windows-latest
@@ -76,6 +78,7 @@ jobs:
       with:
         name: win-arm64
         path: TtxFromTS/bin/Release/net5.0/win-arm64/publish
+        retention-days: 7
   macos-build:
     name: macOS build
     runs-on: macos-latest
@@ -95,6 +98,7 @@ jobs:
       with:
         name: macos-x64
         path: TtxFromTS/bin/Release/net5.0/osx-x64/publish
+        retention-days: 7
   linux-x64-build:
     name: Linux x64 build
     runs-on: ubuntu-latest
@@ -114,6 +118,7 @@ jobs:
       with:
         name: linux-x64
         path: TtxFromTS/bin/Release/net5.0/linux-x64/publish
+        retention-days: 7
   linux-arm-build:
     name: Linux ARM build
     runs-on: ubuntu-latest
@@ -133,3 +138,4 @@ jobs:
       with:
         name: linux-arm
         path: TtxFromTS/bin/Release/net5.0/linux-arm/publish
+        retention-days: 7
