@@ -21,7 +21,7 @@ These arguments are available to use:
 * `-i` **(required)** The input transport stream file.
 * `--pid` **(required if service ID not specified)** The packet identifier of the teletext elementary stream to be decoded.
 * `--sid` **(required if packet ID not specified)** The identifier of the television service containing the teletext service to be decoded.
-* `--service-list` Outputs a list of services and their service identifiers. The PID and SID arguments aren't required if this is used.
+* `--list-services` Outputs a list of services and their service identifiers. The PID and SID arguments aren't required if this is used.
 * `--cycle` The cycle time to be used between subpages in seconds. Must be greater than 1 second, defaults to 10 seconds.
 * `--include-subs` Enables decoding of teletext subtitle packets.
 * `--no-config` Disables creation of a vbit2 configuration file when outputting TTI files.
